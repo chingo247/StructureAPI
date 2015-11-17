@@ -1,2 +1,4 @@
 StructureCraft/nb-configuration.xml
 StructureCraft/target/
+/StructureCraft/StructureCraft-Core/target/
+/StructureCraft/StructureCraft-Bukkit/target/
