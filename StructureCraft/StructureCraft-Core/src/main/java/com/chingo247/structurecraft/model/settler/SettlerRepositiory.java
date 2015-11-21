@@ -22,19 +22,19 @@ public class SettlerRepositiory extends BaseSettlerRepository implements ISettle
     }
 
     @Override
-    public Settler findByUUID(UUID uuid) {
+    public SettlerNode findByUUID(UUID uuid) {
         IBaseSettler settler = super.findByUUID(uuid);
         if(settler != null) {
-            return new Settler(settler.getNode());
+            return new SettlerNode(settler.getNode());
         }
         return null;
     }
 
     @Override
-    public Settler findById(Long id) {
+    public SettlerNode findById(Long id) {
         IBaseSettler settler = super.findById(id);
         if(settler != null) {
-            return new Settler(settler.getNode());
+            return new SettlerNode(settler.getNode());
         }
         return null;
     }

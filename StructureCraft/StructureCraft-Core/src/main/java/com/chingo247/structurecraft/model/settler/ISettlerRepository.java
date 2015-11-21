@@ -5,7 +5,6 @@
  */
 package com.chingo247.structurecraft.model.settler;
 
-import com.chingo247.structurecraft.model.settler.Settler;
 import java.util.UUID;
 
 /**
@@ -14,8 +13,8 @@ import java.util.UUID;
  */
 public interface ISettlerRepository {
     
-    public Settler findByUUID(UUID uuid);
+    public SettlerNode findByUUID(UUID uuid);
     
-    public Settler findById(Long id);
+    public SettlerNode findById(Long id);
     
 }

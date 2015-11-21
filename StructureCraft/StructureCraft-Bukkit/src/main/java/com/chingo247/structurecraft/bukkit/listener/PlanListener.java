@@ -19,9 +19,11 @@ package com.chingo247.structurecraft.bukkit.listener;
 import com.chingo247.xplatform.core.AItemStack;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlatform;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
+import com.chingo247.structurecraft.IStructureAPI;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.isStructurePlan;
 import com.chingo247.structurecraft.placing.PlayerPlacePlanAction;
-import com.chingo247.structurecraft.placing.PlayerPlacePlanHandler;
+import com.chingo247.structurecraft.placing.PlayerPlanPlacer;
+import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.BlockVector;
 import java.util.UUID;
 import org.bukkit.Location;
@@ -37,10 +39,11 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 public class PlanListener implements Listener {
 
-    private final PlayerPlacePlanHandler placeHandler;
+    private final PlayerPlanPlacer placeHandler;
 
-    public PlanListener(IEconomyProvider provider) {
-        this.placeHandler = new PlayerPlacePlanHandler(provider);
+    public PlanListener(IStructureAPI structureAPI, IEconomyProvider provider) {
+        Preconditions.checkNotNull(structureAPI, "StructureAPI may not be null");
+        this.placeHandler = new PlayerPlanPlacer(structureAPI, provider);
     }
 
     @EventHandler
@@ -48,8 +51,6 @@ public class PlanListener implements Listener {
         if (pie.getItem() == null) {
             return;
         }
-        
-
         AItemStack stack = BukkitPlatform.wrapItem(pie.getItem());
         if (isStructurePlan(stack)) {
             pie.setCancelled(true);

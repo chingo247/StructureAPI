@@ -18,13 +18,16 @@ package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
 import com.chingo247.structurecraft.construction.ConstructionEntry;
-import com.chingo247.structurecraft.construction.StructureTask;
-import com.chingo247.structurecraft.construction.event.StructureTaskStartEvent;
+import com.chingo247.structurecraft.construction.ICallback;
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
+import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
 import com.chingo247.structurecraft.event.async.StructureJobAddedEvent;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
+import java.util.UUID;
 import org.primesoft.asyncworldedit.AsyncWorldEditMain;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
@@ -37,13 +40,12 @@ import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
  * @author Chingo
  * @param <T> The Options Type
  */
-public class AWEPlacementTask<T extends PlaceOptions> extends StructureTask {
+public class AWEPlacementTask extends StructureBlockPlacingTask {
 
     private final IPlacement placement;
     private final PlayerEntry playerEntry;
     private final Vector position;
     private final EditSession editSession;
-    private final T options;
     private int jobId;
     private final IAsyncWorldEdit asyncWorldEdit;
 
@@ -52,20 +54,19 @@ public class AWEPlacementTask<T extends PlaceOptions> extends StructureTask {
     /**
      * Constructor.
      *
-     * @param action
+     * @param callback
      * @param connstructionEntry The constructionEntry
      * @param placement The placement
-     * @param playerEntry The playerEntry
+     * @param playerOrRandomUUID A player or random UUID used to track the process. Jobs will be queued on this specific UUID.
      * @param editSession The editsession
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, String action, ConstructionEntry connstructionEntry, IPlacement placement, PlayerEntry playerEntry, EditSession editSession, Vector position, T options) {
-        super(action, connstructionEntry, playerEntry.getUUID());
-        this.playerEntry = playerEntry;
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IConstructionEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position, ICallback callback) {
+        super(callback, connstructionEntry, playerOrRandomUUID);
+        this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;
         this.placement = placement;
-        this.options = options;
         this.jobId = -1;
         this.editSession = editSession;
         this.asyncWorldEdit = asyncWorldEdit;
@@ -112,7 +113,7 @@ public class AWEPlacementTask<T extends PlaceOptions> extends StructureTask {
         }
         );
         
-        p.place(editSession, position, options);
+        p.place(editSession, position, getOptions() != null ? getOptions() : new PlaceOptions());
     }
 
     @Override

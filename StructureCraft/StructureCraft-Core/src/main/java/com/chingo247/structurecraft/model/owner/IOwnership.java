@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.model.owner;
 
-import com.chingo247.structurecraft.model.settler.Settler;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -30,7 +30,7 @@ public interface IOwnership {
      * Gets the owner
      * @return The owner
      */
-    public Settler getOwner();
+    public SettlerNode getOwner();
     
     /**
      * Gets the ownership type

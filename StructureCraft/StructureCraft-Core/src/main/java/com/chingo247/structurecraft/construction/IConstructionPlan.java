@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.options.Traversal;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import java.util.UUID;
@@ -56,4 +57,9 @@ public interface IConstructionPlan {
     boolean isReversed();
     
     boolean isForced();
+    
+    Traversal getStructureTraversal();
+    
+    PlaceOptions getOptions();
+    
 }

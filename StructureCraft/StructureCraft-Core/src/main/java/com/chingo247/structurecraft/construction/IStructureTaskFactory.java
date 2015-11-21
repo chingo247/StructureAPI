@@ -36,7 +36,7 @@ public interface IStructureTaskFactory {
      * @return The structure task
      * @throws Exception 
      */
-    public StructureTask build(EditSession session, UUID player, Structure structure) throws StructureException;
+    public StructureBlockPlacingTask build(EditSession session, UUID player, Structure structure) throws StructureException;
     
     /**
      * Creates a task that will build the structure
@@ -47,7 +47,7 @@ public interface IStructureTaskFactory {
      * @return The structure task
      * @throws Exception 
      */
-    public StructureTask build(EditSession session, UUID player, Structure structure, PlaceOptions options) throws StructureException;
+    public StructureBlockPlacingTask build(EditSession session, UUID player, Structure structure, PlaceOptions options) throws StructureException;
     
     /**
      * Creates a task that will demolish the structure. After the structure is demolished the structure will be removed
@@ -58,7 +58,7 @@ public interface IStructureTaskFactory {
      * @return The structure task
      * @throws Exception 
      */
-    public StructureTask demolish(EditSession session, UUID player, Structure structure) throws StructureException;
+    public StructureBlockPlacingTask demolish(EditSession session, UUID player, Structure structure) throws StructureException;
     
     /**
      * Creates a task that will demolish the structure. After the structure is demolished the structure will be removed.
@@ -71,7 +71,7 @@ public interface IStructureTaskFactory {
      * @return The structure task
      * @throws Exception 
      */
-    public StructureTask demolish(EditSession session, UUID player, Structure structure, PlaceOptions options) throws StructureException;
+    public StructureBlockPlacingTask demolish(EditSession session, UUID player, Structure structure, PlaceOptions options) throws StructureException;
     
 
     

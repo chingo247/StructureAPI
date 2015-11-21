@@ -16,14 +16,10 @@
  */
 package com.chingo247.structurecraft.model.plot;
 
-import com.chingo247.settlercraft.core.model.WorldNode;
-import com.chingo247.structurecraft.model.RelTypes;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 
 /**
  *
@@ -47,23 +43,11 @@ public class Plot implements IPlot {
     public Plot(Node node) {
         this(new PlotNode(node));
     }
-    
-    public WorldNode getWorldNode() {
-        Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
-        for(Relationship rel : rels) {
-            if(rel.getOtherNode(underlyingNode).hasLabel(WorldNode.label())) {
-                WorldNode worldNode = new WorldNode(rel.getOtherNode(underlyingNode));
-                return worldNode;
-            }
-        }
-        return null;
-    }
-    
-    @Override
-    public Node getNode() {
+
+    public Node getUnderlyingNode() {
         return underlyingNode;
     }
-
+    
     @Override
     public Vector getMin() {
         return min;

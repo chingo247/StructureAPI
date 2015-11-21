@@ -36,16 +36,14 @@ public class SchematicDataNode implements ISchematicData {
     public static final String NAME_PROPERTY = "name";
     public static final String LAST_IMPORT = "lastImport";
     
-    
     private final Node underlyingNode;
 
-    @Override
-    public Node getNode() {
-        return underlyingNode;
-    }
-    
     public SchematicDataNode(Node node) {
         this.underlyingNode = node;
+    }
+    
+    public Node getUnderlyingNode() {
+        return underlyingNode;
     }
     
     @Override

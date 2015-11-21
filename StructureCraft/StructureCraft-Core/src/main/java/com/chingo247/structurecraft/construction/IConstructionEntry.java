@@ -17,7 +17,7 @@ public interface IConstructionEntry {
     
     IStructure getStructure();
     
-    void addTask(StructureTask structureTask);
+    void addTask(StructureBlockPlacingTask structureTask);
     
     void proceed();
     

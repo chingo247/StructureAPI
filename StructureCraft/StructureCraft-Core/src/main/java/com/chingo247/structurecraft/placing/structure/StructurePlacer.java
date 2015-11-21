@@ -6,22 +6,22 @@
 package com.chingo247.structurecraft.placing.structure;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structurecraft.event.StructureCreateEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;
 import com.chingo247.structurecraft.model.owner.Ownership;
 import com.chingo247.structurecraft.model.settler.ISettlerRepository;
-import com.chingo247.structurecraft.model.settler.Settler;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.model.settler.SettlerRepositiory;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
-import com.chingo247.structurecraft.model.world.IStructureWorld;
 import com.chingo247.structurecraft.model.world.IStructureWorldRepository;
+import com.chingo247.structurecraft.model.world.StructureWorldNode;
 import com.chingo247.structurecraft.model.world.StructureWorldRepository;
 import com.chingo247.structurecraft.placement.interfaces.FilePlacement;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
@@ -167,11 +167,16 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
             try {
                 tx = graph.beginTx();
                 monitor.enter();
+                
+                
 
                 // Set parent if applicable
                 IStructureRepository structureRepository = new StructureRepository(graph);
+                StructureNode parentNode = null;
                 if (parent == null) {
-                    parent = structureRepository.findStructureOnPosition(world.getUUID(), position);
+                    parentNode = structureRepository.findStructureOnPosition(world.getUUID(), position);
+                } else {
+                    parentNode = structureRepository.findById(parent.getId());
                 }
 
                 // No parent, check overlap globally
@@ -182,7 +187,6 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
 
                     // Check parent - In parent only if applicable
                 } else {
-                    StructureNode parentNode = new StructureNode(parent.getNode());
                     
                     if(placer != null && checkOwnerRestriction) {
                         Ownership ownership = parentNode.getOwnerDomain().getOwnership(placer);
@@ -208,25 +212,24 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 );
                 
                 // Add structure to parent if applicable
-                if(parent != null) {
-                    StructureNode parentNode = new StructureNode(parent.getNode());
+                if(parentNode != null) {
                     parentNode.addSubstructure(structureNode);
                 }
                 
                 // Add structure to the world
                 IStructureWorldRepository worldRepository = new StructureWorldRepository(graph);
-                IStructureWorld sructureWorld = worldRepository.addOrGet(world.getName(), world.getUUID());
+                StructureWorldNode sructureWorld = worldRepository.addOrGet(world.getName(), world.getUUID());
                 sructureWorld.addStructure(structureNode);
                 
                 
                 // Set ownerships...
                 ISettlerRepository settlerRepository = new SettlerRepositiory(graph);
-                OwnerDomain ownerDomain = structureNode.getOwnerDomain();
+                OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 
                 // Set placer as MASTER owner
                 Set<UUID> added = Sets.newHashSet();
                 if(placer != null) {
-                    Settler settler = settlerRepository.findByUUID(placer);
+                    SettlerNode settler = settlerRepository.findByUUID(placer);
                     ownerDomain.setOwnership(settler, OwnerType.MASTER);
                     added.add(placer);
                 }
@@ -235,7 +238,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 if(inheritOwnership) {
                     if(parent != null) {
                         for(Ownership ownership : ownerDomain.getOwnerships()) {
-                            Settler parentOwner = ownership.getOwner();
+                            SettlerNode parentOwner = ownership.getOwner();
                             OwnerType type = ownership.getOwnerType();
                             ownerDomain.setOwnership(parentOwner, type);
                             added.add(parentOwner.getUniqueId());
@@ -246,7 +249,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 // Add Masters
                 for(UUID playerUUID : getMasters()) {
                     if(!added.contains(playerUUID)) {
-                        Settler settler = settlerRepository.findByUUID(playerUUID);
+                        SettlerNode settler = settlerRepository.findByUUID(playerUUID);
                         ownerDomain.setOwnership(settler, OwnerType.MASTER);
                     }
                 }
@@ -254,7 +257,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 // Add Owners
                 for(UUID playerUUID : getOwners()) {
                     if(!added.contains(playerUUID)) {
-                        Settler settler = settlerRepository.findByUUID(playerUUID);
+                        SettlerNode settler = settlerRepository.findByUUID(playerUUID);
                         ownerDomain.setOwnership(settler, OwnerType.OWNER);
                     }
                 }
@@ -262,7 +265,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 // Add Members
                 for(UUID playerUUID : getMembers()) {
                     if(!added.contains(playerUUID)) {
-                        Settler settler = settlerRepository.findByUUID(playerUUID);
+                        SettlerNode settler = settlerRepository.findByUUID(playerUUID);
                         ownerDomain.setOwnership(settler, OwnerType.MEMBER);
                     }
                 }
@@ -272,8 +275,9 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 if(callback != null) {
                     callback.onCreate(structure);
                 }
-                placeResult.setStructure(structure);
                 
+                placeResult.setStructure(structure);
+                structureAPI.getEventDispatcher().post(new StructureCreateEvent(structure));
             } catch (StructureException ex) {
                 if (tx != null) {
                     tx.failure();

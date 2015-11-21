@@ -9,7 +9,7 @@ import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.settlercraft.core.model.WorldNode;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.plot.PlotNode;
-import com.chingo247.structurecraft.model.settler.Settler;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.Vector;
@@ -203,7 +203,7 @@ public class StructureRepository implements IStructureRepository {
 
         Map<String, Object> params = Maps.newHashMap();
         params.put("settlerUUID", settlerUUID.toString());
-        String query = "MATCH (settler:" + Settler.LABEL + " { " + Settler.ID_PROPERTY + ": {settlerUUID} })"
+        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.ID_PROPERTY + ": {settlerUUID} })"
                 + " WITH settler "
                 + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(structure:" + StructureNode.LABEL + ")"
                 + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
@@ -288,14 +288,14 @@ public class StructureRepository implements IStructureRepository {
 
     @Override
     public boolean hasStructuresWithin(UUID worldUUID, CuboidRegion region) {
-        return !findStructuresWithin(worldUUID, region, 1).iterator().hasNext();
+        return findStructuresWithin(worldUUID, region, 1).iterator().hasNext();
     }
 
     @Override
     public int countStructuresOfSettler(UUID settlerUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("settlerUUID", settlerUUID.toString());
-        String query = "MATCH (settler:" + Settler.LABEL + " { " + Settler.ID_PROPERTY + ": {settlerUUID} })"
+        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.ID_PROPERTY + ": {settlerUUID} })"
                 + " WITH settler "
                 + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(structure:" + StructureNode.LABEL + ")"
                 + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
@@ -318,7 +318,7 @@ public class StructureRepository implements IStructureRepository {
     public int countStructuresWithinWorld(UUID worldUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldUUID", worldUUID.toString());
-        String query = "MATCH (world:" + Settler.LABEL + " { " + WorldNode.ID_PROPERTY + ": {worldUUID} })"
+        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + WorldNode.ID_PROPERTY + ": {worldUUID} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(structure:" + StructureNode.LABEL + ")"
                 + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()

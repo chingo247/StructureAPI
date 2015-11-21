@@ -9,9 +9,9 @@ import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.settlercraft.core.model.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
 import com.chingo247.structurecraft.model.RelTypes;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.plot.PlotNode;
-import com.chingo247.structurecraft.model.world.StructureWorld;
+import com.chingo247.structurecraft.model.world.StructureWorldNode;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
@@ -43,7 +43,7 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
  *
  * @author Chingo
  */
-public class StructureNode extends PlotNode implements IStructure {
+public class StructureNode extends PlotNode {
 
     public static final String LABEL = "STRUCTURE";
     public static final String ID_PROPERTY = "structureId";
@@ -62,7 +62,7 @@ public class StructureNode extends PlotNode implements IStructure {
         return DynamicLabel.label(LABEL);
     }
 
-    private final OwnerDomain ownerDomain;
+    private final OwnerDomainNode ownerDomain;
     
     /**
      * The node that provides all the information of the structure
@@ -71,10 +71,10 @@ public class StructureNode extends PlotNode implements IStructure {
      */
     public StructureNode(Node underlyingNode) {
         super(underlyingNode);
-        this.ownerDomain = new OwnerDomain(underlyingNode);
+        this.ownerDomain = new OwnerDomainNode(underlyingNode);
     }
 
-    public OwnerDomain getOwnerDomain() {
+    public OwnerDomainNode getOwnerDomain() {
         return ownerDomain;
     }
     
@@ -130,7 +130,6 @@ public class StructureNode extends PlotNode implements IStructure {
         return NodeHelper.getInt(underlyingNode, CENTER_Z_PROPERTY, 0);
     }
 
-    @Override
     public final Long getId() {
         return NodeHelper.getLong(underlyingNode, ID_PROPERTY, null);
     }
@@ -147,7 +146,6 @@ public class StructureNode extends PlotNode implements IStructure {
         }
     }
 
-    @Override
     public Vector getOrigin() {
         return new Vector(getX(), getY(), getZ());
     }
@@ -179,7 +177,6 @@ public class StructureNode extends PlotNode implements IStructure {
         }
     }
 
-    @Override
     public Node getNode() {
         return underlyingNode;
     }
@@ -199,7 +196,6 @@ public class StructureNode extends PlotNode implements IStructure {
         return (Integer) o;
     }
 
-    @Override
     public double getPrice() {
         if (!underlyingNode.hasProperty(PRICE_PROPERTY)) {
             return 0;
@@ -221,9 +217,8 @@ public class StructureNode extends PlotNode implements IStructure {
         underlyingNode.setProperty(SIZE_PROPERTY, size);
     }
 
-    @Override
     public String getName() {
-        return (String) underlyingNode.getProperty(NAME_PROPERTY);
+        return underlyingNode.hasProperty(NAME_PROPERTY) ?  (String) underlyingNode.getProperty(NAME_PROPERTY) : null;
     }
 
     public void setName(String name) {
@@ -254,7 +249,6 @@ public class StructureNode extends PlotNode implements IStructure {
         return new Date((Long) o);
     }
 
-    @Override
     public ConstructionStatus getStatus() {
         Object o = underlyingNode.getProperty(CONSTRUCTION_STATUS_PROPERTY);
         return o != null ? ConstructionStatus.match((int) o) : null;
@@ -271,7 +265,6 @@ public class StructureNode extends PlotNode implements IStructure {
         }
     }
 
-    @Override
     public final Direction getDirection() {
         return Direction.match((int) underlyingNode.getProperty(DIRECTION_PROPERTY));
     }
@@ -289,12 +282,17 @@ public class StructureNode extends PlotNode implements IStructure {
 
     public StructureNode getParent() {
         // (this)-[:substructure of]-(parent)
-        Relationship rel = underlyingNode.getSingleRelationship(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING);
-        if (rel != null) {
-            Node parentNode = rel.getOtherNode(underlyingNode);
-            return new StructureNode(parentNode);
+        
+        System.out.println("NODE ID: " + underlyingNode.getId());
+        
+        if(!underlyingNode
+                .hasRelationship(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING)) {
+            return null;
         }
-        return null;
+        
+        Relationship rel = underlyingNode.getSingleRelationship(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING);
+        Node parentNode = rel.getOtherNode(underlyingNode);
+        return new StructureNode(parentNode);
     }
 
     public List<StructureNode> getSubstructures() {
@@ -319,21 +317,17 @@ public class StructureNode extends PlotNode implements IStructure {
         return false;
     }
 
+    /**
+     * Gets the root. The root is the structure that has no parent.
+     * @return The root
+     */
     public StructureNode getRoot() {
-        TraversalDescription traversalDescription = underlyingNode.getGraphDatabase().traversalDescription();
-        Iterator<Node> nodeIt = traversalDescription.relationships(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING)
-                .depthFirst()
-                .traverse(underlyingNode)
-                .nodes()
-                .iterator();
-
-        while (nodeIt.hasNext()) {
-            Node n = nodeIt.next();
-            if (!nodeIt.hasNext()) {
-                return new StructureNode(n);
-            }
+        StructureNode parent = getParent();
+        if(parent == null) {
+            return this;
+        } else {
+            return parent.getRoot();
         }
-        return this;
     }
 
     public void addSubstructure(StructureNode otherNode) {
@@ -484,22 +478,18 @@ public class StructureNode extends PlotNode implements IStructure {
      *
      * @return The directory
      */
-    @Override
     public final File getDirectory() {
         File worldStructureFolder = StructureAPI.getInstance().getStructuresDirectory(getWorldName());
         return new File(worldStructureFolder, String.valueOf(getId()));
     }
 
-    @Override
     public IStructurePlan getStructurePlan() throws StructureException {
         File planFile = new File(getDirectory(), "structureplan.xml");
         if(planFile == null) {
             throw new StructureException("Structure #" + getId() + " doesn't have a plan!");
         }
-
         StructurePlanReader reader = new StructurePlanReader();
         IStructurePlan plan = reader.readFile(planFile);
-
         return plan;
     }
     

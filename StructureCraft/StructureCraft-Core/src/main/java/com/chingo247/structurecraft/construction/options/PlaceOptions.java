@@ -5,7 +5,6 @@
  */
 package com.chingo247.structurecraft.construction.options;
 
-import com.chingo247.structurecraft.construction.Traversal;
 import java.util.ArrayList;
 import java.util.List;
 

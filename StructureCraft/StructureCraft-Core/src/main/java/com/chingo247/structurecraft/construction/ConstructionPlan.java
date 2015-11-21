@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.options.Traversal;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class ConstructionPlan implements IConstructionPlan {
         this.assigner = assigner;
     }
 
+    @Override
     public boolean isForced() {
         return useForce;
     }
@@ -126,6 +128,16 @@ public class ConstructionPlan implements IConstructionPlan {
     @Override
     public void execute() {
         executor.execute(this);
+    }
+
+    @Override
+    public Traversal getStructureTraversal() {
+        return traveral;
+    }
+
+    @Override
+    public PlaceOptions getOptions() {
+        return options;
     }
 
     

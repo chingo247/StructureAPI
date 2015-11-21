@@ -62,5 +62,8 @@ public class RegionUtil {
                 && pMax.getBlockZ() >= cMin.getBlockZ() && pMin.getBlockZ() <= cMax.getBlockZ();
     }
 
+    public static Vector getSize(CuboidRegion region) {
+        return region.getMaximumPoint().subtract(region.getMinimumPoint()).add(Vector.ONE);
+    }
 
 }

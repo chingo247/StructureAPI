@@ -14,7 +14,7 @@ import com.chingo247.structurecraft.model.zone.IConstructionZone;
 class ConstructionZonePlaceResult implements IConstructionZonePlaceResult {
     
     private IConstructionZone constructionZone;
-    private String error;
+    private String error = null;
     
 
     void setError(String message) {
@@ -33,7 +33,7 @@ class ConstructionZonePlaceResult implements IConstructionZonePlaceResult {
 
     @Override
     public boolean succes() {
-        return error != null;
+        return constructionZone != null;
     }
 
     @Override

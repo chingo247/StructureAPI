@@ -28,38 +28,51 @@ import java.io.File;
  * @author Chingo
  */
 public interface IStructure extends IPlot {
+
     /**
      * Gets the id of the structure.
+     *
      * @return The id
      */
     Long getId();
+
     /**
      * Gets the name of the structure.
+     *
      * @return The name of the structure
      */
     String getName();
+
     /**
      * Gets the origin of the structure.
+     *
      * @return The origin
      */
     Vector getOrigin();
-    
+
     double getPrice();
+
     Direction getDirection();
-    
+
     /**
      * The construction status
-     * @return 
+     *
+     * @return
      */
     ConstructionStatus getStatus();
-    
+
     /**
      * Gets the structure plan
+     *
      * @return The structure plan
-     * @throws StructureException if structure doesnt have a plan 
+     * @throws StructureException if structure doesnt have a plan
      */
-    public IStructurePlan getStructurePlan() throws StructureException;
+    IStructurePlan getStructurePlan() throws StructureException;
 
-    public File getDirectory();
+    File getDirectory();
+
+    Vector translateRelativeLocation(Vector position);
     
+    Vector getRelativePosition(Vector position);
+
 }

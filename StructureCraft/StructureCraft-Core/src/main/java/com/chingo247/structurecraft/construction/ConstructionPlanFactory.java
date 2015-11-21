@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**
@@ -14,9 +15,11 @@ import com.chingo247.structurecraft.model.structure.IStructure;
 class ConstructionPlanFactory implements IConstructionPlanFactory {
     
     private final IConstructionExecutor executor;
+    private final IStructureAPI structureAPI;
 
-    public ConstructionPlanFactory(IConstructionExecutor executor) {
+    public ConstructionPlanFactory(IStructureAPI structureAPI, IConstructionExecutor executor) {
         this.executor = executor;
+        this.structureAPI = structureAPI;
     }
     
     
@@ -29,12 +32,14 @@ class ConstructionPlanFactory implements IConstructionPlanFactory {
 
     @Override
     public IConstructionPlan newBuildPlan(IStructure structure) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ITaskAssigner assigner = executor.getAssignerFactory().newSimpleBuildAssigner();
+        return new ConstructionPlan(executor, structure, assigner);
     }
 
     @Override
     public IConstructionPlan newDemolitionPlan(IStructure structure) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ITaskAssigner assigner = executor.getAssignerFactory().newSimpleDemolitionAssigner();
+        return new ConstructionPlan(executor, structure, assigner);
     }
 
     @Override

@@ -24,7 +24,6 @@ import org.neo4j.graphdb.Node;
  */
 public interface ISchematicData {
     
-    public Node getNode();
     public int getWidth();
     public int getHeight();
     public int getLength();

@@ -25,9 +25,8 @@ import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.structurecraft.event.StructureAddOwnerEvent;
 import com.chingo247.structurecraft.event.StructureRemoveOwnerEvent;
 import com.chingo247.structurecraft.model.owner.IOwnership;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;
-import com.chingo247.structurecraft.model.settler.ISettler;
 import com.chingo247.structurecraft.model.settler.ISettlerRepository;
 import com.chingo247.structurecraft.model.settler.SettlerRepositiory;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
@@ -35,10 +34,8 @@ import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
-import com.chingo247.structurecraft.model.world.StructureWorld;
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.ConstructionException;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.platform.permission.Permissions;
 import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
@@ -116,8 +113,8 @@ public class StructureCommands {
     private static String getInfo(StructureNode structure, IColors colors) {
         TreeSet<String> owners = Sets.newTreeSet(ALPHABETICAL_ORDER);
 
-        List<? extends ISettler> mastersNode = structure.getOwnerDomain().getOwners(OwnerType.MASTER);
-        for (ISettler master : mastersNode) {
+        List<SettlerNode> mastersNode = structure.getOwnerDomain().getOwners(OwnerType.MASTER);
+        for (SettlerNode master : mastersNode) {
             owners.add(master.getName());
         }
 
@@ -444,7 +441,7 @@ public class StructureCommands {
             StructureNode structure = getStructure(args, tx);
             structureName = structure.getName();
             structureId = structure.getId();
-            for (ISettler member : structure.getOwnerDomain().getOwners(type)) {
+            for (SettlerNode member : structure.getOwnerDomain().getOwners(type)) {
                 ownerships.add(member.getName());
             }
 
@@ -581,7 +578,7 @@ public class StructureCommands {
             UUID uuid = ply.getUniqueId();
             if (method.equalsIgnoreCase("add")) {
                 IBaseSettler settler = settlerRepository.findByUUID(ply.getUniqueId());
-                OwnerDomain ownerDomain = structureNode.getOwnerDomain();
+                OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 IOwnership ownershipToAdd = ownerDomain.getOwnership(settler.getUniqueId());
 
                 if (ownershipToAdd == null) {
@@ -595,7 +592,7 @@ public class StructureCommands {
                             "#" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName());
                 }
             } else { // remove
-                OwnerDomain ownerDomain = structureNode.getOwnerDomain();
+                OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 if (!ownerDomain.removeOwnership(uuid)) {
                     throw new CommandException(ply.getName() + " does not own this structure...");
                 }
@@ -668,7 +665,7 @@ public class StructureCommands {
 
         long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
-            ISettler structureOwner = structureOwnerRepository.findByUUID(playerId);
+            SettlerNode structureOwner = structureOwnerRepository.findByUUID(playerId);
 
             long countStart = System.currentTimeMillis();
             long totalStructures = structureOwner.getStructureCount();

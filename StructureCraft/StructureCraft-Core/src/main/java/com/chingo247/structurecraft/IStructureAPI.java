@@ -84,7 +84,7 @@ public interface IStructureAPI {
      *
      * @return True if StructureAPI is loadings
      */
-    boolean isLoading();
+    boolean isLoadingPlans();
 
     /**
      * Gets the ConfigProvider
@@ -174,6 +174,7 @@ public interface IStructureAPI {
      */
     SchematicPlacement loadSchematic(File schematicFile) throws IOException;
 
+    IWorldConfig loadOrGetConfig(String world);
 
     /**
      * Gets an AsyncEditSessionFactory

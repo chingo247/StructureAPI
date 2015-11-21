@@ -149,10 +149,11 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             System.out.println(MSG_PREFIX + "Disabling SettlerCraft-StructureAPI");
             return;
         }
+        
         structureAPI.registerAsyncEditSesionFactoryProvider(new BKAsyncEditSessionFactoryProvider());
         
         // Register Listeners
-        Bukkit.getPluginManager().registerEvents(new PlanListener(economyProvider), this);
+        Bukkit.getPluginManager().registerEvents(new PlanListener(structureAPI, economyProvider), this);
         
         // Generate Plans 
         File generationDirectory = StructureAPI.getInstance().getGenerationDirectory();

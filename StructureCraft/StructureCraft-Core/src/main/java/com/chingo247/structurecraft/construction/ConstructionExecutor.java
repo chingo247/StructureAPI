@@ -8,11 +8,15 @@ package com.chingo247.structurecraft.construction;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.construction.assigner.AssignerFactory;
+import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
+import com.chingo247.structurecraft.model.structure.StructureRepository;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
@@ -44,16 +48,26 @@ public class ConstructionExecutor implements IConstructionExecutor {
     private static final UUID CONSOLE = UUID.randomUUID();
     private final IStructureAPI structureAPI;
     private final Object entryMutex = new Object();
+    private final IStructureRepository structureRepository;
     private Map<Long, ConstructionEntry> entries;
     private KeyPool<Long> structurePool;
     private ExecutorService es;
     private IConstructionPlanFactory planFactory;
+    private IAssignerFactory assFactory;
+    
 
     public ConstructionExecutor(IStructureAPI structureAPI, ExecutorService es) {
         this.structurePool = new KeyPool<>(es);
         this.es = es;
         this.structureAPI = structureAPI;
-        
+        this.assFactory = new AssignerFactory(structureAPI);
+        this.planFactory = new ConstructionPlanFactory(structureAPI, this);
+        this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
+    }
+
+    @Override
+    public IAssignerFactory getAssignerFactory() {
+        return assFactory;
     }
 
     ConstructionEntry getOrCreateEntry(IStructure structure) {
@@ -90,6 +104,8 @@ public class ConstructionExecutor implements IConstructionExecutor {
     @Override
     public void execute(final IConstructionPlan plan) {
         final IStructure structure = plan.getStructure();
+        System.out.println("plan structure: " + plan.getStructure());
+        
         final APlatform platform = structureAPI.getPlatform();
         final IColors colors = platform.getChatColors();
         final IPlayer player = plan.getPlayer() != null ? platform.getPlayer(plan.getPlayer()) : null;
@@ -105,7 +121,11 @@ public class ConstructionExecutor implements IConstructionExecutor {
             sender = platform.getConsole();
         }
         
-        World world = SettlerCraft.getInstance().getWorld(structure.getWorldName());
+        World world = SettlerCraft
+                .getInstance()
+                .getWorld(
+                        structure.getWorldName()
+                );
         Player ply = SettlerCraft.getInstance().getPlayer(playerOrRandomUUID);
         final AsyncEditSession editSession = plan.getEditSession() != null ? plan.getEditSession() : 
                 (AsyncEditSession)(ply != null ? structureAPI.getSessionFactory().getEditSession(world, -1, ply) : 
@@ -123,7 +143,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                     Long lockId = null;
                     try {
                         tx = graph.beginTx();
-                        StructureNode structureNode = new StructureNode(structure.getNode());
+                        StructureNode structureNode = structureRepository.findById(structure.getId());
                         StructureNode rootNode = structureNode.getRoot();
                         lockId = rootNode.getId();
                     } catch (Exception ex) {
@@ -149,6 +169,8 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                 Transaction tx = null;
                                 try {
                                     tx = graph.beginTx();
+                                    
+                                    StructureNode structureNode = structureRepository.findById(structure.getId());
 
                                     // Traverse the structures from the database/graph
                                     TraversalDescription traversal = graph.traversalDescription()
@@ -160,12 +182,12 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                     }
 
                                     Iterable<Node> nodes = traversal
-                                            .traverse(structure.getNode())
+                                            .traverse(structureNode.getNode())
                                             .nodes();
 
                                     structures = Lists.newArrayList();
-                                    for (Node structureNode : nodes) {
-                                        structures.add(new Structure(structureNode));
+                                    for (Node sn : nodes) {
+                                        structures.add(new Structure(sn));
                                     }
                                 } catch (Exception ex) {
                                     if (tx != null) {
@@ -200,7 +222,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                                 if (startEntry == null) {
                                                     startEntry = currentEntry;
                                                 }
-                                                plan.getAssigner().assignTasks(plan.getEditSession(), playerOrRandomUUID, currentEntry);
+                                                plan.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry);
                                                 if(prevEntry != null) {
                                                     prevEntry.setNextEntry(currentEntry);
                                                 }
@@ -222,7 +244,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                         IConstructionEntry entry = getOrCreateEntry(structure);
                                         ITaskAssigner assigner = plan.getAssigner();
                                         try {
-                                            assigner.assignTasks(plan.getEditSession(), playerOrRandomUUID, entry);
+                                            assigner.assignTasks(editSession, playerOrRandomUUID, entry);
                                             startEntry = entry;
                                         } catch (StructureException ex) {
                                             startEntry = null;
@@ -267,9 +289,6 @@ public class ConstructionExecutor implements IConstructionExecutor {
 
     @Override
     public IConstructionPlanFactory getConstructionPlanFactory() {
-        if(planFactory == null) {
-            this.planFactory = new ConstructionPlanFactory(this);
-        }
         return planFactory;
     }
 

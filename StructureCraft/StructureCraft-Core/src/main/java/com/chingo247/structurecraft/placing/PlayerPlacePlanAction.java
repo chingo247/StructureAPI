@@ -6,8 +6,8 @@
 package com.chingo247.structurecraft.placing;
 
 import com.chingo247.xplatform.core.AItemStack;
+import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.entity.Player;
 import java.util.UUID;
 
 /**
@@ -16,17 +16,27 @@ import java.util.UUID;
  */
 public class PlayerPlacePlanAction {
     
-    private String world;
-    private boolean clickedAir;
-    private AItemStack planItem;
-    private UUID player;
-    private Vector position;
+    private final String world;
+    private final boolean clickedAir;
+    private final AItemStack planItem;
+    private final UUID player;
+    private final Vector position;
 
     public PlayerPlacePlanAction(UUID player, String world, Vector position, boolean clickedAir, AItemStack planItem) {
+        Preconditions.checkNotNull(player, "player was null");
+        Preconditions.checkNotNull(world, "world was null");
+        Preconditions.checkNotNull(planItem, "planItem was null");
+        
         this.world = world;
         this.clickedAir = clickedAir;
         this.planItem = planItem;
         this.position = position;
+        this.player = player;
+        
+        assert this.player.equals(player) : "player not set";
+        assert this.world.equals(world) : "world not set";
+        assert this.clickedAir == clickedAir;
+        assert this.planItem != null : "planItem not set";
     }
 
     public Vector getPosition() {

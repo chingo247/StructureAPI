@@ -39,7 +39,7 @@ public final class StructureHologram implements IStructureHologram {
     public StructureHologram(StructureHologramNode structureHologramNode) {
         this.underlyingNode = structureHologramNode.getNode();
         this.name = structureHologramNode.getName();
-        this.structure = structureHologramNode.getStructure();
+        this.structure = new Structure(structureHologramNode.getStructure());
         this.relativePosition = structureHologramNode.getRelativePosition();
         this.position = getPosition();
     }

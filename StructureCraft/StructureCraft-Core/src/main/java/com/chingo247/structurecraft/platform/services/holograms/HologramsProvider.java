@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft.platform.services.holograms;
 
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.world.World;
 
 /**
  *
@@ -39,6 +38,6 @@ public interface HologramsProvider {
      * @param position The position of the Hologram
      * @return The hologram
      */
-    public Hologram createHologram(String plugin, World world, Vector position);
+    public Hologram createHologram(String plugin, String world, Vector position);
     
 }

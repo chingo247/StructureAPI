@@ -62,7 +62,7 @@ public class CUISelectionManager extends ASelectionManager {
 
     @Override
     public void select(UUID player, Vector start, Vector end) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        select(SettlerCraft.getInstance().getPlayer(player), start, end);
     }
 
     @Override

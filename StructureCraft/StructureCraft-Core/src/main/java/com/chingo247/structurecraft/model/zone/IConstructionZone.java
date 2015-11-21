@@ -17,7 +17,7 @@
 package com.chingo247.structurecraft.model.zone;
 
 import com.chingo247.structurecraft.model.AccessType;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.plot.IPlot;
 
 /**
@@ -28,8 +28,12 @@ public interface IConstructionZone extends IPlot {
     
     Long getId();
     
-    OwnerDomain getOwnerDomain();
+    OwnerDomainNode getOwnerDomain();
     
     AccessType getAccessType();
+    
+    String getWorldGuardRegion();
+    
+    boolean hasWorldGuardRegion();
     
 }

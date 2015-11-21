@@ -50,7 +50,7 @@ public class StructurePlanCommands {
     @CommandPermissions({Permissions.CONTENT_RELOAD_PLANS})
     @Command(aliases = {"plans:reload"}, usage = "/plans:reload", desc = "Reloads structure plans", max = 0)
     public static void reload(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
-        if (!structureAPI.isLoading()) {
+        if (!structureAPI.isLoadingPlans()) {
             structureAPI.getStructurePlanManager().loadPlans(false);
         } else {
             throw new CommandException("Already reloading plans!");
@@ -82,7 +82,7 @@ public class StructurePlanCommands {
             throw new CommandException("Plan shop is not available (no economy plugin)");
         }
 
-        if (structureAPI.isLoading()) {
+        if (structureAPI.isLoadingPlans()) {
             throw new CommandException("Plans are not loaded yet... please wait...");
         }
 

@@ -7,7 +7,7 @@ package com.chingo247.structurecraft.model.zone;
 
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.model.AccessType;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.plot.Plot;
 import com.chingo247.xplatform.core.IWorld;
 import com.sk89q.worldedit.Vector;
@@ -23,8 +23,8 @@ public class ConstructionZone extends Plot implements IConstructionZone {
     private Long id;
     private AccessType accessType;
     private Node underlyingNode;
-    private IWorld world;
     private CuboidRegion region;
+    private String wgRegion;
     
     public ConstructionZone(Node node) {
         this(new ConstructionZoneNode(node));
@@ -36,24 +36,21 @@ public class ConstructionZone extends Plot implements IConstructionZone {
         this.accessType = zoneNode.getAccessType();
         this.underlyingNode = zoneNode.getNode();
         this.region = zoneNode.getCuboidRegion();
+        this.wgRegion = zoneNode.getWorldGuardRegion();
     }
 
-    @Override
     public Long getId() {
         return id;
     }
 
-    @Override
-    public OwnerDomain getOwnerDomain() {
-        return new OwnerDomain(underlyingNode);
+    public OwnerDomainNode getOwnerDomain() {
+        return new OwnerDomainNode(underlyingNode);
     }
 
-    @Override
     public AccessType getAccessType() {
         return accessType;
     }
 
-    @Override
     public Node getNode() {
         return underlyingNode;
     }
@@ -71,6 +68,16 @@ public class ConstructionZone extends Plot implements IConstructionZone {
     @Override
     public CuboidRegion getCuboidRegion() {
         return region;
+    }
+
+    @Override
+    public String getWorldGuardRegion() {
+        return wgRegion;
+    }
+
+    @Override
+    public boolean hasWorldGuardRegion() {
+        return wgRegion != null;
     }
 
     

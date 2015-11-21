@@ -20,7 +20,7 @@ public interface IStructureWorldRepository extends IWorldRepository  {
      * @return The BaseWorld
      */
     @Override
-    public StructureWorld findByUUID(UUID worldUUID);
+    public StructureWorldNode findByUUID(UUID worldUUID);
 
     /**
      * Adds a world if not already added
@@ -29,7 +29,7 @@ public interface IStructureWorldRepository extends IWorldRepository  {
      * @return The world that has been created or the world that already existed with the same UUID
      */
     @Override
-    public StructureWorld addOrGet(String worldName, UUID worldUUID);
+    public StructureWorldNode addOrGet(String worldName, UUID worldUUID);
     
     
 }

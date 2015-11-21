@@ -24,10 +24,10 @@ import com.chingo247.settlercraft.core.model.WorldNode;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.util.XXHasher;
 import com.chingo247.structurecraft.model.RelTypes;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.world.IStructureWorldRepository;
-import com.chingo247.structurecraft.model.settler.Settler;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
 import com.chingo247.structurecraft.model.world.StructureWorldRepository;
@@ -222,8 +222,8 @@ public class StructureInvalidator {
                 System.out.println("[SettlerCraft]: Refunding players which own invalid structures within " + world.getName());
                 for (StructureNode sn : structureNodes) {
                     if (sn.getPrice() > 0 && !sn.isAutoremoved()) {
-                        OwnerDomain ownerDomain = sn.getOwnerDomain();
-                        List<Settler> masters = ownerDomain.getOwners(OwnerType.MASTER);
+                        OwnerDomainNode ownerDomain = sn.getOwnerDomain();
+                        List<SettlerNode> masters = ownerDomain.getOwners(OwnerType.MASTER);
                         double pricePerOwner = sn.getPrice() / masters.size();
                         for (BaseSettlerNode settler : masters) {
                             economy.give(settler.getUniqueId(), pricePerOwner);

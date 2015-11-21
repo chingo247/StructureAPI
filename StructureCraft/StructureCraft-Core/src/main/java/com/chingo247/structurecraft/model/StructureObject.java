@@ -26,7 +26,7 @@ import org.neo4j.graphdb.Node;
  *
  * @author Chingo
  */
-public abstract class StructureObject implements IStructureObject {
+public abstract class StructureObject {
     
     public static final String RELATIVE_X_PROPERTY = "relativeX";
     public static final String RELATIVE_Y_PROPERTY = "relativeY";
@@ -45,14 +45,15 @@ public abstract class StructureObject implements IStructureObject {
         this.underlyingNode = underlyingNode;
     }
 
-    @Override
     public Node getNode() {
         return underlyingNode;
     }
     
+    public abstract StructureNode getStructure();
+    
     private Vector getStructurePosition() {
         if(structurePosition == null) {
-            StructureNode structure = new StructureNode(getStructure().getNode());
+            StructureNode structure = getStructure();
             structurePosition = structure.getOrigin();
         }
         return structurePosition;
@@ -60,7 +61,7 @@ public abstract class StructureObject implements IStructureObject {
     
     private Direction getStructureDirection() {
         if(direction == null) {
-            StructureNode structure = new StructureNode(getStructure().getNode());
+            StructureNode structure = getStructure();
             direction = structure.getDirection();
         }
         return direction;
@@ -71,22 +72,18 @@ public abstract class StructureObject implements IStructureObject {
         return new Vector(p.getBlockX(), p.getBlockY(), p.getBlockZ());
     }
     
-    @Override
     public int getRelativeX() {
         return (int) underlyingNode.getProperty(RELATIVE_X_PROPERTY);
     }
     
-    @Override
     public int getRelativeY() {
         return (int) underlyingNode.getProperty(RELATIVE_Y_PROPERTY);
     }
     
-    @Override
     public int getRelativeZ() {
         return (int) underlyingNode.getProperty(RELATIVE_Z_PROPERTY);
     }
     
-    @Override
     public Vector getRelativePosition() {
         if(relativePosition == null) {
             relativePosition = new Vector(getRelativeX(), getRelativeY(), getRelativeZ()); 
@@ -94,37 +91,30 @@ public abstract class StructureObject implements IStructureObject {
         return relativePosition;
     }
 
-    @Override
     public double getX() {
         return getPosition().getX();
     }
 
-    @Override
     public double getY() {
         return getPosition().getY();
     }
 
-    @Override
     public double getZ() {
         return getPosition().getZ();
     }
 
-    @Override
     public int getBlockX() {
         return getPosition().getBlockX();
     }
 
-    @Override
     public int getBlockY() {
         return getPosition().getBlockY();
     }
 
-    @Override
     public int getBlockZ() {
         return getPosition().getBlockZ();
     }
 
-    @Override
     public Vector getPosition() {
         if(position == null) {
             position = translateRelativeLocation(getRelativePosition());

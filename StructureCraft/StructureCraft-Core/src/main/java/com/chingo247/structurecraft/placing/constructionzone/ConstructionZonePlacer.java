@@ -5,26 +5,21 @@
  */
 package com.chingo247.structurecraft.placing.constructionzone;
 
-import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
-import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.event.zone.CreateConstructionZoneEvent;
 import com.chingo247.structurecraft.exeption.ConstructionZoneException;
-import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.AccessType;
 import com.chingo247.structurecraft.model.owner.OwnerType;
-import com.chingo247.structurecraft.model.settler.ISettler;
 import com.chingo247.structurecraft.model.settler.ISettlerRepository;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.model.settler.SettlerRepositiory;
 import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
 import com.chingo247.structurecraft.model.world.IStructureWorldRepository;
-import com.chingo247.structurecraft.model.world.StructureWorld;
+import com.chingo247.structurecraft.model.world.StructureWorldNode;
 import com.chingo247.structurecraft.model.world.StructureWorldRepository;
 import com.chingo247.structurecraft.model.zone.ConstructionZone;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneRepository;
-import com.chingo247.structurecraft.model.zone.IConstructionZone;
 import com.chingo247.structurecraft.model.zone.IConstructionZoneRepository;
 import com.chingo247.structurecraft.placing.AbstractPlacer;
 import com.chingo247.structurecraft.restriction.exception.ConstructionZoneRestrictionException;
@@ -33,7 +28,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Monitor;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -104,7 +98,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 
                 // Add zone to world
                 IStructureWorldRepository structureWorldRepository = new StructureWorldRepository(graph);
-                StructureWorld structureWorld = structureWorldRepository.addOrGet(world.getName(), world.getUUID());
+                StructureWorldNode structureWorld = structureWorldRepository.addOrGet(world.getName(), world.getUUID());
                 structureWorld.addZone(zone);
                 
                 
@@ -113,7 +107,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 Set<UUID> added = Sets.newHashSet();
                 // Add masters
                 for(UUID player : getMasters()) {
-                    ISettler settler = settlerRepository.findByUUID(player);
+                    SettlerNode settler = settlerRepository.findByUUID(player);
                     zone.getOwnerDomain().setOwnership(settler, OwnerType.MASTER);
                     added.add(player);
                 }
@@ -121,7 +115,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 // Add owners
                 for(UUID player : getOwners()) {
                     if(!added.contains(player)) {
-                        ISettler settler = settlerRepository.findByUUID(player);
+                        SettlerNode settler = settlerRepository.findByUUID(player);
                         zone.getOwnerDomain().setOwnership(settler, OwnerType.OWNER);
                         added.add(player);
                     }
@@ -130,7 +124,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 // Add members
                 for(UUID player : getMembers()) {
                     if(!added.contains(player)) {
-                        ISettler settler = settlerRepository.findByUUID(player);
+                        SettlerNode settler = settlerRepository.findByUUID(player);
                         zone.getOwnerDomain().setOwnership(settler, OwnerType.MEMBER);
                         added.add(player);
                     }

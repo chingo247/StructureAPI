@@ -18,6 +18,7 @@ package com.chingo247.structurecraft.model.hologram;
 
 import com.chingo247.structurecraft.model.StructureObject;
 import com.chingo247.structurecraft.model.structure.Structure;
+import com.chingo247.structurecraft.model.structure.StructureNode;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.DynamicRelationshipType;
@@ -42,18 +43,20 @@ public class StructureHologramNode extends StructureObject {
         this.name = "StructureHologram";
     }
 
-    @Override
-    public Structure getStructure() {
+    public StructureNode getStructure() {
         Node n = getNode();
+        if(!n.hasRelationship(RELATION_HAS_HOLOGRAM, Direction.INCOMING)) {
+            return null;
+        }
+        
         Relationship r = n.getSingleRelationship(RELATION_HAS_HOLOGRAM, Direction.INCOMING);
         if(r == null) {
             return null;
         }
         Node other = r.getOtherNode(n);
-        return other != null ? new Structure(other) : null; // Shouldn't be null...
+        return other != null ? new StructureNode(other) : null; // Shouldn't be null...
     }
 
-    @Override
     public String getName() {
         return name;
     }

@@ -15,32 +15,32 @@ import org.neo4j.graphdb.Node;
  */
 public interface IStructureObject {
     
-    public Structure getStructure();
+    Structure getStructure();
     
-    public Node getNode();
+    Node getNode();
     
-    public String getName();
+    String getName();
     
-    public double getX();
+    double getX();
     
-    public double getY();
+    double getY();
     
-    public double getZ();
+    double getZ();
     
-    public int getBlockX();
+    int getBlockX();
     
-    public int getBlockY();
+    int getBlockY();
     
-    public int getBlockZ();
+    int getBlockZ();
     
-    public int getRelativeX();
+    int getRelativeX();
     
-    public int getRelativeY();
+    int getRelativeY();
     
-    public int getRelativeZ();
+    int getRelativeZ();
     
-    public Vector getPosition();
+    Vector getPosition();
     
-    public Vector getRelativePosition();
+    Vector getRelativePosition();
     
 }

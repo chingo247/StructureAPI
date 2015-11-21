@@ -32,7 +32,7 @@ import org.neo4j.graphdb.Relationship;
  * Defines a region that is 'ownable' 
  * @author Chingo
  */
-public class PlotNode implements IPlot {
+public class PlotNode {
 
     public static final String MIN_X_PROPERTY = "minX", MIN_Y_PROPERTY = "minY", MIN_Z_PROPERTY = "minZ", MAX_X_PROPERTY = "maxX", MAX_Y_PROPERTY = "maxY", MAX_Z_PROPERTY = "maxZ";
     public static final String PLOT_TYPE_PROPERTY = "plotType";
@@ -48,12 +48,24 @@ public class PlotNode implements IPlot {
         this.underlyingNode = node;
     }
     
-    @Override
+    public WorldNode getWorldNode() {
+        if(!underlyingNode.hasRelationship(RelTypes.WITHIN, Direction.OUTGOING)) {
+            return null;
+        }
+        Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
+        for(Relationship rel : rels) {
+            if(rel.getOtherNode(underlyingNode).hasLabel(WorldNode.label())) {
+                WorldNode worldNode = new WorldNode(rel.getOtherNode(underlyingNode));
+                return worldNode;
+            }
+        }
+        return null;
+    }
+    
     public Node getNode() {
         return underlyingNode;
     }
 
-    @Override
     public UUID getWorldUUID() {
         Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
         for(Relationship rel : rels) {
@@ -113,19 +125,14 @@ public class PlotNode implements IPlot {
         return (int) underlyingNode.getProperty(MAX_Z_PROPERTY);
     }
 
-    @Override
     public Vector getMin() {
         return new BlockVector(getMinX(), getMinY(), getMinZ());
     }
 
-    @Override
     public Vector getMax() {
         return new BlockVector(getMaxX(), getMaxY(), getMaxZ());
     }
     
-    
-    
-    @Override
     public CuboidRegion getCuboidRegion() {
         int minX = (int) underlyingNode.getProperty(MIN_X_PROPERTY);
         int minY = (int) underlyingNode.getProperty(MIN_Y_PROPERTY);
@@ -136,7 +143,6 @@ public class PlotNode implements IPlot {
         return new CuboidRegion(new Vector(minX, minY, minZ), new Vector(maxX, maxY, maxZ));
     }
 
-    @Override
     public String getWorldName() {
         Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
         for(Relationship rel : rels) {

@@ -18,7 +18,7 @@ package com.chingo247.structurecraft.model.zone;
 
 import com.chingo247.structurecraft.model.AccessType;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.plot.PlotNode;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.Label;
@@ -28,12 +28,13 @@ import org.neo4j.graphdb.Node;
  *
  * @author ching
  */
-public class ConstructionZoneNode extends PlotNode implements IConstructionZone {
+public class ConstructionZoneNode extends PlotNode {
     
     public static final String LABEL = "CONSTRUCTION_ZONE";
     public static final String ACCESS_TYPE_PROPERTY = "ACCESS_TYPE"; // 
+    public static final String WORLD_GUARD_REGION = "WGRegion";
     public static final String ID_PROPERTY = "ID";
-    private OwnerDomain ownerDomain;
+    private OwnerDomainNode ownerDomain;
     
     public static Label label() {
         return DynamicLabel.label(LABEL);
@@ -43,17 +44,14 @@ public class ConstructionZoneNode extends PlotNode implements IConstructionZone 
         super(node);
     }
 
-    @Override
-    public OwnerDomain getOwnerDomain() {
+    public OwnerDomainNode getOwnerDomain() {
         return ownerDomain;
     }
     
-    @Override
     public Long getId() {
         return NodeHelper.getLong(underlyingNode, ID_PROPERTY, null);
     }
     
-    @Override
     public AccessType getAccessType() {
         int type = NodeHelper.getInt(underlyingNode, ACCESS_TYPE_PROPERTY, -1);
         if(type == -1) {
@@ -65,6 +63,12 @@ public class ConstructionZoneNode extends PlotNode implements IConstructionZone 
     
     public void setAccessType(AccessType accessType) {
         underlyingNode.setProperty(ACCESS_TYPE_PROPERTY, accessType.getTypeId());
+    }
+    
+    public String getWorldGuardRegion() {
+        return underlyingNode.hasProperty(WORLD_GUARD_REGION) ? 
+                (String) underlyingNode.getProperty(WORLD_GUARD_REGION) 
+                : null;
     }
 
     

@@ -66,11 +66,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -78,9 +75,6 @@ import org.dom4j.DocumentException;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
-import org.primesoft.asyncworldedit.AsyncWorldEditMain;
-import org.primesoft.asyncworldedit.blockPlacer.BlockPlacer;
-import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 
 /**
@@ -283,7 +277,7 @@ public class StructureAPI implements IStructureAPI {
     }
 
     @Override
-    public boolean isLoading() {
+    public boolean isLoadingPlans() {
         return isLoadingPlans;
     }
 
@@ -381,6 +375,11 @@ public class StructureAPI implements IStructureAPI {
 
     public ExecutorService getExecutor() {
         return executor;
+    }
+
+    @Override
+    public IWorldConfig loadOrGetConfig(String world) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     private class StructurePlanManagerHandler {

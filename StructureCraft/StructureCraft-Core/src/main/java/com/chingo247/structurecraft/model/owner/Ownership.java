@@ -16,8 +16,7 @@
  */
 package com.chingo247.structurecraft.model.owner;
 
-import com.chingo247.structurecraft.model.settler.Settler;
-import com.chingo247.structurecraft.model.structure.StructureNode;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 
@@ -27,10 +26,10 @@ import org.neo4j.graphdb.Relationship;
  */
 public class Ownership implements IOwnership {
     
-    private final Settler owner;
+    private final SettlerNode owner;
     private final Relationship rel;
 
-    public Ownership(Settler owner, Relationship relation) {
+    public Ownership(SettlerNode owner, Relationship relation) {
         this.owner = owner;
         this.rel = relation;
     }
@@ -46,7 +45,7 @@ public class Ownership implements IOwnership {
     }
 
     @Override
-    public Settler getOwner() {
+    public SettlerNode getOwner() {
         return owner;
     }
 

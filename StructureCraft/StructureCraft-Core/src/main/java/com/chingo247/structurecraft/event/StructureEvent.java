@@ -16,8 +16,7 @@
  */
 package com.chingo247.structurecraft.event;
 
-import com.chingo247.structurecraft.model.structure.StructureNode;
-import com.chingo247.structurecraft.model.structure.Structure;
+import com.chingo247.structurecraft.model.structure.IStructure;
 
 
 /**
@@ -26,13 +25,13 @@ import com.chingo247.structurecraft.model.structure.Structure;
  */
 public class StructureEvent {
     
-    private final Structure structure;
+    private final IStructure structure;
 
-    public StructureEvent(Structure structure) {
+    public StructureEvent(IStructure structure) {
         this.structure = structure;
     }
 
-    public Structure getStructure() {
+    public IStructure getStructure() {
         return structure;
     }
     

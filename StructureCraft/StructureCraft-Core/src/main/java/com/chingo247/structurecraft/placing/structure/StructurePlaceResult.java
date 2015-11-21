@@ -6,6 +6,7 @@
 package com.chingo247.structurecraft.placing.structure;
 
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.google.common.base.Preconditions;
 
 /**
  *
@@ -31,7 +32,7 @@ public class StructurePlaceResult implements IStructurePlaceResult {
 
     @Override
     public boolean succes() {
-        return errorMessage != null;
+        return structure != null;
     }
 
     @Override

@@ -26,9 +26,8 @@ import com.chingo247.structurecraft.event.zone.ConstructionZoneRemoveOwnerEvent;
 import com.chingo247.structurecraft.event.zone.ConstructionZoneUpdateOwnerEvent;
 import com.chingo247.structurecraft.event.zone.DeleteConstructionZoneEvent;
 import com.chingo247.structurecraft.model.owner.IOwnership;
-import com.chingo247.structurecraft.model.owner.OwnerDomain;
+import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;
-import com.chingo247.structurecraft.model.settler.ISettler;
 import com.chingo247.structurecraft.model.settler.ISettlerRepository;
 import com.chingo247.structurecraft.model.settler.SettlerRepositiory;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
@@ -36,6 +35,8 @@ import com.chingo247.structurecraft.model.zone.ConstructionZoneRepository;
 import com.chingo247.structurecraft.model.zone.IConstructionZone;
 import com.chingo247.structurecraft.model.zone.IConstructionZoneRepository;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.model.settler.SettlerNode;
+import com.chingo247.structurecraft.model.zone.ConstructionZone;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlaceResult;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlacer;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlacerFactory;
@@ -62,8 +63,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.math.NumberUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -149,11 +148,14 @@ public class ConstructionZoneCommands {
             IPlayer ply = (IPlayer) sender;
             
             try(Transaction tx = graph.beginTx()) {
-                zone = zoneRepository.findOnPosition(ply.getLocation());
-                if(zone == null) {
+                ConstructionZoneNode z = zoneRepository.findOnPosition(ply.getLocation());
+                if(z == null) {
                     tx.success();
                     throw new CommandException("Not within a construction zone");
                 }
+                
+                zone = new ConstructionZone(z);
+                
                 String line = getInfo(zone, colors);
                 sender.sendMessage(line);
                 tx.success();
@@ -164,11 +166,13 @@ public class ConstructionZoneCommands {
                     + "alias: /cstz:info [zone-id]");
             
             try(Transaction tx = graph.beginTx()) {
-                zone = zoneRepository.findById(id);
-                if(zone == null) {
+                ConstructionZoneNode z = zoneRepository.findById(id);
+                if(z == null) {
                     tx.success();
                     throw new CommandException("No construction zone for id #" + id);
                 }
+                zone = new ConstructionZone(z);
+                
                 String line = getInfo(zone, colors);
                 sender.sendMessage(line);
                 tx.success();
@@ -184,8 +188,8 @@ public class ConstructionZoneCommands {
     private static String getInfo(IConstructionZone zone, IColors colors) {
         TreeSet<String> owners = Sets.newTreeSet(ALPHABETICAL_ORDER);
 
-        List<? extends ISettler> mastersNode = zone.getOwnerDomain().getOwners(OwnerType.MASTER);
-        for (ISettler master : mastersNode) {
+        List<SettlerNode> mastersNode = zone.getOwnerDomain().getOwners(OwnerType.MASTER);
+        for (SettlerNode master : mastersNode) {
             owners.add(master.getName());
         }
 
@@ -220,8 +224,8 @@ public class ConstructionZoneCommands {
             line += colors.reset() + "Owners(MASTER): " +colors.red() + "NONE";
         }
 
-        if (zone.getNode().hasProperty("WGRegion")) {
-            line += colors.reset() + "WorldGuard-Region: " + colors.yellow() + zone.getNode().getProperty("WGRegion");
+        if (zone.hasWorldGuardRegion()) {
+            line += colors.reset() + "WorldGuard-Region: " + colors.yellow() + zone.getWorldGuardRegion();
         }
         
         return line;
@@ -239,7 +243,7 @@ public class ConstructionZoneCommands {
                     + "Alias: /cstz:delete [zone-id]");
         
         try(Transaction tx = graph.beginTx()) {
-            IConstructionZone zone = zoneRepository.findById(id);
+            ConstructionZoneNode zone = zoneRepository.findById(id);
             if(zone == null) {
                 tx.success();
                 throw new CommandException("No construction zone found for id #" + id);
@@ -249,12 +253,9 @@ public class ConstructionZoneCommands {
             for(Relationship rel : n.getRelationships()) {
                 rel.delete();
             }
-            
-            
             tx.success();
-            
             sender.sendMessage("Deleted construction-zone #" + id);
-            AsyncEventManager.getInstance().post(new DeleteConstructionZoneEvent(zone));
+            AsyncEventManager.getInstance().post(new DeleteConstructionZoneEvent(new ConstructionZone(zone)));
         }
         
         
@@ -305,7 +306,7 @@ public class ConstructionZoneCommands {
         try (Transaction tx = graph.beginTx()) {
             ConstructionZoneNode zone = getConstructionZone(args, tx);
             zoneId = zone.getId();
-            for (ISettler member : zone.getOwnerDomain().getOwners(type)) {
+            for (SettlerNode member : zone.getOwnerDomain().getOwners(type)) {
                 ownerships.add(member.getName());
             }
 
@@ -437,25 +438,25 @@ public class ConstructionZoneCommands {
             UUID uuid = ply.getUniqueId();
             if (method.equalsIgnoreCase("add")) {
                 IBaseSettler settler = settlerRepository.findByUUID(ply.getUniqueId());
-                OwnerDomain ownerDomain = zone.getOwnerDomain();
+                OwnerDomainNode ownerDomain = zone.getOwnerDomain();
                 IOwnership ownershipToAdd = ownerDomain.getOwnership(settler.getUniqueId());
 
                 if (ownershipToAdd == null) {
                     ownerDomain.setOwnership(settler, type);
-                    EventManager.getInstance().getEventBus().post(new ConstructionZoneUpdateOwnerEvent(zone, uuid, type));
+                    EventManager.getInstance().getEventBus().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
                     sender.sendMessage("Successfully added '" + colors.green() + ply.getName() + colors.reset() + "' to #" + colors.gold() + zone.getId() + colors.reset() + " as " + colors.yellow() + type.name());
                 } else {
                     ownerDomain.setOwnership(settler, type);
-                    EventManager.getInstance().getEventBus().post(new ConstructionZoneUpdateOwnerEvent(zone, uuid, type));
+                    EventManager.getInstance().getEventBus().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
                     sender.sendMessage("Updated ownership of '" + colors.green() + ply.getName() + colors.reset() + "' to " + colors.yellow() + type.name() + colors.reset() + " for structure ",
                             "#" + colors.gold() + zone.getId());
                 }
             } else { // remove
-                OwnerDomain ownerDomain = zone.getOwnerDomain();
+                OwnerDomainNode ownerDomain = zone.getOwnerDomain();
                 if (!ownerDomain.removeOwnership(uuid)) {
                     throw new CommandException(ply.getName() + " does not own this construction zone...");
                 }
-                EventManager.getInstance().getEventBus().post(new ConstructionZoneRemoveOwnerEvent(zone, uuid, type));
+                EventManager.getInstance().getEventBus().post(new ConstructionZoneRemoveOwnerEvent(new ConstructionZone(zone), uuid, type));
                 sender.sendMessage("Successfully removed '" + colors.green() + ply.getName() + colors.reset() + "' from #" + colors.gold() + zone.getId() + " as " + colors.yellow() + type.name());
             }
             tx.success();
