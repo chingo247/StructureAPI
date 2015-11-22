@@ -23,7 +23,6 @@ import static com.chingo247.settlercraft.core.Direction.NORTH;
 import static com.chingo247.settlercraft.core.Direction.SOUTH;
 import static com.chingo247.settlercraft.core.Direction.WEST;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
-import com.chingo247.structurecraft.construction.block.StructureBlock;
 import com.chingo247.structurecraft.construction.options.BlockMask;
 import com.chingo247.structurecraft.construction.options.BlockPredicate;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;

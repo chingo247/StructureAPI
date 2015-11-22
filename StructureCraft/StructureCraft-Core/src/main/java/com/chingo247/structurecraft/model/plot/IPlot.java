@@ -27,6 +27,8 @@ import org.neo4j.graphdb.Node;
  */
 public interface IPlot {
     
+    Node getUnderlyingNode();
+    
     Vector getMin();
     
     Vector getMax();

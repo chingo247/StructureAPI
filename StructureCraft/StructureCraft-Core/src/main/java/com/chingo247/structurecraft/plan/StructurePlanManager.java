@@ -118,7 +118,7 @@ public class StructurePlanManager implements IStructurePlanProvider{
         // Make dirs if not exist!
         planDirectory.mkdirs();
 
-        EventManager.getInstance().getEventBus().post(new StructurePlansReloadEvent());
+        StructureAPI.getInstance().getEventDispatcher().post(new StructurePlansReloadEvent());
 
         // If it isn't null and there are still processes running... terminate them
         if (forkJoinPool != null && !forkJoinPool.isShutdown()) {
@@ -143,7 +143,7 @@ public class StructurePlanManager implements IStructurePlanProvider{
                     if (!forkJoinPool.isShutdown()) {
                         forkJoinPool.shutdown();
                     }
-                    EventManager.getInstance().getEventBus().post(new StructurePlansLoadedEvent());
+                    StructureAPI.getInstance().getEventDispatcher().post(new StructurePlansLoadedEvent());
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }

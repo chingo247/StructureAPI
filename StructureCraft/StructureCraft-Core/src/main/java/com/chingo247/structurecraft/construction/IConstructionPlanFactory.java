@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**

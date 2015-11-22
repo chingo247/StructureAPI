@@ -16,8 +16,7 @@
  */
 package com.chingo247.structurecraft.event;
 
-import com.chingo247.structurecraft.model.structure.Structure;
-import com.chingo247.structurecraft.model.structure.StructureNode;
+import com.chingo247.structurecraft.model.structure.IStructure;
 
 
 /**
@@ -26,7 +25,7 @@ import com.chingo247.structurecraft.model.structure.StructureNode;
  */
 public class StructureStateChangeEvent extends StructureEvent {
 
-    public StructureStateChangeEvent(Structure structure) {
+    public StructureStateChangeEvent(IStructure structure) {
         super(structure);
     }
     

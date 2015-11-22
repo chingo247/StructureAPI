@@ -5,11 +5,13 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.assigner.AssignerFactory;
 import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
+import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -22,6 +24,7 @@ import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IPlayer;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.World;
 import java.io.IOException;
@@ -44,6 +47,8 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 public class ConstructionExecutor implements IConstructionExecutor {
 
+    
+    
     private static final Logger LOG = Logger.getLogger(ConstructionExecutor.class.getName());
     private static final UUID CONSOLE = UUID.randomUUID();
     private final IStructureAPI structureAPI;
@@ -54,7 +59,6 @@ public class ConstructionExecutor implements IConstructionExecutor {
     private ExecutorService es;
     private IConstructionPlanFactory planFactory;
     private IAssignerFactory assFactory;
-    
 
     public ConstructionExecutor(IStructureAPI structureAPI, ExecutorService es) {
         this.structurePool = new KeyPool<>(es);
@@ -63,6 +67,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
         this.assFactory = new AssignerFactory(structureAPI);
         this.planFactory = new ConstructionPlanFactory(structureAPI, this);
         this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
+        this.entries = Maps.newHashMap();
     }
 
     @Override
@@ -106,12 +111,13 @@ public class ConstructionExecutor implements IConstructionExecutor {
         final IStructure structure = plan.getStructure();
         System.out.println("plan structure: " + plan.getStructure());
         System.out.println("plan structure id: " + plan.getStructure().getId());
-        
+
         final APlatform platform = structureAPI.getPlatform();
         final IColors colors = platform.getChatColors();
         final IPlayer player = plan.getPlayer() != null ? platform.getPlayer(plan.getPlayer()) : null;
         final UUID playerOrRandomUUID;
         final ICommandSender sender;
+        final IPlaceOptionsAssigner placeOptionsAssigner = plan.getOptionsAssigner();
 
         // Set the person who should receive a message if anything fails
         if (player != null) {
@@ -121,16 +127,16 @@ public class ConstructionExecutor implements IConstructionExecutor {
             playerOrRandomUUID = CONSOLE;
             sender = platform.getConsole();
         }
-        
+
         World world = SettlerCraft
                 .getInstance()
                 .getWorld(
                         structure.getWorldName()
                 );
         Player ply = SettlerCraft.getInstance().getPlayer(playerOrRandomUUID);
-        final AsyncEditSession editSession = plan.getEditSession() != null ? plan.getEditSession() : 
-                (AsyncEditSession)(ply != null ? structureAPI.getSessionFactory().getEditSession(world, -1, ply) : 
-                structureAPI.getSessionFactory().getEditSession(world, -1));
+        final AsyncEditSession editSession = plan.getEditSession() != null ? plan.getEditSession()
+                : (AsyncEditSession) (ply != null ? structureAPI.getSessionFactory().getEditSession(world, -1, ply)
+                        : structureAPI.getSessionFactory().getEditSession(world, -1));
 
         es.execute(new Runnable() {
 
@@ -144,10 +150,8 @@ public class ConstructionExecutor implements IConstructionExecutor {
                     Long lockId = null;
                     try {
                         tx = graph.beginTx();
-                        StructureNode structureNode = structureRepository.findById(structure.getId());
-                        
+                        StructureNode structureNode = new StructureNode(structure.getUnderlyingNode());
                         System.out.println("Structure: " + structureNode);
-                        
                         StructureNode rootNode = structureNode.getRoot();
                         lockId = rootNode.getId();
                     } catch (Exception ex) {
@@ -172,101 +176,110 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                 List<Structure> structures = null;
                                 Transaction tx = null;
                                 try {
-                                    tx = graph.beginTx();
-                                    
-                                    StructureNode structureNode = structureRepository.findById(structure.getId());
 
-                                    // Traverse the structures from the database/graph
-                                    TraversalDescription traversal = graph.traversalDescription()
-                                            .relationships(RelTypes.SUBSTRUCTURE_OF, Direction.INCOMING)
-                                            .breadthFirst();
+                                    try {
+                                        tx = graph.beginTx();
 
-                                    if (plan.isReversed()) {
-                                        traversal = traversal.reverse();
+                                        StructureNode structureNode = structureRepository.findById(structure.getId());
+
+                                        // Traverse the structures from the database/graph
+                                        TraversalDescription traversal = graph.traversalDescription()
+                                                .relationships(RelTypes.SUBSTRUCTURE_OF, Direction.INCOMING)
+                                                .breadthFirst();
+
+                                        if (plan.isReversed()) {
+                                            traversal = traversal.reverse();
+                                        }
+
+                                        Iterable<Node> nodes = traversal
+                                                .traverse(structureNode.getNode())
+                                                .nodes();
+
+                                        structures = Lists.newArrayList();
+                                        for (Node sn : nodes) {
+                                            structures.add(new Structure(sn));
+                                        }
+                                        
+                                        tx.success();
+                                    } catch (Exception ex) {
+                                        if (tx != null) {
+                                            tx.failure();
+                                        }
+                                        if (player != null) {
+                                            sender.sendMessage(colors.red() + "[StructureAPI]: An error ocurrerd... See console");
+                                        }
+                                        LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                                        structures = null;
+                                    } finally {
+                                        if (tx != null) {
+                                            tx.close();
+                                        }
                                     }
 
-                                    Iterable<Node> nodes = traversal
-                                            .traverse(structureNode.getNode())
-                                            .nodes();
+                                    if (structures != null) {
+                                        // STOP ALL
+                                        for (Structure s : structures) {
+                                            ConstructionEntry entry = getEntry(s);
+                                            if (entry != null) {
+                                                entry.purge();
+                                            }
+                                        }
 
-                                    structures = Lists.newArrayList();
-                                    for (Node sn : nodes) {
-                                        structures.add(new Structure(sn));
+                                        IConstructionEntry startEntry = null;
+                                        if (plan.isRecursive()) {
+                                            ConstructionEntry prevEntry = null;
+                                            try {
+                                                for (Structure s : structures) {
+                                                    ConstructionEntry currentEntry = getOrCreateEntry(s);
+                                                    if (startEntry == null) {
+                                                        startEntry = currentEntry;
+                                                    }
+                                                    plan.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry, placeOptionsAssigner);
+                                                    if (prevEntry != null) {
+                                                        prevEntry.setNextEntry(currentEntry);
+                                                    }
+                                                    prevEntry = currentEntry;
+                                                }
+                                            } catch (StructureException ex) {
+                                                startEntry = null;
+                                                remove(structures);
+                                                sender.sendMessage(ex.getMessage());
+                                            } catch (IOException ex) {
+                                                startEntry = null;
+                                                if (player != null) {
+                                                    sender.sendMessage("[StructureAPI]: An error occured... See console");
+                                                }
+                                                remove(structures); // Cleanup entries
+                                                Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+                                        } else {
+                                            IConstructionEntry entry = getOrCreateEntry(structure);
+                                            ITaskAssigner assigner = plan.getAssigner();
+                                            try {
+                                                assigner.assignTasks(editSession, playerOrRandomUUID, entry, placeOptionsAssigner);
+                                                startEntry = entry;
+                                            } catch (StructureException ex) {
+                                                startEntry = null;
+                                                sender.sendMessage(ex.getMessage());
+                                                remove(entry.getStructure().getId());
+                                            } catch (IOException ex) {
+                                                startEntry = null;
+                                                remove(entry.getStructure().getId());
+                                                Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+                                        }
+
+                                        if (startEntry != null) {
+                                            startEntry.proceed();
+                                        }
+
                                     }
                                 } catch (Exception ex) {
-                                    if (tx != null) {
-                                        tx.failure();
-                                    }
                                     if (player != null) {
-                                        sender.sendMessage(colors.red() + "[StructureAPI]: An error ocurrerd... See console");
+                                        player.sendMessage(colors.red() + "[StructureAPI]: An error occured... see console");
                                     }
                                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
-                                    structures = null;
-                                } finally {
-                                    if (tx != null) {
-                                        tx.close();
-                                    }
                                 }
-
-                                if (structures != null) {
-                                    // STOP ALL
-                                    for (Structure s : structures) {
-                                        ConstructionEntry entry = getEntry(s);
-                                        if (entry != null) {
-                                            entry.purge();
-                                        }
-                                    }
-
-                                    IConstructionEntry startEntry = null;
-                                    if (plan.isRecursive()) {
-                                        ConstructionEntry prevEntry = null;
-                                        try {
-                                            for (Structure s : structures) {
-                                                ConstructionEntry currentEntry = getOrCreateEntry(s);
-                                                if (startEntry == null) {
-                                                    startEntry = currentEntry;
-                                                }
-                                                plan.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry);
-                                                if(prevEntry != null) {
-                                                    prevEntry.setNextEntry(currentEntry);
-                                                }
-                                                prevEntry = currentEntry;
-                                            }
-                                        } catch (StructureException ex) {
-                                            startEntry = null;
-                                            remove(structures);
-                                            sender.sendMessage(ex.getMessage());
-                                        } catch (IOException ex) {
-                                            startEntry = null;
-                                            if(player != null) {
-                                                sender.sendMessage("[StructureAPI]: An error occured... See console");
-                                            }
-                                            remove(structures); // Cleanup entries
-                                            Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    } else {
-                                        IConstructionEntry entry = getOrCreateEntry(structure);
-                                        ITaskAssigner assigner = plan.getAssigner();
-                                        try {
-                                            assigner.assignTasks(editSession, playerOrRandomUUID, entry);
-                                            startEntry = entry;
-                                        } catch (StructureException ex) {
-                                            startEntry = null;
-                                            sender.sendMessage(ex.getMessage());
-                                            remove(entry.getStructure().getId());
-                                        } catch (IOException ex) {
-                                            startEntry = null;
-                                            remove(entry.getStructure().getId());
-                                            Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-                                    
-                                    if(startEntry != null) {
-                                        startEntry.proceed();
-                                    }
-
-                                }
-
                             }
 
                         });
@@ -288,7 +301,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
 
     @Override
     public void remove(IConstructionEntry entry) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        remove(entry.getStructure().getId());
     }
 
     @Override

@@ -259,7 +259,7 @@ public class ConstructionZoneCommands {
             }
             tx.success();
             sender.sendMessage("Deleted construction-zone #" + id);
-            AsyncEventManager.getInstance().post(new DeleteConstructionZoneEvent(new ConstructionZone(zone)));
+            structureAPI.getEventDispatcher().post(new DeleteConstructionZoneEvent(new ConstructionZone(zone)));
         }
         
         
@@ -449,11 +449,11 @@ public class ConstructionZoneCommands {
 
                 if (ownershipToAdd == null) {
                     ownerDomain.setOwnership(settler, type);
-                    EventManager.getInstance().getEventBus().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
+                    structureAPI.getEventDispatcher().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
                     sender.sendMessage("Successfully added '" + colors.green() + ply.getName() + colors.reset() + "' to #" + colors.gold() + zone.getId() + colors.reset() + " as " + colors.yellow() + type.name());
                 } else {
                     ownerDomain.setOwnership(settler, type);
-                    EventManager.getInstance().getEventBus().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
+                    structureAPI.getEventDispatcher().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
                     sender.sendMessage("Updated ownership of '" + colors.green() + ply.getName() + colors.reset() + "' to " + colors.yellow() + type.name() + colors.reset() + " for structure ",
                             "#" + colors.gold() + zone.getId());
                 }

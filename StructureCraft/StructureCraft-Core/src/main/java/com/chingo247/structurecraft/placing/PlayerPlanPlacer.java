@@ -205,7 +205,7 @@ public class PlayerPlanPlacer {
                             } else {
                                 player.sendMessage(color.red() + placeResult.error());
                             }
-
+                            deselect(playerUUID);
                         } else {
                             selectionManager.deselect(player.getUniqueId());
                             selectionManager.select(player.getUniqueId(), pos1, pos2);

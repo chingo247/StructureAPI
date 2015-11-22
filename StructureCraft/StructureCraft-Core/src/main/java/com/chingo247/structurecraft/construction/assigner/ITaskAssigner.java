@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.assigner;
 
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.Structure;
 import java.io.IOException;
@@ -29,6 +31,6 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 public interface ITaskAssigner {
     
     
-    void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException;
+    void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry, IPlaceOptionsAssigner assigner) throws StructureException, IOException;
     
 }

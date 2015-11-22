@@ -8,12 +8,15 @@ package com.chingo247.structurecraft.construction.assigner;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
-import com.chingo247.structurecraft.event.construction.BuildCompleteEvent;
-import com.chingo247.structurecraft.event.construction.DemolitionCompleteEvent;
+import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.event.structure.StructureBuildCompleteEvent;
+import com.chingo247.structurecraft.event.structure.StructureDemolitionCompleteEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.interfaces.RotationalPlacement;
 import com.sk89q.worldedit.Vector;
 import java.io.IOException;
 import java.util.UUID;
@@ -30,18 +33,24 @@ public abstract class AWETaskAssigner extends ATaskAssigner {
         super(structureAPI);
     }
 
+    
     protected abstract IPlacement getPlacementFor(final IConstructionEntry entry) throws StructureException;
 
     protected abstract ITaskCallback getCallbackFor(final IConstructionEntry entry);
 
     @Override
-    public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException {
+    public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry, IPlaceOptionsAssigner optionsAssigner) throws StructureException, IOException {
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = constructionEntry.getStructure().getMin(); // Always place from the min position... 
         ITaskCallback callback = getCallbackFor(constructionEntry);
         IPlacement placement = getPlacementFor(constructionEntry);
-        constructionEntry.addTask(
-                new AWEPlacementTask(
+        
+        if (placement instanceof RotationalPlacement) {
+            RotationalPlacement rt = (RotationalPlacement) placement;
+            rt.rotate(constructionEntry.getStructure().getDirection().getRotation());
+        }
+        
+        AWEPlacementTask task = new AWEPlacementTask(
                         asyncWorldEdit,
                         constructionEntry,
                         placement,
@@ -49,8 +58,10 @@ public abstract class AWETaskAssigner extends ATaskAssigner {
                         session,
                         position,
                         callback
-                )
-        );
+                );
+        PlaceOptions options = optionsAssigner != null ? optionsAssigner.getPlaceOptionsFor(constructionEntry) : new PlaceOptions();
+        task.setOptions(options != null ? options : new PlaceOptions());
+        constructionEntry.addTask(task);
     }
 
 }

@@ -8,8 +8,13 @@ package com.chingo247.structurecraft.construction.assigner;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.event.construction.BuildCompleteEvent;
-import com.chingo247.structurecraft.event.construction.DemolitionCompleteEvent;
+import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.event.StructureEvent;
+import com.chingo247.structurecraft.event.structure.StructureBuildCompleteEvent;
+import com.chingo247.structurecraft.event.structure.StructureBuildingEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
+import com.chingo247.structurecraft.event.structure.StructureDemolitionCompleteEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 
@@ -34,12 +39,22 @@ class SimpleAWEBuildAss extends AWETaskAssigner {
 
             @Override
             public void onComplete() {
-                structureAPI.getEventDispatcher().post(new BuildCompleteEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().post(new StructureBuildCompleteEvent(entry.getStructure()));
             }
 
             @Override
             public void onCancelled() {
-                structureAPI.getEventDispatcher().post(new DemolitionCompleteEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().post(new StructureConstructionCancelledEvent(entry.getStructure()));
+            }
+
+            @Override
+            public void onStarted() {
+                structureAPI.getEventDispatcher().post(new StructureBuildingEvent(entry.getStructure()));
+            }
+
+            @Override
+            public void onQueued() {
+                structureAPI.getEventDispatcher().post(new StructureConstructionQueued(entry.getStructure()));
             }
         };
     }

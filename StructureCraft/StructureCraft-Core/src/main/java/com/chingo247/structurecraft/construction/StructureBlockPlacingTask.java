@@ -17,6 +17,7 @@
 package com.chingo247.structurecraft.construction;
 
 import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.event.task.StructureTaskCancelledEvent;
 import com.chingo247.structurecraft.event.task.StructureTaskCompleteEvent;
@@ -32,7 +33,7 @@ public abstract class StructureBlockPlacingTask {
     private IConstructionEntry constructionEntry;
     private final UUID submitter, uuid;
     private boolean cancelled = false, failed = false, finished = false, started = false;
-    private ITaskCallback callback;
+    protected final ITaskCallback callback;
     private PlaceOptions options;
     
     public StructureBlockPlacingTask(IConstructionEntry constructionEntry, UUID submitter) {
@@ -119,10 +120,10 @@ public abstract class StructureBlockPlacingTask {
             finished = true;
             if (isCancelled()) {
                 callback.onCancelled();
-                AsyncEventManager.getInstance().post(new StructureTaskCancelledEvent(this));
+                StructureAPI.getInstance().getEventDispatcher().post(new StructureTaskCancelledEvent(this));
             } else {
                 callback.onComplete();
-                AsyncEventManager.getInstance().post(new StructureTaskCompleteEvent(this));
+                StructureAPI.getInstance().getEventDispatcher().post(new StructureTaskCompleteEvent(this));
             }
             
             if(!isCancelled() && !failed) {

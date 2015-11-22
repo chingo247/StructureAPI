@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.options.Traversal;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -23,7 +24,7 @@ public interface IConstructionPlan {
     
     IConstructionPlan setStructureTraversal(Traversal traversal);
     
-    IConstructionPlan setOptions(PlaceOptions options);
+    IConstructionPlan setOptionsAssigner(IPlaceOptionsAssigner options);
     
     /**
      * If enabled, will check if the player has the right privileges to execute
@@ -60,6 +61,10 @@ public interface IConstructionPlan {
     
     Traversal getStructureTraversal();
     
-    PlaceOptions getOptions();
+    /**
+     * Gets the place options assigner, never returns null
+     * @return 
+     */
+    IPlaceOptionsAssigner getOptionsAssigner();
     
 }

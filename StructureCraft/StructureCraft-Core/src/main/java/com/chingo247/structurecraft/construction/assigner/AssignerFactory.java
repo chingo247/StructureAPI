@@ -7,7 +7,6 @@ package com.chingo247.structurecraft.construction.assigner;
 
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.sk89q.worldedit.Vector;

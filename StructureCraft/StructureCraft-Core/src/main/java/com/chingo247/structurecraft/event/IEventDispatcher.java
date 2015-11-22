@@ -13,8 +13,10 @@ import com.google.common.eventbus.EventBus;
  */
 public interface IEventDispatcher {
     
-    void register(EventBus eventBus);
-    
     void post(Object event);
+    
+    EventBus getEventBus();
+    
+    EventBus getAsyncEventBus();
     
 }

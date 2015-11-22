@@ -11,6 +11,10 @@ package com.chingo247.structurecraft.construction;
  */
 public interface ITaskCallback {
     
+    void onStarted();
+    
+    void onQueued();
+    
     void onComplete();
     
     void onCancelled();

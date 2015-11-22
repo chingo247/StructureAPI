@@ -6,7 +6,6 @@
 package com.chingo247.structurecraft.construction.assigner;
 
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.ITaskAssigner;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**

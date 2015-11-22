@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.event.construction;
+package com.chingo247.structurecraft.event.structure;
 
 import com.chingo247.structurecraft.event.StructureEvent;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -12,9 +12,9 @@ import com.chingo247.structurecraft.model.structure.IStructure;
  *
  * @author Chingo
  */
-public class RestoreCancelledEvent extends StructureEvent {
+public class StructureRestoreCompleteEvent extends StructureEvent{
 
-    public RestoreCancelledEvent(IStructure structure) {
+    public StructureRestoreCompleteEvent(IStructure structure) {
         super(structure);
     }
     

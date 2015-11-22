@@ -32,6 +32,7 @@ import com.chingo247.structurecraft.menu.StructurePlanMenuFactory;
 import com.chingo247.structurecraft.menu.StructurePlanMenuReader;
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
+import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.construction.ConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.event.EventDispatcher;
@@ -230,15 +231,14 @@ public class StructureAPI implements IStructureAPI {
             // Load StructurePlans
             StructurePlanMenuReader reader = new StructurePlanMenuReader();
 
-            menuTemplate = reader.read(new File(getWorkingDirectory(), "menu.xml"));
-            planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
+            this.menuTemplate = reader.read(new File(getWorkingDirectory(), "menu.xml"));
+            this.planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
             
-            this.eventDispatcher = new EventDispatcher();
-            this.eventDispatcher.register(EventManager.getInstance().getEventBus());
-            this.eventDispatcher.register(AsyncEventManager.getInstance().getEventBus());
-
+            this.eventDispatcher = new EventDispatcher(EventManager.getInstance().getEventBus(), AsyncEventManager.getInstance().getEventBus());
+            IEconomyProvider economyProvider = SettlerCraft.getInstance().getEconomyProvider();
+            this.eventDispatcher.getAsyncEventBus().register(new StructureEventListener(economyProvider, this));
             reload();
-            initialized = true;
+            this.initialized = true;
         }
     }
 

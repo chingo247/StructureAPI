@@ -17,6 +17,7 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.ConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
@@ -98,17 +99,26 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
                 setJobId(job.getJobId());
                 System.out.println("Added task " + t.getUUID() + ", jobId: " + jobId);
                 AWEJobManager.getInstance().register(t);
-                AsyncEventManager.getInstance().post(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
+                StructureAPI.getInstance().getEventDispatcher().post(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
+                if(callback != null) {
+                    callback.onQueued();
+                }
             }
 
             @Override
             public void onCancelled() {
                 cancel();
+                if(callback != null) {
+                    callback.onCancelled();
+                }
             }
 
             @Override
             public void onStarted() {
-                AsyncEventManager.getInstance().post(new StructureTaskStartEvent(t));
+                if(callback != null) {
+                    callback.onStarted();
+                }
+                StructureAPI.getInstance().getEventDispatcher().post(new StructureTaskStartEvent(t));
             }
         }
         );

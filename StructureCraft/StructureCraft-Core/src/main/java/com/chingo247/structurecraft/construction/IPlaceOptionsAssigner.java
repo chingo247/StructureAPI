@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner;
+package com.chingo247.structurecraft.construction;
 
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 
@@ -11,10 +11,9 @@ import com.chingo247.structurecraft.construction.options.PlaceOptions;
  *
  * @author Chingo
  */
-public interface IAssignerFactory {
+public interface IPlaceOptionsAssigner {
     
-    ITaskAssigner newSimpleBuildAssigner();
     
-    ITaskAssigner newSimpleDemolitionAssigner();
+    PlaceOptions getPlaceOptionsFor(IConstructionEntry entry);
     
 }

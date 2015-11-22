@@ -28,7 +28,7 @@ import java.util.Queue;
 public class ConstructionEntry implements IConstructionEntry {
 
     private IStructure structure;
-    private IConstructionExecutor executor;
+    private IConstructionExecutor constructionExecutor;
     private ConstructionEntry nextEntry;
     private ConstructionEntry prevEntry;
     private StructureBlockPlacingTask currentTask;
@@ -39,12 +39,12 @@ public class ConstructionEntry implements IConstructionEntry {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
         this.tasks = new LinkedList<>();
         this.structure = structure;
-        this.executor = executor;
+        this.constructionExecutor = executor;
     }
 
     @Override
     public IConstructionExecutor getConstructionExecutor() {
-        return executor;
+        return constructionExecutor;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ConstructionEntry implements IConstructionEntry {
         if (currentTask == null) {
             System.out.println("[ConstructionEntry]: Current task is null!");
             System.out.println("[ConstructionEntry]: Removing current task!");
-            executor.remove(this);
+            constructionExecutor.remove(this);
 
             if (nextEntry != null) {
                 System.out.println("[ConstructionEntry]: Moving to next entry");

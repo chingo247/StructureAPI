@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.block;
+package com.chingo247.structurecraft.placement;
 
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -26,7 +26,7 @@ import com.sk89q.worldedit.blocks.BlockType;
  *
  * @author Chingo
  */
-public class StructureBlock implements Comparable<StructureBlock> {
+class StructureBlock implements Comparable<StructureBlock> {
 
     private static final int PRIORITY_FIRST = 4;
     private static final int PRIORITY_LIQUID = 3;

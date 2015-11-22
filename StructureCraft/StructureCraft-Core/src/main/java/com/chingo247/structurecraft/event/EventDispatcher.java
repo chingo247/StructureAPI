@@ -6,6 +6,7 @@
 package com.chingo247.structurecraft.event;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import java.util.List;
 
@@ -15,22 +16,28 @@ import java.util.List;
  */
 public class EventDispatcher implements IEventDispatcher {
 
-    private List<EventBus> eventBusses;
+    private EventBus eventBus;
+    private AsyncEventBus asyncEventBus;
 
-    public EventDispatcher() {
-        this.eventBusses = Lists.newArrayList();
+    public EventDispatcher(EventBus eventBus, AsyncEventBus asyncEventBus) {
+        this.eventBus = eventBus;
+        this.asyncEventBus = asyncEventBus;
     }
     
     @Override
-    public void register(EventBus eventBus) {
-        this.eventBusses.add(eventBus);
+    public void post(Object event) {
+        this.eventBus.post(event);
+        this.asyncEventBus.post(event);
     }
 
     @Override
-    public void post(Object event) {
-        for(EventBus e : eventBusses) {
-            e.post(event);
-        }
+    public EventBus getEventBus() {
+        return eventBus;
+    }
+
+    @Override
+    public EventBus getAsyncEventBus() {
+        return asyncEventBus;
     }
 
 }

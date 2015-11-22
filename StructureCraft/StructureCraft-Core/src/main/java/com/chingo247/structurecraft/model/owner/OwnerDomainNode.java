@@ -110,7 +110,7 @@ public class OwnerDomainNode {
     public List<Ownership> getOwnerships() {
         List<Ownership> owners = Lists.newArrayList();
         for (Relationship rel : underlyingNode.getRelationships(DynamicRelationshipType.withName(Relations.RELATION_OWNED_BY), org.neo4j.graphdb.Direction.OUTGOING)) {
-            if (rel.hasProperty("Type") && rel.getOtherNode(underlyingNode).hasLabel(SettlerNode.label())) {
+            if (rel.getOtherNode(underlyingNode).hasLabel(SettlerNode.label())) {
                 SettlerNode ownerNode = new SettlerNode(rel.getOtherNode(underlyingNode));
                 owners.add(new Ownership(ownerNode, rel));
             }

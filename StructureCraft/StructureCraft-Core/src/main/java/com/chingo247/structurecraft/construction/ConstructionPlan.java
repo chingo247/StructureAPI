@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.options.Traversal;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -17,6 +18,14 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 public class ConstructionPlan implements IConstructionPlan {
     
+    private static final IPlaceOptionsAssigner DEFAULT_OPTIONS_ASSIGNER = new IPlaceOptionsAssigner() {
+
+        @Override
+        public PlaceOptions getPlaceOptionsFor(IConstructionEntry entry) {
+            return new PlaceOptions();
+        }
+    };
+    
     private final IStructure structure;
     private final IConstructionExecutor executor;
     private final ITaskAssigner assigner;
@@ -24,7 +33,7 @@ public class ConstructionPlan implements IConstructionPlan {
     private UUID player;
     private AsyncEditSession editSession;
     private Traversal traveral;
-    private PlaceOptions options;
+    private IPlaceOptionsAssigner optionsAssigner;
     private boolean useForce;
     
     
@@ -119,8 +128,8 @@ public class ConstructionPlan implements IConstructionPlan {
     }
     
     @Override
-    public IConstructionPlan setOptions(PlaceOptions options) {
-        this.options = options;
+    public IConstructionPlan setOptionsAssigner(IPlaceOptionsAssigner optionsAssigner) {
+        this.optionsAssigner = optionsAssigner;
         return this;
     }
 
@@ -136,8 +145,11 @@ public class ConstructionPlan implements IConstructionPlan {
     }
 
     @Override
-    public PlaceOptions getOptions() {
-        return options;
+    public IPlaceOptionsAssigner getOptionsAssigner() {
+        if(optionsAssigner == null) {
+            return DEFAULT_OPTIONS_ASSIGNER;
+        }
+        return optionsAssigner;
     }
 
     
