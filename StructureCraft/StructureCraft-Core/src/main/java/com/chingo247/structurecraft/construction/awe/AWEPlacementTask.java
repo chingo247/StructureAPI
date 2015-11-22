@@ -18,7 +18,7 @@ package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
 import com.chingo247.structurecraft.construction.ConstructionEntry;
-import com.chingo247.structurecraft.construction.ICallback;
+import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
@@ -62,7 +62,7 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IConstructionEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position, ICallback callback) {
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IConstructionEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position, ITaskCallback callback) {
         super(callback, connstructionEntry, playerOrRandomUUID);
         this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;

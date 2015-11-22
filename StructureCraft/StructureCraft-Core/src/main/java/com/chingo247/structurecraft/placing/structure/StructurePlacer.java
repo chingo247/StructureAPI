@@ -278,6 +278,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 
                 placeResult.setStructure(structure);
                 structureAPI.getEventDispatcher().post(new StructureCreateEvent(structure));
+                tx.success();
             } catch (StructureException ex) {
                 if (tx != null) {
                     tx.failure();

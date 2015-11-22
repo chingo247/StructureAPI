@@ -6,7 +6,7 @@
 package com.chingo247.structurecraft.model.settler;
 
 import com.chingo247.structurecraft.model.structure.StructureNode;
-import com.chingo247.settlercraft.core.model.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
 import com.chingo247.structurecraft.model.Relations;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.google.common.collect.Lists;

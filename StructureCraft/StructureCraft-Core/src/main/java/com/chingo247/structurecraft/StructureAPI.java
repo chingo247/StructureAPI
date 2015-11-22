@@ -30,7 +30,7 @@ import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
 import com.chingo247.settlercraft.core.exception.SettlerCraftException;
 import com.chingo247.structurecraft.menu.StructurePlanMenuFactory;
 import com.chingo247.structurecraft.menu.StructurePlanMenuReader;
-import com.chingo247.settlercraft.core.model.WorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.structurecraft.construction.ConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;

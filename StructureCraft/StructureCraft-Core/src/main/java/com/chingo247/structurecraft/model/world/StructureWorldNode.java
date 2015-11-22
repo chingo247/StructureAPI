@@ -6,10 +6,9 @@
 package com.chingo247.structurecraft.model.world;
 
 import com.chingo247.structurecraft.model.structure.StructureNode;
-import com.chingo247.settlercraft.core.model.WorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
-import com.chingo247.structurecraft.model.zone.IConstructionZone;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 

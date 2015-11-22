@@ -5,8 +5,10 @@
  */
 package com.chingo247.structurecraft.model.world;
 
-import com.chingo247.settlercraft.core.model.WorldRepository;
-import com.chingo247.settlercraft.core.model.interfaces.IWorld;
+import com.chingo247.settlercraft.core.model.world.IWorldRepository;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldRepository;
+import com.chingo247.xplatform.core.IWorld;
 import java.util.UUID;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -14,15 +16,17 @@ import org.neo4j.graphdb.GraphDatabaseService;
  *
  * @author Chingo
  */
-public class StructureWorldRepository extends WorldRepository implements IStructureWorldRepository {
+public class StructureWorldRepository  implements IStructureWorldRepository {
 
+    private IWorldRepository<WorldNode> worldRepository;
+    
     public StructureWorldRepository(GraphDatabaseService graph) {
-        super(graph);
+        this.worldRepository = new WorldRepository(graph);
     }
 
     @Override
     public StructureWorldNode findByUUID(UUID worldUUID) {
-        IWorld world = super.findByUUID(worldUUID); //To change body of generated methods, choose Tools | Templates.
+        WorldNode world = worldRepository.findByUUID(worldUUID); //To change body of generated methods, choose Tools | Templates.
         if(world != null) {
             return new StructureWorldNode(world.getNode());
         }
@@ -31,7 +35,7 @@ public class StructureWorldRepository extends WorldRepository implements IStruct
 
     @Override
     public StructureWorldNode addOrGet(String worldName, UUID worldUUID) {
-        IWorld world = super.addOrGet(worldName, worldUUID); //To change body of generated methods, choose Tools | Templates.
+        WorldNode world = worldRepository.addOrGet(worldName, worldUUID); //To change body of generated methods, choose Tools | Templates.
         return new StructureWorldNode(world.getNode());
     }
     

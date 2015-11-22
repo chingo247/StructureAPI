@@ -105,6 +105,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
     public void execute(final IConstructionPlan plan) {
         final IStructure structure = plan.getStructure();
         System.out.println("plan structure: " + plan.getStructure());
+        System.out.println("plan structure id: " + plan.getStructure().getId());
         
         final APlatform platform = structureAPI.getPlatform();
         final IColors colors = platform.getChatColors();
@@ -144,6 +145,9 @@ public class ConstructionExecutor implements IConstructionExecutor {
                     try {
                         tx = graph.beginTx();
                         StructureNode structureNode = structureRepository.findById(structure.getId());
+                        
+                        System.out.println("Structure: " + structureNode);
+                        
                         StructureNode rootNode = structureNode.getRoot();
                         lockId = rootNode.getId();
                     } catch (Exception ex) {

@@ -6,7 +6,7 @@
 package com.chingo247.structurecraft.construction.assigner;
 
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.ICallback;
+import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.event.construction.BuildCompleteEvent;
 import com.chingo247.structurecraft.event.construction.DemolitionCompleteEvent;
@@ -29,8 +29,8 @@ class SimpleAWEBuildAss extends AWETaskAssigner {
     }
 
     @Override
-    protected ICallback getCallbackFor(final IConstructionEntry entry) {
-        return new ICallback() {
+    protected ITaskCallback getCallbackFor(final IConstructionEntry entry) {
+        return new ITaskCallback() {
 
             @Override
             public void onComplete() {

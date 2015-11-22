@@ -16,7 +16,8 @@
  */
 package com.chingo247.structurecraft.model.owner;
 
-import com.chingo247.settlercraft.core.model.interfaces.IBaseSettler;
+import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.structurecraft.model.Relations;
 import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.google.common.collect.Lists;
@@ -70,7 +71,7 @@ public class OwnerDomainNode {
      * @param ownerType The owner type to set, may not be null
      * @return True if there was an update
      */
-    public boolean setOwnership(IBaseSettler settler, OwnerType ownerType) {
+    public boolean setOwnership(BaseSettlerNode settler, OwnerType ownerType) {
         Preconditions.checkNotNull(ownerType, "Ownertype may not be null...");
         // if exists... update it
         for(Ownership o : getOwnerships()) {

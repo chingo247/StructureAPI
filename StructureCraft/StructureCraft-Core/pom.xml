@@ -37,20 +37,6 @@
             </plugin>
         </plugins>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>SettlerCraft-MenuAPI</artifactId>
-            <version>2.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>SettlerCraft-Core</artifactId>
-            <version>2.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
     <name>StructureCraft-Core</name>
     <reporting>
         <plugins>

@@ -6,7 +6,7 @@
 package com.chingo247.structurecraft.construction.assigner;
 
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.ICallback;
+import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.event.construction.BuildCompleteEvent;
@@ -32,13 +32,13 @@ public abstract class AWETaskAssigner extends ATaskAssigner {
 
     protected abstract IPlacement getPlacementFor(final IConstructionEntry entry) throws StructureException;
 
-    protected abstract ICallback getCallbackFor(final IConstructionEntry entry);
+    protected abstract ITaskCallback getCallbackFor(final IConstructionEntry entry);
 
     @Override
     public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException {
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = constructionEntry.getStructure().getMin(); // Always place from the min position... 
-        ICallback callback = getCallbackFor(constructionEntry);
+        ITaskCallback callback = getCallbackFor(constructionEntry);
         IPlacement placement = getPlacementFor(constructionEntry);
         constructionEntry.addTask(
                 new AWEPlacementTask(

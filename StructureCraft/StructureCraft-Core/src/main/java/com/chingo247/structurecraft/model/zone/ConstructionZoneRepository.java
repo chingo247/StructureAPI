@@ -17,11 +17,10 @@
 package com.chingo247.structurecraft.model.zone;
 
 import com.chingo247.structurecraft.model.AccessType;
-import com.chingo247.settlercraft.core.model.WorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.plot.PlotNode;
-import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.xplatform.core.ILocation;
 import com.google.common.collect.Maps;

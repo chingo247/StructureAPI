@@ -5,14 +5,14 @@
  */
 package com.chingo247.structurecraft.model.world;
 
-import com.chingo247.settlercraft.core.model.interfaces.IWorldRepository;
+import com.chingo247.settlercraft.core.model.world.IWorldRepository;
 import java.util.UUID;
 
 /**
  *
  * @author Chingo
  */
-public interface IStructureWorldRepository extends IWorldRepository  {
+public interface IStructureWorldRepository extends IWorldRepository<StructureWorldNode>  {
     
     /**
      * Finds a StructureWorld by UUID

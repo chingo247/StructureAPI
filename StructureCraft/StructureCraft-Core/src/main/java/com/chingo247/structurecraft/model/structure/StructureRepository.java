@@ -6,7 +6,7 @@
 package com.chingo247.structurecraft.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.settlercraft.core.model.WorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.plot.PlotNode;
 import com.chingo247.structurecraft.model.settler.SettlerNode;
@@ -51,10 +51,9 @@ public class StructureRepository implements IStructureRepository {
 
         Result result = graph.execute(query, params);
 
-        while (result.hasNext()) {
+        if (result.hasNext()) {
             Node n = (Node) result.next().get("structure");
             structure = new StructureNode(n);
-            break;
         }
 
         return structure;
@@ -89,6 +88,7 @@ public class StructureRepository implements IStructureRepository {
     public StructureNode addStructure(String name, Vector position, CuboidRegion region, Direction direction, double price) {
         long id = nextId();
         Node stNode = graph.createNode(StructureNode.label(), DynamicLabel.label(PlotNode.LABEL_PLOT));
+        System.out.println("Adding structure with id: " + id);
         stNode.setProperty(StructureNode.ID_PROPERTY, id);
         stNode.setProperty(StructureNode.NAME_PROPERTY, name);
         stNode.setProperty(StructureNode.CONSTRUCTION_STATUS_PROPERTY, ConstructionStatus.ON_HOLD.getStatusId());

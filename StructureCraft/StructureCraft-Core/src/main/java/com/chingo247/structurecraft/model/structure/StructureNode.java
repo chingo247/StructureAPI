@@ -6,12 +6,10 @@
 package com.chingo247.structurecraft.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.settlercraft.core.model.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.plot.PlotNode;
-import com.chingo247.structurecraft.model.world.StructureWorldNode;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;

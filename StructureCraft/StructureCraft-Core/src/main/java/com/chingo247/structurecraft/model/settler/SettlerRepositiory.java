@@ -5,8 +5,9 @@
  */
 package com.chingo247.structurecraft.model.settler;
 
-import com.chingo247.settlercraft.core.model.BaseSettlerRepository;
-import com.chingo247.settlercraft.core.model.interfaces.IBaseSettler;
+import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.BaseSettlerRepository;
+import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import java.util.UUID;
 import org.neo4j.graphdb.GraphDatabaseService;
 
@@ -23,7 +24,7 @@ public class SettlerRepositiory extends BaseSettlerRepository implements ISettle
 
     @Override
     public SettlerNode findByUUID(UUID uuid) {
-        IBaseSettler settler = super.findByUUID(uuid);
+        BaseSettlerNode settler = super.findByUUID(uuid);
         if(settler != null) {
             return new SettlerNode(settler.getNode());
         }
@@ -32,7 +33,7 @@ public class SettlerRepositiory extends BaseSettlerRepository implements ISettle
 
     @Override
     public SettlerNode findById(Long id) {
-        IBaseSettler settler = super.findById(id);
+        BaseSettlerNode settler = super.findById(id);
         if(settler != null) {
             return new SettlerNode(settler.getNode());
         }

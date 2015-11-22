@@ -21,7 +21,8 @@ import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.settlercraft.core.event.EventManager;
 import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
-import com.chingo247.settlercraft.core.model.interfaces.IBaseSettler;
+import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.structurecraft.event.zone.ConstructionZoneRemoveOwnerEvent;
 import com.chingo247.structurecraft.event.zone.ConstructionZoneUpdateOwnerEvent;
 import com.chingo247.structurecraft.event.zone.DeleteConstructionZoneEvent;
@@ -63,6 +64,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.math.NumberUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -75,6 +78,7 @@ import org.neo4j.graphdb.Transaction;
  */
 public class ConstructionZoneCommands {
     
+    private static final Logger LOG = Logger.getLogger(ConstructionZoneCommands.class.getName());
     private static final Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>() {
 
         @Override
@@ -370,7 +374,9 @@ public class ConstructionZoneCommands {
             throw new CommandException("Unknown method '" + method + "', expected 'add' or 'remove'" + "\n" + help);
         }
 
-        try (Transaction tx = graph.beginTx()) {
+        Transaction tx = null;
+        try  {
+            tx = graph.beginTx();
             ConstructionZoneNode zone = getConstructionZone(args, tx);
             if (!isOP(sender)) {
                 IPlayer player = (IPlayer) sender;
@@ -420,7 +426,7 @@ public class ConstructionZoneCommands {
                 Long id = null;
                 try {
                     id = Long.parseLong(playerArg);
-                    IBaseSettler sn = settlerRepository.findById(id);
+                    BaseSettlerNode sn = settlerRepository.findById(id);
                     if (sn == null) {
                         tx.success();
                         throw new CommandException("Couldn't find a player for id'" + playerArg + "'");
@@ -437,7 +443,7 @@ public class ConstructionZoneCommands {
 
             UUID uuid = ply.getUniqueId();
             if (method.equalsIgnoreCase("add")) {
-                IBaseSettler settler = settlerRepository.findByUUID(ply.getUniqueId());
+                BaseSettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
                 OwnerDomainNode ownerDomain = zone.getOwnerDomain();
                 IOwnership ownershipToAdd = ownerDomain.getOwnership(settler.getUniqueId());
 
@@ -460,6 +466,19 @@ public class ConstructionZoneCommands {
                 sender.sendMessage("Successfully removed '" + colors.green() + ply.getName() + colors.reset() + "' from #" + colors.gold() + zone.getId() + " as " + colors.yellow() + type.name());
             }
             tx.success();
+        } catch (Exception ex) {
+            if(tx != null) {
+                tx.failure();
+            }
+            if(ex instanceof CommandException) {
+                throw ex;
+            }
+            sender.sendMessage(colors.red() + "Somethin went wrong... See console");
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        } finally {
+            if(tx != null) {
+                tx.close();
+            }
         }
     }
     

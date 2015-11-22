@@ -20,8 +20,9 @@ import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.event.EventManager;
-import com.chingo247.settlercraft.core.model.interfaces.IBaseSettler;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
+import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.structurecraft.event.StructureAddOwnerEvent;
 import com.chingo247.structurecraft.event.StructureRemoveOwnerEvent;
 import com.chingo247.structurecraft.model.owner.IOwnership;
@@ -553,7 +554,7 @@ public class StructureCommands {
                 Long id = null;
                 try {
                     id = Long.parseLong(playerArg);
-                    IBaseSettler sn = settlerRepository.findById(id);
+                    BaseSettlerNode sn = settlerRepository.findById(id);
                     if (sn == null) {
                         tx.success();
                         throw new CommandException("Couldn't find a player for id'" + playerArg + "'");
@@ -577,7 +578,7 @@ public class StructureCommands {
 
             UUID uuid = ply.getUniqueId();
             if (method.equalsIgnoreCase("add")) {
-                IBaseSettler settler = settlerRepository.findByUUID(ply.getUniqueId());
+                BaseSettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 IOwnership ownershipToAdd = ownerDomain.getOwnership(settler.getUniqueId());
 

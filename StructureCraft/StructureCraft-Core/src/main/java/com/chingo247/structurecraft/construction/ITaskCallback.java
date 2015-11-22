@@ -9,7 +9,7 @@ package com.chingo247.structurecraft.construction;
  *
  * @author Chingo
  */
-public interface ICallback {
+public interface ITaskCallback {
     
     void onComplete();
     

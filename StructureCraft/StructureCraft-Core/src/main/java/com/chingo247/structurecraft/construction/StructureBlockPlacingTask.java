@@ -32,14 +32,14 @@ public abstract class StructureBlockPlacingTask {
     private IConstructionEntry constructionEntry;
     private final UUID submitter, uuid;
     private boolean cancelled = false, failed = false, finished = false, started = false;
-    private ICallback callback;
+    private ITaskCallback callback;
     private PlaceOptions options;
     
     public StructureBlockPlacingTask(IConstructionEntry constructionEntry, UUID submitter) {
         this(null, constructionEntry, submitter);
     }
     
-    public StructureBlockPlacingTask(ICallback callback, IConstructionEntry constructionEntry, UUID submitter) {
+    public StructureBlockPlacingTask(ITaskCallback callback, IConstructionEntry constructionEntry, UUID submitter) {
         Preconditions.checkNotNull(constructionEntry, "ConstructionEntry may not be null");
         Preconditions.checkNotNull(submitter, "Submitter may not be null");
         this.constructionEntry = constructionEntry;

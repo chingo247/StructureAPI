@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.model.plot;
 
-import com.chingo247.settlercraft.core.model.WorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
