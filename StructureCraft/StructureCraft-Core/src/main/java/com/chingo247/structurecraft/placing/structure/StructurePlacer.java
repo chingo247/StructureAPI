@@ -6,6 +6,7 @@
 package com.chingo247.structurecraft.placing.structure;
 
 import com.chingo247.settlercraft.core.Direction;
+import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.event.StructureCreateEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
@@ -28,6 +29,8 @@ import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.structurecraft.placing.AbstractPlacer;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.export.PlacementExporter;
+import com.chingo247.structurecraft.restriction.StructureRestriction;
+import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
 import com.chingo247.structurecraft.util.PlacementUtil;
 import com.chingo247.xplatform.core.ILocation;
 import com.chingo247.xplatform.core.IWorld;
@@ -36,11 +39,15 @@ import com.google.common.io.Files;
 import com.google.common.util.concurrent.Monitor;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -56,6 +63,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
     private double price;
     private boolean inheritOwnership;
     private boolean checkOwnerRestriction;
+    private boolean checkStructureRestrictions;
     private IStructure parent;
     private StructureAPI structureAPI;
     private final IWorld world;
@@ -68,6 +76,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         this.checkOwnerRestriction = true;
         this.structureAPI = (StructureAPI)StructureAPI.getInstance();
         this.monitor = structureAPI.getMonitor(world.getName());
+        this.checkStructureRestrictions = true;
     }
 
     @Override
@@ -75,6 +84,15 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         this.placer = placer;
         return this;
     }
+
+    
+    @Override
+    public IStructurePlacer setCheckStructureRestrictions(boolean checkStructureRestrictions) {
+        this.checkStructureRestrictions = checkStructureRestrictions;
+        return this;
+    }
+    
+    
 
     @Override
     public IStructurePlacer setCheckOwnerRestriction(boolean enable) {
@@ -146,6 +164,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         ILocation spawn = world.getSpawn();
 
         try {
+            
 
             // Check too low
             if (region.getMinimumY() <= 0) {
@@ -160,6 +179,14 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
             // Check overlap world's spawn
             if (region.contains(new BlockVector(spawn.getBlockX(), spawn.getBlockY(), spawn.getBlockZ()))) {
                 throw new StructureException("Structure overlaps the world's spawn");
+            }
+            
+            if(checkStructureRestrictions) {
+                for(StructureRestriction restriction : structureAPI.getRestrictions()) {
+                    Player player = SettlerCraft.getInstance().getPlayer(placer);
+                    World w = SettlerCraft.getInstance().getWorld(world.getUUID());
+                    restriction.check(player, w, region);
+                }
             }
 
             GraphDatabaseService graph = structureAPI.getGraphDatabase();
@@ -291,9 +318,9 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 monitor.leave();
             }
 
-        } catch (StructureException ex) {
+        } catch (StructureRestrictionException | StructureException ex) {
             placeResult.setError(ex.getMessage());
-        }
+        } 
         return placeResult;
     }
 

@@ -61,6 +61,7 @@ import com.google.common.util.concurrent.Monitor;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
@@ -83,32 +84,32 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
  * @author Chingo
  */
 public class StructureAPI implements IStructureAPI {
-
-    public static final String STRUCTURE_PLAN_FILE_NAME = "plan.xml";
     public static final String PLUGIN_NAME = "SettlerCraft";
     public static final String PLANS_DIRECTORY = "plans";
+    private static final Logger LOG = Logger.getLogger(StructureAPI.class.getName());
+
+    private final IConstructionExecutor constructionExecutor;
+    private final Lock loadLock = new ReentrantLock();
     private final Set<StructureRestriction> restrictions;
     private final APlatform platform;
-    private IPlugin plugin;
-    private ConfigProvider config;
-    private IConstructionExecutor constructionExecutor;
-    private final Lock loadLock = new ReentrantLock();
-    private StructurePlanMenuFactory planMenuFactory;
-    private AsyncEditSessionFactoryProvider sessionFactoryProvider;
-    private CategoryMenu menuTemplate;
-    private final GraphDatabaseService graph;
-    private boolean isLoadingPlans = false, initialized = false;
-    private static StructureAPI instance;
-    private final Logger LOG = Logger.getLogger(getClass().getName());
     private final IColors COLORS;
-    private Level logLevel;
     private final Map<String, Monitor> monitors;
     private final IStructurePlacerFactory structurePlacerFactory;
     private final IConstructionZonePlacerFactory constructionZonePlacerFactory;
+    private final ExecutorService executor;
+    private final GraphDatabaseService graph;
+    
+    private IPlugin plugin;
+    private ConfigProvider config;
+    private StructurePlanMenuFactory planMenuFactory;
+    private AsyncEditSessionFactoryProvider sessionFactoryProvider;
+    private CategoryMenu menuTemplate;
+    private boolean isLoadingPlans = false, initialized = false;
     private IEventDispatcher eventDispatcher;
     private IAsyncWorldEditIntegration asyncWorldEditIntegration;
-    private final ExecutorService executor;
-;
+    
+    private static StructureAPI instance;
+
     private StructureAPI() {
         this.platform = SettlerCraft.getInstance().getPlatform();
         this.graph = SettlerCraft.getInstance().getNeo4j();
@@ -116,7 +117,6 @@ public class StructureAPI implements IStructureAPI {
         this.monitors = Maps.newHashMap();
         this.COLORS = platform.getChatColors();
         this.restrictions = Sets.newHashSet();
-        this.logLevel = Level.SEVERE;
 
         EventManager.getInstance().getEventBus().register(new StructurePlanManagerHandler());
         setupSchema();
@@ -126,6 +126,13 @@ public class StructureAPI implements IStructureAPI {
         this.structurePlacerFactory = new StructurePlacerFactory(this);
         this.constructionExecutor = new ConstructionExecutor(this, executor);
     }
+
+    @Override
+    public Iterable<StructureRestriction> getRestrictions() {
+        return new ArrayList<>(restrictions);
+    }
+    
+    
 
     @Override
     public IConstructionZonePlacerFactory getConstructionZonePlacerFactory() {

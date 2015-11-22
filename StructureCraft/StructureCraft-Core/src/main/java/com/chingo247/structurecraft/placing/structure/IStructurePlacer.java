@@ -23,6 +23,8 @@ public interface IStructurePlacer {
     
     IStructurePlacer setPlacer(UUID placer);
     
+    IStructurePlacer setCheckStructureRestrictions(boolean check);
+    
     IStructurePlacer setCheckOwnerRestriction(boolean enable);
     
     IStructurePlacer setInheritOwnership(boolean inherit);

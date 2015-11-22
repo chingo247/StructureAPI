@@ -165,6 +165,8 @@ public interface IStructureAPI {
     
     void removeRestriction(StructureRestriction structureRestriction);
     
+    Iterable<StructureRestriction> getRestrictions();
+    
     /**
      * Loads a schematic file
      *

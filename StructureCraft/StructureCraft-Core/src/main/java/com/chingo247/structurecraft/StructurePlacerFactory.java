@@ -12,11 +12,11 @@ import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IWorld;
 
 /**
- * 
+ *
  * @author Chingo
  */
 class StructurePlacerFactory implements IStructurePlacerFactory {
-    
+
     private StructureAPI structureAPI;
 
     StructurePlacerFactory(StructureAPI structureAPI) {
@@ -27,17 +27,10 @@ class StructurePlacerFactory implements IStructurePlacerFactory {
     public IStructurePlacer createPlacer(String worldName) {
         APlatform platform = structureAPI.getPlatform();
         IWorld world = platform.getServer().getWorld(worldName);
-        if(world == null) {
+        if (world == null) {
             throw new IllegalArgumentException("World with name '" + worldName + "' does not exist");
         }
-        
-        return new StructurePlacer(
-                world
-        );
+        return new StructurePlacer(world);
     }
-    
-    
-    
-    
-    
+
 }
