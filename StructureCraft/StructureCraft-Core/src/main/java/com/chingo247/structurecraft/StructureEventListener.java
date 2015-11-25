@@ -128,7 +128,7 @@ class StructureEventListener {
                     }
                     
                     if(oldStatus != newStatus) {
-                        structureAPI.getEventDispatcher().post(new StructureStateChangeEvent(structure));
+                        structureAPI.getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(structure));
                     }
                     
                     boolean shouldTell = (oldStatus != newStatus);

@@ -16,9 +16,7 @@
  */
 package com.chingo247.structurecraft.construction.awe;
 
-import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.ConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
@@ -29,7 +27,6 @@ import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import java.util.UUID;
-import org.primesoft.asyncworldedit.AsyncWorldEditMain;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
 import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
@@ -99,7 +96,7 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
                 setJobId(job.getJobId());
                 System.out.println("Added task " + t.getUUID() + ", jobId: " + jobId);
                 AWEJobManager.getInstance().register(t);
-                StructureAPI.getInstance().getEventDispatcher().post(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
+                StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
                 if(callback != null) {
                     callback.onQueued();
                 }
@@ -118,7 +115,7 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
                 if(callback != null) {
                     callback.onStarted();
                 }
-                StructureAPI.getInstance().getEventDispatcher().post(new StructureTaskStartEvent(t));
+                StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskStartEvent(t));
             }
         }
         );

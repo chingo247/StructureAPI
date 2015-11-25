@@ -25,8 +25,10 @@ import com.chingo247.menuapi.menu.MenuAPI;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IPlugin;
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.core.event.EventManager;
-import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
+import com.chingo247.settlercraft.core.concurrent.ThreadPoolFactory;
+import com.chingo247.settlercraft.core.event.DefaultSubscriberExceptionHandler;
+import com.chingo247.settlercraft.core.event.EventDispatcher;
+import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.settlercraft.core.exception.SettlerCraftException;
 import com.chingo247.structurecraft.menu.StructurePlanMenuFactory;
 import com.chingo247.structurecraft.menu.StructurePlanMenuReader;
@@ -35,8 +37,6 @@ import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.construction.ConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
-import com.chingo247.structurecraft.event.EventDispatcher;
-import com.chingo247.structurecraft.event.IEventDispatcher;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;
@@ -56,6 +56,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.AllowConcurrentEvents;
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Monitor;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -66,13 +68,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import org.dom4j.DocumentException;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
@@ -106,6 +104,7 @@ public class StructureAPI implements IStructureAPI {
     private CategoryMenu menuTemplate;
     private boolean isLoadingPlans = false, initialized = false;
     private IEventDispatcher eventDispatcher;
+    private EventBus eventBus, asyncEventBus;
     private IAsyncWorldEditIntegration asyncWorldEditIntegration;
     
     private static StructureAPI instance;
@@ -113,12 +112,14 @@ public class StructureAPI implements IStructureAPI {
     private StructureAPI() {
         this.platform = SettlerCraft.getInstance().getPlatform();
         this.graph = SettlerCraft.getInstance().getNeo4j();
-        this.executor = new ThreadPoolExecutor(0, Runtime.getRuntime().availableProcessors(), 30L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        this.executor = new ThreadPoolFactory().newCachedThreadPool(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors());
         this.monitors = Maps.newHashMap();
         this.COLORS = platform.getChatColors();
         this.restrictions = Sets.newHashSet();
-
-        EventManager.getInstance().getEventBus().register(new StructurePlanManagerHandler());
+        this.eventDispatcher = new EventDispatcher();
+        this.asyncEventBus = new AsyncEventBus(executor, new DefaultSubscriberExceptionHandler());
+        this.eventBus = new EventBus( new DefaultSubscriberExceptionHandler());
+        this.eventBus.register(new StructurePlanManagerHandler());
         setupSchema();
         applyUpdates();
         
@@ -126,6 +127,18 @@ public class StructureAPI implements IStructureAPI {
         this.structurePlacerFactory = new StructurePlacerFactory(this);
         this.constructionExecutor = new ConstructionExecutor(this, executor);
     }
+
+    @Override
+    public EventBus getAsyncEventBus() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public EventBus getEventBus() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
     @Override
     public Iterable<StructureRestriction> getRestrictions() {
@@ -241,9 +254,7 @@ public class StructureAPI implements IStructureAPI {
             this.menuTemplate = reader.read(new File(getWorkingDirectory(), "menu.xml"));
             this.planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
             
-            this.eventDispatcher = new EventDispatcher(EventManager.getInstance().getEventBus(), AsyncEventManager.getInstance().getEventBus());
             IEconomyProvider economyProvider = SettlerCraft.getInstance().getEconomyProvider();
-            this.eventDispatcher.getAsyncEventBus().register(new StructureEventListener(economyProvider, this));
             reload();
             this.initialized = true;
         }

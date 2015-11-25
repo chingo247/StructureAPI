@@ -19,10 +19,7 @@ package com.chingo247.structurecraft.commands;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
-import com.chingo247.settlercraft.core.event.EventManager;
-import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
-import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.structurecraft.event.zone.ConstructionZoneRemoveOwnerEvent;
 import com.chingo247.structurecraft.event.zone.ConstructionZoneUpdateOwnerEvent;
 import com.chingo247.structurecraft.event.zone.DeleteConstructionZoneEvent;
@@ -259,7 +256,7 @@ public class ConstructionZoneCommands {
             }
             tx.success();
             sender.sendMessage("Deleted construction-zone #" + id);
-            structureAPI.getEventDispatcher().post(new DeleteConstructionZoneEvent(new ConstructionZone(zone)));
+            structureAPI.getEventDispatcher().dispatchEvent(new DeleteConstructionZoneEvent(new ConstructionZone(zone)));
         }
         
         
@@ -449,11 +446,11 @@ public class ConstructionZoneCommands {
 
                 if (ownershipToAdd == null) {
                     ownerDomain.setOwnership(settler, type);
-                    structureAPI.getEventDispatcher().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
+                    structureAPI.getEventDispatcher().dispatchEvent(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
                     sender.sendMessage("Successfully added '" + colors.green() + ply.getName() + colors.reset() + "' to #" + colors.gold() + zone.getId() + colors.reset() + " as " + colors.yellow() + type.name());
                 } else {
                     ownerDomain.setOwnership(settler, type);
-                    structureAPI.getEventDispatcher().post(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
+                    structureAPI.getEventDispatcher().dispatchEvent(new ConstructionZoneUpdateOwnerEvent(new ConstructionZone(zone), uuid, type));
                     sender.sendMessage("Updated ownership of '" + colors.green() + ply.getName() + colors.reset() + "' to " + colors.yellow() + type.name() + colors.reset() + " for structure ",
                             "#" + colors.gold() + zone.getId());
                 }
@@ -462,7 +459,7 @@ public class ConstructionZoneCommands {
                 if (!ownerDomain.removeOwnership(uuid)) {
                     throw new CommandException(ply.getName() + " does not own this construction zone...");
                 }
-                EventManager.getInstance().getEventBus().post(new ConstructionZoneRemoveOwnerEvent(new ConstructionZone(zone), uuid, type));
+                structureAPI.getEventDispatcher().dispatchEvent(new ConstructionZoneRemoveOwnerEvent(new ConstructionZone(zone), uuid, type));
                 sender.sendMessage("Successfully removed '" + colors.green() + ply.getName() + colors.reset() + "' from #" + colors.gold() + zone.getId() + " as " + colors.yellow() + type.name());
             }
             tx.success();

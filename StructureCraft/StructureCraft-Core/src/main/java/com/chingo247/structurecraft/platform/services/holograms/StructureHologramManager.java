@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft.platform.services.holograms;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.core.event.EventManager;
 import com.chingo247.structurecraft.event.StructureCreateEvent;
 import com.chingo247.structurecraft.event.StructureStateChangeEvent;
 import com.chingo247.structurecraft.model.hologram.StructureHologram;
@@ -100,7 +99,7 @@ public class StructureHologramManager {
         this.plugin = plugin;
         invalidate();
         setupUnchecked();
-        EventManager.getInstance().getEventBus().register(this); // Should be registered once...
+        StructureAPI.getInstance().getEventBus().register(this); // Should be registered once...
     }
 
     public HologramsProvider getHologramsProvider() {

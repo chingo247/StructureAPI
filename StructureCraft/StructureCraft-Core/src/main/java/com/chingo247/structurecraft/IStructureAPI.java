@@ -19,14 +19,15 @@ package com.chingo247.structurecraft;
 import com.chingo247.structurecraft.restriction.StructureRestriction;
 import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
 import com.chingo247.menuapi.menu.CategoryMenu;
+import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
-import com.chingo247.structurecraft.event.IEventDispatcher;
 import com.chingo247.structurecraft.placement.SchematicPlacement;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlacerFactory;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.platform.ConfigProvider;
 import com.chingo247.structurecraft.placing.structure.IStructurePlacerFactory;
 import com.chingo247.xplatform.core.APlatform;
+import com.google.common.eventbus.EventBus;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +45,10 @@ public interface IStructureAPI {
     GraphDatabaseService getGraphDatabase();
     
     IEventDispatcher getEventDispatcher();
+    
+    EventBus getAsyncEventBus();
+    
+    EventBus getEventBus();
     
     /**
      * Gets the ConstructionManager

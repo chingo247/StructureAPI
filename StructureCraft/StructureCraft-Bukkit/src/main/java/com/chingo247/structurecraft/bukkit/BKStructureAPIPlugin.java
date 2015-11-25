@@ -23,8 +23,10 @@ import com.chingo247.structurecraft.bukkit.listener.PlanListener;
 import com.chingo247.settlercraft.core.platforms.bukkit.BKPermissionRegistry;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
+import com.chingo247.settlercraft.core.concurrent.ThreadPoolFactory;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.StructureInvalidator;
+import com.chingo247.structurecraft.bukkit.logging.structure.StructureBlockLogger;
 import com.chingo247.structurecraft.commands.SettlerCommands;
 import com.chingo247.structurecraft.commands.StructureCommands;
 import com.chingo247.structurecraft.commands.StructurePlanCommands;
@@ -45,8 +47,16 @@ import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import com.sk89q.worldedit.command.SchematicCommands;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.PrimeSoft.blocksHub.BlocksHub;
+import org.PrimeSoft.blocksHub.IBlocksHubApi;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -73,6 +83,8 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
     private static BKStructureAPIPlugin instance;
     private GraphDatabaseService graph;
     private PluginCommandManager commands;
+    private int maxThreadsForLogger = 2;
+    private ExecutorService loggerPool;
 
     @Override
     public void onEnable() {
@@ -170,6 +182,16 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
         
         // Setup Commands
         registerCommands();
+        
+        if(Bukkit.getPluginManager().getPlugin(BLOCKS_HUB) != null) {
+            System.out.println(MSG_PREFIX + "Enabling blockshub integration");
+            BlocksHub blocksHub = (BlocksHub) Bukkit.getPluginManager().getPlugin(BLOCKS_HUB);
+            final IBlocksHubApi blocksHubApi = blocksHub.getApi();
+            loggerPool = new ThreadPoolFactory().newCachedThreadPool(maxThreadsForLogger, maxThreadsForLogger);
+//            loggerPool = Executors.newWorkStealingPool(maxThreadsForLogger);
+            blocksHubApi.registerBlocksLogger(new StructureBlockLogger("StructureLogger", loggerPool, structureAPI));
+        }
+        
     }
     
     private void registerCommands() {
@@ -214,6 +236,9 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
     @Override
     public void onDisable() {
         super.onDisable(); //To change body of generated methods, choose Tools | Templates.
+        if(loggerPool != null) {
+            loggerPool.shutdown();
+        }
     }
     
     

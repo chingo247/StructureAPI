@@ -19,10 +19,8 @@ package com.chingo247.structurecraft.commands;
 import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.core.event.EventManager;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
-import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.structurecraft.event.StructureAddOwnerEvent;
 import com.chingo247.structurecraft.event.StructureRemoveOwnerEvent;
 import com.chingo247.structurecraft.model.owner.IOwnership;
@@ -584,11 +582,11 @@ public class StructureCommands {
 
                 if (ownershipToAdd == null) {
                     ownerDomain.setOwnership(settler, type);
-                    EventManager.getInstance().getEventBus().post(new StructureAddOwnerEvent(uuid, new Structure(structureNode), type));
+                    structureAPI.getEventDispatcher().dispatchEvent(new StructureAddOwnerEvent(uuid, new Structure(structureNode), type));
                     sender.sendMessage("Successfully added '" + colors.green() + ply.getName() + colors.reset() + "' to #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName() + colors.reset() + " as " + colors.yellow() + type.name());
                 } else {
                     ownerDomain.setOwnership(settler, type);
-                    EventManager.getInstance().getEventBus().post(new StructureAddOwnerEvent(uuid, new Structure(structureNode), type));
+                    structureAPI.getEventDispatcher().dispatchEvent(new StructureAddOwnerEvent(uuid, new Structure(structureNode), type));
                     sender.sendMessage("Updated ownership of '" + colors.green() + ply.getName() + colors.reset() + "' to " + colors.yellow() + type.name() + colors.reset() + " for structure ",
                             "#" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName());
                 }
@@ -597,7 +595,7 @@ public class StructureCommands {
                 if (!ownerDomain.removeOwnership(uuid)) {
                     throw new CommandException(ply.getName() + " does not own this structure...");
                 }
-                EventManager.getInstance().getEventBus().post(new StructureRemoveOwnerEvent(uuid, new Structure(structureNode), type));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureRemoveOwnerEvent(uuid, new Structure(structureNode), type));
                 sender.sendMessage("Successfully removed '" + colors.green() + ply.getName() + colors.reset() + "' from #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName() + " as " + colors.yellow() + type.name());
             }
             tx.success();

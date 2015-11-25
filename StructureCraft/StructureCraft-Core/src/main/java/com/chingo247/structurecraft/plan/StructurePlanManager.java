@@ -19,8 +19,6 @@ package com.chingo247.structurecraft.plan;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlanProvider;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
-import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.core.event.EventManager;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;
 import com.chingo247.structurecraft.event.StructurePlansReloadEvent;
@@ -118,7 +116,7 @@ public class StructurePlanManager implements IStructurePlanProvider{
         // Make dirs if not exist!
         planDirectory.mkdirs();
 
-        StructureAPI.getInstance().getEventDispatcher().post(new StructurePlansReloadEvent());
+        StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructurePlansReloadEvent());
 
         // If it isn't null and there are still processes running... terminate them
         if (forkJoinPool != null && !forkJoinPool.isShutdown()) {
@@ -143,7 +141,7 @@ public class StructurePlanManager implements IStructurePlanProvider{
                     if (!forkJoinPool.isShutdown()) {
                         forkJoinPool.shutdown();
                     }
-                    StructureAPI.getInstance().getEventDispatcher().post(new StructurePlansLoadedEvent());
+                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructurePlansLoadedEvent());
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }

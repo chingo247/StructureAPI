@@ -8,7 +8,6 @@ package com.chingo247.structurecraft.construction.assigner;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.StructureDemolishingEvent;
@@ -41,22 +40,22 @@ class SimpleAWEDemolitionAss extends AWETaskAssigner {
 
             @Override
             public void onComplete() {
-                structureAPI.getEventDispatcher().post(new StructureDemolitionCompleteEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolitionCompleteEvent(entry.getStructure()));
             }
 
             @Override
             public void onCancelled() {
-                structureAPI.getEventDispatcher().post(new StructureConstructionCancelledEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionCancelledEvent(entry.getStructure()));
             }
 
             @Override
             public void onStarted() {
-                structureAPI.getEventDispatcher().post(new StructureDemolishingEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolishingEvent(entry.getStructure()));
             }
 
             @Override
             public void onQueued() {
-                structureAPI.getEventDispatcher().post(new StructureConstructionQueued(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
             }
         };
     }

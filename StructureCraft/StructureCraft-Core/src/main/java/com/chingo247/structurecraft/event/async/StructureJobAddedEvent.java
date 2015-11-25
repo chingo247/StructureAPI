@@ -16,9 +16,7 @@
  */
 package com.chingo247.structurecraft.event.async;
 
-import com.chingo247.settlercraft.core.event.async.AsyncEventManager;
 import com.chingo247.structurecraft.model.structure.IStructure;
-import com.chingo247.structurecraft.model.structure.Structure;
 import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
 
 /**
