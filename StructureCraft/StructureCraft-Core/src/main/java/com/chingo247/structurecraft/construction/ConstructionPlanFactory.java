@@ -45,7 +45,9 @@ class ConstructionPlanFactory implements IConstructionPlanFactory {
 
     @Override
     public IConstructionPlan newRestorePlan(IStructure structure) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ITaskAssigner assigner = executor.getAssignerFactory().newSimpleRestoreAssigner();
+        return new ConstructionPlan(executor, structure, assigner)
+                .setRecursive(false);
     }
     
     

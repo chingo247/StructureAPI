@@ -21,6 +21,7 @@ import com.chingo247.structurecraft.plan.exception.PlacementException;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.structurecraft.plan.io.parser.SchematicPlacementParser;
 import com.chingo247.structurecraft.placement.PlacementTypes;
+import com.chingo247.structurecraft.placement.interfaces.IWriteablePlacement;
 import com.chingo247.structurecraft.plan.io.parser.PlacementParser;
 import com.chingo247.structurecraft.plan.io.handlers.PlacementXMLHandler;
 import com.chingo247.structurecraft.plan.io.handlers.SchematicPlacementXMLHandler;
@@ -65,7 +66,7 @@ public class PlacementAPI {
         }
     }
     
-    public Element handle(IPlacement p) {
+    public Element handle(IWriteablePlacement p) {
         String type = p.getTypeName();
         PlacementXMLHandler handler = writers.get(type);
         if(handler == null) {

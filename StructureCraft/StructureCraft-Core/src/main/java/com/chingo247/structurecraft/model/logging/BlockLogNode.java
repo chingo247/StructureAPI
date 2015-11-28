@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.model.logging;
 
+import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import org.neo4j.graphdb.Node;
 
@@ -87,7 +88,7 @@ public class BlockLogNode {
     }
     
     public void setStructure(StructureNode structureNode) {
-        structureNode.getNode().createRelationshipTo(underlyingNode, LogRelTypes.HAS_BLOCK);   
+        structureNode.getNode().createRelationshipTo(underlyingNode, RelTypes.HAS_BLOCK);   
     }
 
 }

@@ -18,6 +18,7 @@ package com.chingo247.structurecraft.plan;
 
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.structurecraft.plan.io.export.StructurePlanExporter;
+import com.chingo247.structurecraft.plan.io.export.UnsupportedPlacementException;
 import java.io.File;
 import java.io.IOException;
 
@@ -40,7 +41,7 @@ public class DefaultStructurePlan extends AbstractStructurePlan{
     }
 
     @Override
-    public synchronized void save() throws IOException {
+    public synchronized void save() throws IOException, UnsupportedPlacementException {
         StructurePlanExporter exporter = new StructurePlanExporter();
         exporter.export(this, getFile().getParentFile(), getName() + ".xml", true);
     }

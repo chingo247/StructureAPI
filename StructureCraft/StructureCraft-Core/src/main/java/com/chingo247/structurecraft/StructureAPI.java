@@ -119,23 +119,26 @@ public class StructureAPI implements IStructureAPI {
         this.eventDispatcher = new EventDispatcher();
         this.asyncEventBus = new AsyncEventBus(executor, new DefaultSubscriberExceptionHandler());
         this.eventBus = new EventBus( new DefaultSubscriberExceptionHandler());
-        this.eventBus.register(new StructurePlanManagerHandler());
+        this.eventDispatcher.register(eventBus);
+        this.eventDispatcher.register(asyncEventBus);
+        this.asyncEventBus.register(new StructurePlanManagerHandler());
         setupSchema();
         applyUpdates();
         
         this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
         this.structurePlacerFactory = new StructurePlacerFactory(this);
         this.constructionExecutor = new ConstructionExecutor(this, executor);
+        this.asyncEventBus.register(new StructureEventListener(SettlerCraft.getInstance().getEconomyProvider(), this));
     }
 
     @Override
     public EventBus getAsyncEventBus() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return asyncEventBus;
     }
 
     @Override
     public EventBus getEventBus() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return eventBus;
     }
     
     

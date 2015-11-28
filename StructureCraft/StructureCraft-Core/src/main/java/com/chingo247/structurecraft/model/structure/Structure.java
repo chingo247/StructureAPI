@@ -141,6 +141,7 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The date of completion
      */
+    @Override
     public Date getCompletedAt() {
         return completedAt;
     }
@@ -163,6 +164,7 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The date of removal
      */
+    @Override
     public Date getDeletedAt() {
         return deletedAt;
     }
@@ -181,6 +183,7 @@ public class Structure extends Plot implements IStructure {
      * @param offset The offset
      * @return the location
      */
+    @Override
     public Vector translateRelativeLocation(Vector offset) {
         Vector p = WorldUtil.translateLocation(getOrigin(), getDirection(), offset.getX(), offset.getY(), offset.getZ());
         return new Vector(p.getBlockX(), p.getBlockY(), p.getBlockZ());
@@ -191,6 +194,7 @@ public class Structure extends Plot implements IStructure {
      * @param worldPosition The worldposition
      * @return The relative position
      */
+    @Override
     public Vector getRelativePosition(Vector worldPosition) {
         switch (getDirection()) {
             case NORTH:
@@ -227,6 +231,7 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The directory
      */
+    @Override
     public final File getDirectory() {
         IWorld world = StructureAPI.getInstance().getPlatform().getServer().getWorld(getWorldUUID());
         

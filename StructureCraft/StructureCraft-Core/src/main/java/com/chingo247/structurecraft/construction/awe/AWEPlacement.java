@@ -107,11 +107,6 @@ class AWEPlacement extends AbstractAWEPlacement {
     }
 
     @Override
-    public String getTypeName() {
-        return placement.getTypeName();
-    }
-
-    @Override
     public Vector getSize() {
         return placement.getSize();
     }

@@ -9,6 +9,7 @@ import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.io.export.UnsupportedPlacementException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.IOException;
@@ -47,11 +48,11 @@ public interface IStructurePlacer {
     
     IStructurePlacer setParent(IStructure parent);
     
-    IStructurePlaceResult place(CuboidRegion structureRegion) throws IOException;
+    IStructurePlaceResult place(CuboidRegion structureRegion) throws IOException, UnsupportedPlacementException;
     
-    IStructurePlaceResult place(IPlacement placement, Vector position, Direction direction) throws IOException;
+    IStructurePlaceResult place(IPlacement placement, Vector position, Direction direction) throws IOException, UnsupportedPlacementException;
     
-    IStructurePlaceResult place(IStructurePlan plan, Vector position, Direction direction) throws IOException;
+    IStructurePlaceResult place(IStructurePlan plan, Vector position, Direction direction) throws IOException, UnsupportedPlacementException;
     
     
 

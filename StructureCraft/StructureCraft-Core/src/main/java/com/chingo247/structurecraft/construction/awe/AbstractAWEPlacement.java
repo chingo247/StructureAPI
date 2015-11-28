@@ -21,7 +21,6 @@ import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.xplatform.core.IScheduler;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import org.primesoft.asyncworldedit.AsyncWorldEditMain;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
 import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
@@ -57,16 +56,11 @@ public abstract class AbstractAWEPlacement implements IPlacement {
    
 
     @Override
-    public Vector getPosition() {
-        return placement.getPosition();
+    public Vector getOffset() {
+        return placement.getOffset();
     }
 
     
-
-    @Override
-    public void move(Vector offset) {
-        placement.move(offset);
-    }
 
     /**
      * Get next job id for current player

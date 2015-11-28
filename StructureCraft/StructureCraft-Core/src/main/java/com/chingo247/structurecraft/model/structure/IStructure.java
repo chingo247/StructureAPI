@@ -22,6 +22,7 @@ import com.chingo247.structurecraft.model.plot.IPlot;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.sk89q.worldedit.Vector;
 import java.io.File;
+import java.util.Date;
 
 /**
  *
@@ -74,5 +75,11 @@ public interface IStructure extends IPlot {
     Vector translateRelativeLocation(Vector position);
     
     Vector getRelativePosition(Vector position);
+    
+    Date getCreatedAt();
+    
+    Date getCompletedAt();
+    
+    Date getDeletedAt();
 
 }

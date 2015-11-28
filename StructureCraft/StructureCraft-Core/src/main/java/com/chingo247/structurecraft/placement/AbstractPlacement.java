@@ -18,7 +18,6 @@ package com.chingo247.structurecraft.placement;
 
 import com.chingo247.structurecraft.placement.interfaces.RotationalPlacement;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
@@ -54,7 +53,7 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
     }
 
     @Override
-    public Vector getPosition() {
+    public Vector getOffset() {
         return position;
     }
 
@@ -79,20 +78,10 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
         return ya;
     } 
     
-
-
-    @Override
-    public void move(Vector offset) {
-        this.position.add(offset);
-    }
-
     @Override
     public Vector getSize() {
         return new Vector(width, height, length);
     }
-    
-    
-    
     
     @Override
     public int getRotation() {

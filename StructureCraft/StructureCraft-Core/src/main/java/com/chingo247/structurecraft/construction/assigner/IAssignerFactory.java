@@ -17,4 +17,6 @@ public interface IAssignerFactory {
     
     ITaskAssigner newSimpleDemolitionAssigner();
     
+    ITaskAssigner newSimpleRestoreAssigner();
+    
 }

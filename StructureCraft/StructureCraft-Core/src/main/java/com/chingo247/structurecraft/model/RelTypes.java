@@ -30,7 +30,9 @@ public enum RelTypes implements RelationshipType {
     
     OWNED_BY,
     
-    PROTECTED_BY
+    PROTECTED_BY,
+    
+    HAS_BLOCK,
    
     
 }

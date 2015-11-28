@@ -28,7 +28,7 @@ import java.io.IOException;
  */
 public class PlacementExporter {
     
-    public void export(IPlacement p, File destinationDirectory, String fileName, boolean prettyprint) throws IOException {
+    public void export(IPlacement p, File destinationDirectory, String fileName, boolean prettyprint) throws IOException, UnsupportedPlacementException {
         File placementPlanFile = new File(destinationDirectory, fileName);
         DefaultStructurePlan plan = new PlacementPlan(placementPlanFile.getAbsolutePath(), placementPlanFile, p);
         plan.setCategory("Other");

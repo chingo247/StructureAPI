@@ -67,10 +67,5 @@ public class DemolishingPlacement extends AbstractPlacement {
         }
     }
     
-    @Override
-    public String getTypeName() {
-        return PlacementTypes.DEMOLISHING;
-    }
-
     
 }

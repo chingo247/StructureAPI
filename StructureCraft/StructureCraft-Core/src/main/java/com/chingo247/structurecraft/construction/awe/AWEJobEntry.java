@@ -186,7 +186,6 @@ public class AWEJobEntry extends JobEntry {
             case Waiting:
                 setStatus(JobEntry.JobStatus.PlacingBlocks);
                 callback.onStarted();
-//                AsyncEventManager.getInstance().post(new StructureJobStartedEvent(m_TaskUUID, getJobId()));
                 break;
         }
 

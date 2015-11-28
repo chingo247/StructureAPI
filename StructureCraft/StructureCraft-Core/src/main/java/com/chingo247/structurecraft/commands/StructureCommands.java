@@ -344,6 +344,57 @@ public class StructureCommands {
                 .execute();
 
     }
+    
+    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandExtras(async = true)
+    @Command(aliases = {"structure:rollback", "stt:rollback"}, desc = "Rollback a structure", min = 1, max = 1, flags = "f")
+    public static void restore(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
+        final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+        final StructureRepository structureRepository = new StructureRepository(graph);
+        final Structure structure;
+        final UUID uuid = getUUID(sender);
+
+        String structureIdArg = args.getString(0);
+        if (!NumberUtils.isNumber(structureIdArg)) {
+            throw new CommandException("Expected a number but got '" + structureIdArg + "' \n" + "/structure:rollback [id]");
+        }
+
+        // Check structure
+        long id = Long.parseLong(structureIdArg);
+        long start = System.currentTimeMillis();
+        try (Transaction tx = graph.beginTx()) {
+            StructureNode sn = structureRepository.findById(id);
+
+            // Structure not found!
+            if (sn == null) {
+                tx.success();
+                throw new CommandException("Couldn't find a structure for #" + structureIdArg);
+            }
+
+            // Player is not the owner!
+            if (isPlayer(sender) && !isOP(sender) && !sn.getOwnerDomain().isOwnerOfType(uuid, OwnerType.MASTER)) {
+                tx.success();
+                throw new CommandException("You are not the 'MASTER' owner of this structure...");
+            }
+            structure = new Structure(sn);
+
+            tx.success();
+        }
+        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
+
+        // Use force?
+        String force = args.hasFlag('f') ? args.getFlag('f') : null;
+        final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
+
+        // Start demolition
+        structureAPI.getConstructionExecutor().getConstructionPlanFactory()
+                .newRestorePlan(structure)
+                .setRestrictive(true)
+                .setForced(useForce)
+                .setPlayer(uuid)
+                .execute();
+
+    }
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
     @CommandExtras(async = true)

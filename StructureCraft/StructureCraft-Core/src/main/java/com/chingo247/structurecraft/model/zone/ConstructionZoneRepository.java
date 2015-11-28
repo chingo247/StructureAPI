@@ -94,7 +94,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
         String query
-                = "MATCH ( world: " + WorldNode.LABEL + " { " + WorldNode.ID_PROPERTY + ": {worldId} })"
+                = "MATCH ( world: " + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "
@@ -127,7 +127,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         Vector max = searchArea.getMaximumPoint();
 
         String query
-                = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.ID_PROPERTY + ": {worldId} })"
+                = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "

@@ -31,7 +31,7 @@ public class StructureBlockLogger extends BatchBlockLogger<StructureBlockLogEntr
 
         this.structureAPI = structureAPI;
         this.tracker = new StructureTracker();
-        structureAPI.getEventDispatcher().getAsyncEventBus().register(tracker);
+        structureAPI.getAsyncEventBus().register(tracker);
     }
 
     @Override

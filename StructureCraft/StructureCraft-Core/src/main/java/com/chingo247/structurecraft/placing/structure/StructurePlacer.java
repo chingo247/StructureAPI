@@ -29,6 +29,7 @@ import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.structurecraft.placing.AbstractPlacer;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.export.PlacementExporter;
+import com.chingo247.structurecraft.plan.io.export.UnsupportedPlacementException;
 import com.chingo247.structurecraft.restriction.StructureRestriction;
 import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
 import com.chingo247.structurecraft.util.PlacementUtil;
@@ -127,18 +128,18 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
     }
 
     @Override
-    public IStructurePlaceResult place(CuboidRegion structureRegion) throws IOException {
+    public IStructurePlaceResult place(CuboidRegion structureRegion) throws IOException, UnsupportedPlacementException {
         return place(structureRegion, structureRegion.getMinimumPoint(), Direction.EAST, null);
     }
 
     @Override
-    public IStructurePlaceResult place(final IPlacement placement, final Vector position, final Direction direction) throws IOException {
+    public IStructurePlaceResult place(final IPlacement placement, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException {
         Vector min = position;
         Vector max = PlacementUtil.getPoint2Right(min, direction, placement.getCuboidRegion().getMaximumPoint());
         IStructurePlaceResult result = place(new CuboidRegion(min, max), position, direction, new ICallback() {
 
             @Override
-            public void onCreate(IStructure structure) throws IOException {
+            public void onCreate(IStructure structure) throws IOException, UnsupportedPlacementException {
                 copyResources(structure, placement);
             }
         });
@@ -146,7 +147,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
     }
 
     @Override
-    public IStructurePlaceResult place(final IStructurePlan plan, final Vector position, final Direction direction) throws IOException  {
+    public IStructurePlaceResult place(final IStructurePlan plan, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException  {
         CuboidRegion affectedArea = getAffectedRegion(plan.getPlacement(), position, direction);
         IStructurePlaceResult placeResult = place(affectedArea, position, direction, new ICallback() {
 
@@ -158,7 +159,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         return placeResult;
     }
 
-    private IStructurePlaceResult place(CuboidRegion region, Vector position, Direction direction, ICallback callback) throws IOException {
+    private IStructurePlaceResult place(CuboidRegion region, Vector position, Direction direction, ICallback callback) throws IOException, UnsupportedPlacementException {
         StructurePlaceResult placeResult = new StructurePlaceResult();
 
         ILocation spawn = world.getSpawn();
@@ -306,7 +307,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 placeResult.setStructure(structure);
                 structureAPI.getEventDispatcher().dispatchEvent(new StructureCreateEvent(structure));
                 tx.success();
-            } catch (StructureException ex) {
+            } catch (StructureException | UnsupportedPlacementException ex) {
                 if (tx != null) {
                     tx.failure();
                 }
@@ -348,7 +349,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         }
     }
 
-    private void copyResources(IStructure structure, IPlacement placement) throws IOException {
+    private void copyResources(IStructure structure, IPlacement placement) throws IOException, UnsupportedPlacementException {
         File structureDirectory = structure.getDirectory();
         if (structureDirectory.exists()) {
             FileUtils.deleteDirectory(structureDirectory);
@@ -363,7 +364,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
 
     private interface ICallback {
 
-        void onCreate(IStructure structure) throws IOException;
+        void onCreate(IStructure structure) throws IOException, UnsupportedPlacementException;
 
     }
 

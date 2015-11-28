@@ -11,7 +11,7 @@
         <module>StructureCraft-WorldGuard</module>
         <module>StructureCraft-HolographicDisplays</module>
         <module>StructureCraft-Bukkit</module>
-        <module>StructureCraft-RollbackAPI</module>
+        <module>StructureCraft-RollbackOldAPI</module>
     </modules>
     <properties>
         <settlercraft.version>2.2.0</settlercraft.version>

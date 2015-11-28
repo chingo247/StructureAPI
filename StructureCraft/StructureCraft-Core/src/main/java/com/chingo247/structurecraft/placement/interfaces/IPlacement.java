@@ -28,23 +28,19 @@ import com.sk89q.worldedit.regions.CuboidRegion;
  */
 public interface IPlacement {
     
-    public void place(EditSession session, Vector pos, PlaceOptions option);
+    void place(EditSession session, Vector pos, PlaceOptions option);
     
-    public Vector getPosition();
+    Vector getOffset();
     
-    public void move(Vector offset);
+    Vector getSize();
     
-    public Vector getSize();
+    int getWidth();
     
-    public int getWidth();
+    int getHeight();
     
-    public int getHeight();
+    int getLength();
     
-    public int getLength();
-    
-    public String getTypeName();
-    
-    public CuboidRegion getCuboidRegion();
+    CuboidRegion getCuboidRegion();
     
     
      

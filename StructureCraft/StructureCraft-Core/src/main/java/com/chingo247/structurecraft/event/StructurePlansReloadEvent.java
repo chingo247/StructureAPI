@@ -21,5 +21,10 @@ package com.chingo247.structurecraft.event;
  * @author Chingo
  */
 public class StructurePlansReloadEvent {
+
+    public StructurePlansReloadEvent() {
+    }
+    
+    
     
 }

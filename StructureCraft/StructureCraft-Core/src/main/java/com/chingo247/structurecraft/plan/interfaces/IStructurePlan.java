@@ -93,6 +93,6 @@ public interface IStructurePlan {
      */
     public File getFile();
     
-    public void save() throws IOException;
+    public void save() throws Exception;
     
 }

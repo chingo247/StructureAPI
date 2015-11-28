@@ -18,6 +18,7 @@ package com.chingo247.structurecraft.plan.io.handlers;
 
 import com.chingo247.structurecraft.placement.interfaces.RotationalPlacement;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.interfaces.IWriteablePlacement;
 import com.chingo247.structurecraft.plan.io.PlacementXMLConstants;
 import com.sk89q.worldedit.Vector;
 import org.dom4j.Element;
@@ -28,14 +29,14 @@ import org.dom4j.tree.BaseElement;
  * @author Chingo
  * @param <T>
  */
-public abstract class AbstractPlacementXMLHandler<T extends IPlacement> implements PlacementXMLHandler<T> {
+public abstract class AbstractPlacementXMLHandler<T extends IWriteablePlacement> implements PlacementXMLHandler<T> {
 
     @Override
     public Element handle(T placement) {
         Element placementRoot = new BaseElement(PlacementXMLConstants.ROOT_ELEMENT);
 //        d.add(placementRoot);
 
-        Vector v = placement.getPosition();
+        Vector v = placement.getOffset();
         if (!v.equals(Vector.ZERO)) { // Not equal to default
             Element xElement = new BaseElement(PlacementXMLConstants.X_ELEMENT);
             Element yElement = new BaseElement(PlacementXMLConstants.Y_ELEMENT);
