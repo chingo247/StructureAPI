@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner;
+package com.chingo247.structurecraft.construction.assigner.impl.rollback;
 
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.construction.assigner.AWETaskAssigner;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
@@ -41,9 +42,9 @@ import org.primesoft.asyncworldedit.worldedit.CancelabeEditSession;
  *
  * @author Chingo
  */
-class SimpleAWERollbackAss extends AWETaskAssigner {
+class SimpleAWERollbackAssigner extends AWETaskAssigner {
 
-    public SimpleAWERollbackAss(IStructureAPI structureAPI) {
+    public SimpleAWERollbackAssigner(IStructureAPI structureAPI) {
         super(structureAPI);
     }
 

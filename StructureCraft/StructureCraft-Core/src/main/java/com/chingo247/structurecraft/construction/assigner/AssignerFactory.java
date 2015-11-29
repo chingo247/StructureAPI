@@ -5,6 +5,8 @@
  */
 package com.chingo247.structurecraft.construction.assigner;
 
+import com.chingo247.structurecraft.construction.assigner.impl.rollback.SimpleAWERollbackAss;
+import com.chingo247.structurecraft.construction.assigner.impl.demolish.SimpleAWEDemolitionAss;
 import com.chingo247.structurecraft.IStructureAPI;
 
 /**

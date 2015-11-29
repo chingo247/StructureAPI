@@ -3,11 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner;
+package com.chingo247.structurecraft.construction.assigner.impl.demolish;
 
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.assigner.AWETaskAssigner;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.StructureDemolishingEvent;
