@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.rollback;
+package com.chingo247.structurecraft.construction;
 
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 
@@ -11,7 +11,7 @@ import com.chingo247.structurecraft.placement.interfaces.IPlacement;
  *
  * @author Chingo
  */
-public interface IRollbackPlacementSource {
+public interface IPlacementSource {
     
     IPlacement nextPlacement();
     

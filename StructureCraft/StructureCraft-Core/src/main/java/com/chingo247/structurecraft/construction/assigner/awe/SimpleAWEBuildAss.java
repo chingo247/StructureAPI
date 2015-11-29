@@ -10,7 +10,9 @@ import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.IPlacementSource;
 import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.construction.SinglePlacementSource;
 import com.chingo247.structurecraft.event.structure.StructureBuildCompleteEvent;
 import com.chingo247.structurecraft.event.structure.StructureBuildingEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
@@ -25,9 +27,12 @@ import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 class SimpleAWEBuildAss extends AWETaskAssigner {
 
     @Override
-    protected IPlacement getPlacementFor(IConstructionEntry entry) throws StructureException {
-        return entry.getStructure().getStructurePlan().getPlacement();
+    protected void setPlacementSource(IConstructionEntry entry) throws StructureException {
+        entry.setPlacementSource(new SinglePlacementSource(
+                entry.getStructure().getStructurePlan().getPlacement()));
     }
+
+    
 
     @Override
     protected ITaskCallback getCallbackFor(final IConstructionEntry entry) {

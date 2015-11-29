@@ -9,6 +9,7 @@ import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.construction.SinglePlacementSource;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.StructureDemolishingEvent;
@@ -26,9 +27,10 @@ import com.sk89q.worldedit.Vector;
 class SimpleAWEDemolitionAss extends AWETaskAssigner {
 
     @Override
-    protected IPlacement getPlacementFor(IConstructionEntry entry) throws StructureException {
+    protected void setPlacementSource(IConstructionEntry entry) throws StructureException {
         Vector size = RegionUtil.getSize(entry.getStructure().getCuboidRegion());
-        return new DemolishingPlacement(size);
+        DemolishingPlacement pl =  new DemolishingPlacement(size);
+        entry.setPlacementSource(new SinglePlacementSource(pl));
     }
 
     @Override

@@ -5,6 +5,8 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.options.Traversal;

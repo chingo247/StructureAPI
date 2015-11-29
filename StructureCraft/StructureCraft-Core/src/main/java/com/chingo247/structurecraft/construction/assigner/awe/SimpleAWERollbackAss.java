@@ -34,11 +34,6 @@ class SimpleAWERollbackAss extends AWETaskAssigner {
 
 
     @Override
-    protected IPlacement getPlacementFor(IConstructionEntry entry) throws StructureException {
-        return new RollbackPlacement(entry.getStructure());
-    }
-
-    @Override
     protected ITaskCallback getCallbackFor(final IConstructionEntry entry) {
         final IStructureAPI structureAPI = StructureAPI.getInstance();
         return new ITaskCallback() {
@@ -116,6 +111,11 @@ class SimpleAWERollbackAss extends AWETaskAssigner {
         Result r = structureAPI.getGraphDatabase().execute(query, params);
         System.out.println("Done in " + (System.currentTimeMillis() - start));
         return r;
+    }
+
+    @Override
+    protected void setPlacementSource(IConstructionEntry entry) throws StructureException {
+        
     }
     
    

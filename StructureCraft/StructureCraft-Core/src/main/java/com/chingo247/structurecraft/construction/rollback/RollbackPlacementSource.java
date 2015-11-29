@@ -5,8 +5,10 @@
  */
 package com.chingo247.structurecraft.construction.rollback;
 
+import com.chingo247.structurecraft.construction.IPlacementSource;
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.Order;
 import com.chingo247.structurecraft.model.RelTypes;
@@ -39,25 +41,20 @@ import org.parboiled.common.Preconditions;
  *
  * @author Chingo
  */
-class RollbackPlacementSource implements IRollbackPlacementSource {
-    
+class RollbackPlacementSource implements IPlacementSource {
+
     private int currentChunk;
     private int totalChunks;
     private int maxBlocks;
     private int skip;
     private ListIterator<Integer> chunkBlockCounts;
-    private IStructureAPI structureAPI;
     private IStructure structure;
     private Long startDate, endDate;
-    
 
-    RollbackPlacementSource(IStructureAPI structureAPI, IStructure structure, Date startDate, Date endDate) {
-        this.structureAPI = structureAPI;
+    RollbackPlacementSource(IStructure structure) {
         this.structure = structure;
-        this.startDate = startDate != null ? startDate.getTime() : 
-                structure.getCreatedAt() != null ? structure.getCreatedAt().getTime() : null;
-        this.endDate = endDate != null ? endDate.getTime() : 
-                structure.getCompletedAt() != null ? structure.getCompletedAt().getTime() : null;
+        this.startDate = structure.getCreatedAt() != null ? structure.getCreatedAt().getTime() : null;
+        this.endDate = structure.getCompletedAt() != null ? structure.getCompletedAt().getTime() : null;
         this.maxBlocks = 200_000;
         this.skip = 0;
     }
@@ -65,8 +62,9 @@ class RollbackPlacementSource implements IRollbackPlacementSource {
     public void setMaxBlocks(int maxBlocks) {
         this.maxBlocks = maxBlocks;
     }
-    
+
     private Result getBlocksResult(UUID world, long structure, long skip, long limit, Order order) {
+        IStructureAPI structureAPI = StructureAPI.getInstance();
         Map<String, Object> params = Maps.newHashMap();
         params.put("sid", structure);
         // Set start- & endDate
@@ -78,7 +76,7 @@ class RollbackPlacementSource implements IRollbackPlacementSource {
         }
         // Specifiy world...
         params.put("world", world.toString());
-        
+
         // Set the limit AND skip
         if (skip > 0) {
             params.put("skip", skip);
@@ -88,11 +86,11 @@ class RollbackPlacementSource implements IRollbackPlacementSource {
         }
 
         String query
-                = "MATCH (w:"+WorldNode.LABEL+" {"+WorldNode.UUID_PROPERTY+":{world}}) "
+                = "MATCH (w:" + WorldNode.LABEL + " {" + WorldNode.UUID_PROPERTY + ":{world}}) "
                 + "WITH w "
-                + "MATCH (w)<-[:"+RelTypes.WITHIN +"]-(s:"+StructureNode.LABEL+" { "+StructureNode.ID_PROPERTY+": {sid} }) "
+                + "MATCH (w)<-[:" + RelTypes.WITHIN + "]-(s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {sid} }) "
                 + "WITH s "
-                + "MATCH (s)-[:"+RelTypes.HAS_BLOCK+"]->(b:"+BlockLogNode.LABEL+") ";
+                + "MATCH (s)-[:" + RelTypes.HAS_BLOCK + "]->(b:" + BlockLogNode.LABEL + ") ";
 
         if (startDate != null && endDate != null) { // FROM AND TO
             query += "WHERE b.d >= {from} AND b.d <= {to} ";
@@ -106,65 +104,62 @@ class RollbackPlacementSource implements IRollbackPlacementSource {
         if (skip > 0) {
             query += "SKIP {skip} ";
         }
-        
+
         query += " ORDER BY b.d " + (order == Order.DATE_ASCENDING ? "ASC" : "DESC ");
-        
+
         if (limit > 0) {
             query += "LIMIT {limit}";
         }
-        
-        
-        
+
         System.out.println("BLOCKS QUERY: " + query);
         long start = System.currentTimeMillis();
         Result r = structureAPI.getGraphDatabase().execute(query, params);
         System.out.println("Done in " + (System.currentTimeMillis() - start));
         return r;
-    } 
+    }
 
     private List<Integer> getChunkBlockCounts() {
         return null;
     }
-    
-    
+
     @Override
     public IPlacement nextPlacement() {
-        if(chunkBlockCounts == null) {
+        if (chunkBlockCounts == null) {
             List<Integer> cbc = getChunkBlockCounts();
             this.chunkBlockCounts = cbc.listIterator();
-            this.totalChunks =  cbc.size();
+            this.totalChunks = cbc.size();
         }
-        
-        if(!hasNext()) {
+
+        if (!hasNext()) {
             return null;
         }
-        
+
         int limit = 0;
-        while(chunkBlockCounts.hasNext()) {
-            limit+= chunkBlockCounts.next();
+        while (chunkBlockCounts.hasNext()) {
+            limit += chunkBlockCounts.next();
             currentChunk++;
-            if(limit > maxBlocks) {
+            if (limit > maxBlocks) {
                 break;
             }
-        } 
-        
-        int count = 0;
-        List<StructureBlock> blocks = Lists.newArrayList();
+        }
+
+        IStructureAPI structureAPI = StructureAPI.getInstance();
         GraphDatabaseService graph = structureAPI.getGraphDatabase();
-            try(Transaction tx = graph.beginTx()) {
-                Result r = getBlocksResult(structure.getWorldUUID(), structure.getId(), skip, limit, Order.DATE_DESCENDING);
-                while(r.hasNext()) {
-                    Map<String, Object> map = r.next();
-                    BlockLogNode blockNode = new BlockLogNode((Node) map.get("block"));
-                    BaseBlock b = new BaseBlock(blockNode.getOldMaterial(), blockNode.getOldData());
-                    Vector p = new BlockVector(blockNode.getX(), blockNode.getY(), blockNode.getZ());
-                    blocks.add(new StructureBlock(p, b));
-                    count++;
-                }
-                
-                
-                tx.success();
+        List<StructureBlock> blocks = Lists.newArrayList();
+        int count = 0;
+        try (Transaction tx = graph.beginTx()) {
+            Result r = getBlocksResult(structure.getWorldUUID(), structure.getId(), skip, limit, Order.DATE_DESCENDING);
+            while (r.hasNext()) {
+                Map<String, Object> map = r.next();
+                BlockLogNode blockNode = new BlockLogNode((Node) map.get("block"));
+                BaseBlock b = new BaseBlock(blockNode.getOldMaterial(), blockNode.getOldData());
+                Vector p = new BlockVector(blockNode.getX(), blockNode.getY(), blockNode.getZ());
+                blocks.add(new StructureBlock(p, b));
+                count++;
             }
+
+            tx.success();
+        }
         System.out.println("count: " + count);
         skip = limit;
         return new RollbackPlacement(blocks);
@@ -174,25 +169,25 @@ class RollbackPlacementSource implements IRollbackPlacementSource {
     public boolean hasNext() {
         return this.chunkBlockCounts.hasNext();
     }
-    
+
     private class RollbackPlacement implements IPlacement, ICleanablePlacement {
-        
+
         private List<StructureBlock> blocks;
         private boolean cleanupAfter;
 
         public RollbackPlacement(List<StructureBlock> blocks) {
-            Preconditions.checkNotNull(blocks, "Blocks was null"); 
+            Preconditions.checkNotNull(blocks, "Blocks was null");
             this.blocks = blocks;
             this.cleanupAfter = true;
         }
-        
+
         @Override
         public void place(EditSession session, Vector pos, PlaceOptions option) {
-            for(StructureBlock sb : blocks) {
+            for (StructureBlock sb : blocks) {
                 session.rawSetBlock(sb.getPosition(), sb.getBlock());
             }
-            
-            if(cleanupAfter) {
+
+            if (cleanupAfter) {
                 cleanUp();
             }
         }
@@ -236,16 +231,12 @@ class RollbackPlacementSource implements IRollbackPlacementSource {
         public void setCleanupAfterUsage(boolean cleanUp) {
             this.cleanupAfter = cleanUp;
         }
-        
-        
 
         @Override
         public boolean cleanUpAfterUsage() {
             return cleanupAfter;
         }
-        
-        
-        
+
     }
-    
+
 }

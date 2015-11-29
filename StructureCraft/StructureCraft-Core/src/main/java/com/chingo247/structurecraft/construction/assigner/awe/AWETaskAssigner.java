@@ -28,17 +28,19 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 public abstract class AWETaskAssigner<T extends IConstructionEntry> implements ITaskAssigner<T> {
     
-    protected abstract IPlacement getPlacementFor(final IConstructionEntry entry) throws StructureException;
-
+    protected abstract void setPlacementSource(final IConstructionEntry entry) throws StructureException;
+    
     protected abstract ITaskCallback getCallbackFor(final IConstructionEntry entry);
 
     @Override
     public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry, IPlaceOptionsAssigner optionsAssigner) throws StructureException, IOException {
+        setPlacementSource(constructionEntry);
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = constructionEntry.getStructure().getMin(); // Always place from the min position... 
         ITaskCallback callback = getCallbackFor(constructionEntry);
-        IPlacement placement = getPlacementFor(constructionEntry);
+        
+        IPlacement placement = constructionEntry.getPlacementSource().nextPlacement();
         
         if (placement instanceof RotationalPlacement) {
             RotationalPlacement rt = (RotationalPlacement) placement;

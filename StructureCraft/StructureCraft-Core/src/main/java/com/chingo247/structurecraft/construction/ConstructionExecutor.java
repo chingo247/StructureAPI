@@ -12,7 +12,6 @@ import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.IStructure;

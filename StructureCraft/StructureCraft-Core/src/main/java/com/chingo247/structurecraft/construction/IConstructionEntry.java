@@ -17,6 +17,10 @@ public interface IConstructionEntry {
     
     IStructure getStructure();
     
+    IPlacementSource getPlacementSource();
+    
+    void setPlacementSource(IPlacementSource source);
+    
     void addTask(StructureBlockPlacingTask structureTask);
     
     void proceed();
