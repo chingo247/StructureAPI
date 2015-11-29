@@ -3,16 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner.impl.rollback;
+package com.chingo247.structurecraft.construction.assigner.awe;
 
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.construction.assigner.awe.AWETaskAssigner;
+import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
+import com.chingo247.structurecraft.event.structure.StructureRestoreCompleteEvent;
+import com.chingo247.structurecraft.event.structure.StructureRestoringEvent;
+import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.Order;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.logging.BlockLogNode;
 import com.chingo247.structurecraft.model.structure.StructureNode;
+import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.google.common.collect.Maps;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import org.neo4j.graphdb.Result;
@@ -21,17 +30,43 @@ import org.neo4j.graphdb.Result;
  *
  * @author Chingo
  */
-class RollbackSource {
-    
-    private int skip;
-    private Iterator<Integer> chunkBlockCounts;
-    private IStructureAPI structureAPI;
+class SimpleAWERollbackAss extends AWETaskAssigner {
 
-    public RollbackSource(IStructureAPI structureAPI) {
-        this.structureAPI = structureAPI;
+
+    @Override
+    protected IPlacement getPlacementFor(IConstructionEntry entry) throws StructureException {
+        return new RollbackPlacement(entry.getStructure());
+    }
+
+    @Override
+    protected ITaskCallback getCallbackFor(final IConstructionEntry entry) {
+        final IStructureAPI structureAPI = StructureAPI.getInstance();
+        return new ITaskCallback() {
+
+            @Override
+            public void onComplete() {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureRestoreCompleteEvent(entry.getStructure()));
+            }
+
+            @Override
+            public void onCancelled() {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionCancelledEvent(entry.getStructure()));
+            }
+
+            @Override
+            public void onStarted() {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureRestoringEvent(entry.getStructure()));
+            }
+
+            @Override
+            public void onQueued() {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+            }
+        };
     }
     
     public Result getBlocksResult(UUID world, long structure, long from, long to, long skip, long limit, Order order) {
+        final IStructureAPI structureAPI = StructureAPI.getInstance();
         Map<String, Object> params = Maps.newHashMap();
         params.put("sid", structure);
         if (from > -1) {
@@ -81,6 +116,8 @@ class RollbackSource {
         Result r = structureAPI.getGraphDatabase().execute(query, params);
         System.out.println("Done in " + (System.currentTimeMillis() - start));
         return r;
-    } 
+    }
+    
+   
     
 }

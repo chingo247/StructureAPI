@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner;
+package com.chingo247.structurecraft.construction.assigner.awe;
 
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.IPlaceOptionsAssigner;
+import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
+import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.exeption.StructureException;
@@ -24,12 +26,7 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  *
  * @author Chingo
  */
-public abstract class AWETaskAssigner extends ATaskAssigner {
-
-    public AWETaskAssigner(IStructureAPI structureAPI) {
-        super(structureAPI);
-    }
-
+public abstract class AWETaskAssigner<T extends IConstructionEntry> implements ITaskAssigner<T> {
     
     protected abstract IPlacement getPlacementFor(final IConstructionEntry entry) throws StructureException;
 
@@ -37,6 +34,7 @@ public abstract class AWETaskAssigner extends ATaskAssigner {
 
     @Override
     public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry, IPlaceOptionsAssigner optionsAssigner) throws StructureException, IOException {
+        IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = constructionEntry.getStructure().getMin(); // Always place from the min position... 
         ITaskCallback callback = getCallbackFor(constructionEntry);

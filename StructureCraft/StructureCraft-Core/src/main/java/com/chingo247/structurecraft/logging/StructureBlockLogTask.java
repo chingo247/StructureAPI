@@ -3,9 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.bukkit.logging.structure;
+package com.chingo247.structurecraft.logging;
 
-import com.chingo247.structurecraft.logging.ABlockLogTask;
 import com.chingo247.structurecraft.model.logging.BlockLogNode;
 import java.util.List;
 import org.neo4j.graphdb.GraphDatabaseService;

@@ -35,7 +35,7 @@ public class ConstructionEntry implements IConstructionEntry {
     private Queue<StructureBlockPlacingTask> tasks;
     
 
-    ConstructionEntry(IConstructionExecutor executor, IStructure structure) {
+    protected ConstructionEntry(IConstructionExecutor executor, IStructure structure) {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
         this.tasks = new LinkedList<>();
         this.structure = structure;

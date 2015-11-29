@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.bukkit.logging.structure;
+package com.chingo247.structurecraft.logging;
 
 import com.chingo247.structurecraft.model.logging.BlockLogEntry;
 import com.chingo247.structurecraft.model.structure.StructureNode;

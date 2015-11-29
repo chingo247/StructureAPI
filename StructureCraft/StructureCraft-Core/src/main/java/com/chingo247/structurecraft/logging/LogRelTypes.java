@@ -3,16 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.rollbackapi;
+package com.chingo247.structurecraft.logging;
+
+import org.neo4j.graphdb.RelationshipType;
 
 /**
  *
  * @author Chingo
  */
-public interface IRollbackAPI {
-    
-    void rollback(long structureId);
-    
-    void rollback(long structureId, long date);
-    
+public enum LogRelTypes implements RelationshipType {
+//    HAS_HOUR,
+    HAS_BLOCK,
+//    HAS_REGION,
+//    HAS_CHUNK,
 }

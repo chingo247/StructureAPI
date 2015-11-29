@@ -3,45 +3,40 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner.impl.demolish;
+package com.chingo247.structurecraft.construction.assigner.awe;
 
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.assigner.AWETaskAssigner;
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.ITaskCallback;
+import com.chingo247.structurecraft.event.structure.StructureBuildCompleteEvent;
+import com.chingo247.structurecraft.event.structure.StructureBuildingEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
-import com.chingo247.structurecraft.event.structure.StructureDemolishingEvent;
-import com.chingo247.structurecraft.event.structure.StructureDemolitionCompleteEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
-import com.chingo247.structurecraft.placement.DemolishingPlacement;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
-import com.chingo247.structurecraft.util.RegionUtil;
-import com.sk89q.worldedit.Vector;
 
 /**
  *
  * @author Chingo
  */
-class SimpleAWEDemolitionAss extends AWETaskAssigner {
-
-    public SimpleAWEDemolitionAss(IStructureAPI structureAPI) {
-        super(structureAPI);
-    }
+class SimpleAWEBuildAss extends AWETaskAssigner {
 
     @Override
     protected IPlacement getPlacementFor(IConstructionEntry entry) throws StructureException {
-        Vector size = RegionUtil.getSize(entry.getStructure().getCuboidRegion());
-        return new DemolishingPlacement(size);
+        return entry.getStructure().getStructurePlan().getPlacement();
     }
 
     @Override
     protected ITaskCallback getCallbackFor(final IConstructionEntry entry) {
+        final IStructureAPI structureAPI = StructureAPI.getInstance();
         return new ITaskCallback() {
 
             @Override
             public void onComplete() {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolitionCompleteEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureBuildCompleteEvent(entry.getStructure()));
             }
 
             @Override
@@ -51,7 +46,7 @@ class SimpleAWEDemolitionAss extends AWETaskAssigner {
 
             @Override
             public void onStarted() {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolishingEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureBuildingEvent(entry.getStructure()));
             }
 
             @Override
@@ -61,7 +56,4 @@ class SimpleAWEDemolitionAss extends AWETaskAssigner {
         };
     }
 
-    
-   
-    
 }

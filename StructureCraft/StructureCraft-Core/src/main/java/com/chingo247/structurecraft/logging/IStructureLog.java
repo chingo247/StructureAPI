@@ -3,12 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.assigner.impl.rollback;
+package com.chingo247.structurecraft.logging;
 
 /**
  *
  * @author Chingo
  */
-class RollbackPlacement {
+public interface IStructureLog<T> {
+    
+    Long getStructureId();
+    
+    void addBlock(T t);
     
 }

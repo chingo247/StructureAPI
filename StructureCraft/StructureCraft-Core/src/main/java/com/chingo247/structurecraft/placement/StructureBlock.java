@@ -26,7 +26,7 @@ import com.sk89q.worldedit.blocks.BlockType;
  *
  * @author Chingo
  */
-class StructureBlock implements Comparable<StructureBlock> {
+public class StructureBlock implements Comparable<StructureBlock> {
 
     private static final int PRIORITY_FIRST = 4;
     private static final int PRIORITY_LIQUID = 3;

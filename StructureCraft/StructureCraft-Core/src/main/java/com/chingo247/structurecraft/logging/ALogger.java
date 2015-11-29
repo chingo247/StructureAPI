@@ -5,11 +5,14 @@
  */
 package com.chingo247.structurecraft.logging;
 
+import com.chingo247.xplatform.core.IWorld;
+
+
 /**
  *
  * @author Chingo
  */
-public abstract class ALogger implements IStructureAPIBlockLogger {
+public abstract class ALogger  {
 
     private boolean enabled;
     private String name;
@@ -35,5 +38,6 @@ public abstract class ALogger implements IStructureAPIBlockLogger {
         return name;
     }
     
+    public abstract void logBlock(int x, int y, int z, String player, IWorld world, int oldMaterial, byte oldData, int newMaterial, byte newData);
     
 }

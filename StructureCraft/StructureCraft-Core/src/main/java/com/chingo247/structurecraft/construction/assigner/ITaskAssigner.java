@@ -17,7 +17,9 @@
 package com.chingo247.structurecraft.construction.assigner;
 
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.IPlaceOptionsAssigner;
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
+import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.Structure;
 import java.io.IOException;
@@ -28,7 +30,7 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  *
  * @author Chingo
  */
-public interface ITaskAssigner {
+public interface ITaskAssigner<T extends IConstructionEntry> {
     
     
     void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry, IPlaceOptionsAssigner assigner) throws StructureException, IOException;

@@ -66,7 +66,6 @@ public abstract class ABlockLogTask<T extends BlockLogEntry> implements Runnable
         } catch (Exception ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
         }
-
     }
 
 }

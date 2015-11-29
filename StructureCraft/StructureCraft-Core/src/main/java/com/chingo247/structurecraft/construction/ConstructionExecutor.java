@@ -5,12 +5,13 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
+import com.chingo247.structurecraft.construction.assigner.awe.AWEAssignerFactory;
 import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
+import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.assigner.AssignerFactory;
-import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
@@ -47,8 +48,6 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 public class ConstructionExecutor implements IConstructionExecutor {
 
-    
-    
     private static final Logger LOG = Logger.getLogger(ConstructionExecutor.class.getName());
     private static final UUID CONSOLE = UUID.randomUUID();
     private final IStructureAPI structureAPI;
@@ -64,7 +63,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
         this.structurePool = new KeyPool<>(es);
         this.es = es;
         this.structureAPI = structureAPI;
-        this.assFactory = new AssignerFactory(structureAPI);
+        this.assFactory = new AWEAssignerFactory(structureAPI);
         this.planFactory = new ConstructionPlanFactory(structureAPI, this);
         this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
         this.entries = Maps.newHashMap();
