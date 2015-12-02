@@ -6,11 +6,15 @@
 package com.chingo247.structurecraft.util;
 
 /**
- *
+ * Represents something that can 'progress'
  * @author Chingo
  */
-public interface IFeedBack {
+public interface IProgressable {
     
-    void onUpdate(String updateMessage);
+    /**
+     * Gets the current progress. Returns a value between 0 and 100
+     * @return The progress
+     */
+    double getProgress();
     
 }

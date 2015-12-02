@@ -9,38 +9,46 @@ import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskCallback;
-import com.chingo247.structurecraft.construction.SinglePlacementSource;
+import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
+import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
+import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
-import com.chingo247.structurecraft.event.structure.StructureDemolishingEvent;
+import com.chingo247.structurecraft.event.structure.StructureDemolishEvent;
 import com.chingo247.structurecraft.event.structure.StructureDemolitionCompleteEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.placement.DemolishingPlacement;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.sk89q.worldedit.Vector;
+import java.io.IOException;
+import java.util.UUID;
+import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
+import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
 /**
  *
  * @author Chingo
  */
-class SimpleAWEDemolitionAss extends AWETaskAssigner {
+class SimpleAWEDemolitionAss implements ITaskAssigner {
 
-    @Override
-    protected void setPlacementSource(IConstructionEntry entry) throws StructureException {
-        Vector size = RegionUtil.getSize(entry.getStructure().getCuboidRegion());
-        DemolishingPlacement pl =  new DemolishingPlacement(size);
-        entry.setPlacementSource(new SinglePlacementSource(pl));
-    }
 
-    @Override
     protected ITaskCallback getCallbackFor(final IConstructionEntry entry) {
         final IStructureAPI structureAPI = StructureAPI.getInstance();
         return new ITaskCallback() {
 
             @Override
             public void onComplete() {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolitionCompleteEvent(entry.getStructure()));
+                if(!entry.hasNextTask()) {
+                    structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolitionCompleteEvent(entry.getStructure()));
+                } 
+//                else if(source instanceof IProgressable) {
+//                    structureAPI.getEventDispatcher().dispatchEvent(
+//                            new StructureDemolitionProgressUpdateEvent(
+//                                    entry.getStructure(), 
+//                                    (IProgressable) source)
+//                    );
+//                }
             }
 
             @Override
@@ -50,7 +58,7 @@ class SimpleAWEDemolitionAss extends AWETaskAssigner {
 
             @Override
             public void onStarted() {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolishingEvent(entry.getStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureDemolishEvent(entry.getStructure()));
             }
 
             @Override
@@ -60,6 +68,25 @@ class SimpleAWEDemolitionAss extends AWETaskAssigner {
         };
     }
 
+    @Override
+    public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException {
+        IStructureAPI structureAPI = StructureAPI.getInstance();
+        IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
+        Vector position = constructionEntry.getStructure().getMin(); // Always place from the min position... 
+        ITaskCallback callback = getCallbackFor(constructionEntry);  
+        IPlacement placement = new DemolishingPlacement(RegionUtil.getSize(constructionEntry.getStructure().getCuboidRegion()));
+        AWEPlacementTask task = new AWEPlacementTask(
+                        asyncWorldEdit,
+                        constructionEntry,
+                        placement,
+                        playerOrRandomUUID,
+                        session,
+                        position,
+                        callback
+                );
+        task.setOptions(new PlaceOptions());
+        constructionEntry.addTask(task);
+    }
     
    
     

@@ -5,10 +5,8 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.options.Traversal;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
@@ -24,8 +22,6 @@ public interface IConstructionPlan {
     IConstructionPlan setForced(boolean forced);
     
     IConstructionPlan setStructureTraversal(Traversal traversal);
-    
-    IConstructionPlan setOptionsAssigner(IPlaceOptionsAssigner options);
     
     /**
      * If enabled, will check if the player has the right privileges to execute
@@ -61,11 +57,5 @@ public interface IConstructionPlan {
     boolean isForced();
     
     Traversal getStructureTraversal();
-    
-    /**
-     * Gets the place options assigner, never returns null
-     * @return 
-     */
-    IPlaceOptionsAssigner getOptionsAssigner();
     
 }

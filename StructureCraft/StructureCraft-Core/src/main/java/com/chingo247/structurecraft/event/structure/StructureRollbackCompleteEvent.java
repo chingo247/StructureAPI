@@ -12,9 +12,9 @@ import com.chingo247.structurecraft.model.structure.IStructure;
  *
  * @author Chingo
  */
-public class StructureRestoreCompleteEvent extends StructureEvent{
+public class StructureRollbackCompleteEvent extends StructureEvent{
 
-    public StructureRestoreCompleteEvent(IStructure structure) {
+    public StructureRollbackCompleteEvent(IStructure structure) {
         super(structure);
     }
     

@@ -33,7 +33,7 @@ public class ConstructionEntry implements IConstructionEntry {
     private ConstructionEntry prevEntry;
     private StructureBlockPlacingTask currentTask;
     private Queue<StructureBlockPlacingTask> tasks;
-    private IPlacementSource source;
+    
 
     protected ConstructionEntry(IConstructionExecutor executor, IStructure structure) {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
@@ -42,11 +42,6 @@ public class ConstructionEntry implements IConstructionEntry {
         this.constructionExecutor = executor;
     }
     
-    public void setPlacementSource(IPlacementSource source) {
-        this.source = source;
-    }
-
-   
     
     @Override
     public IConstructionExecutor getConstructionExecutor() {
@@ -92,6 +87,9 @@ public class ConstructionEntry implements IConstructionEntry {
             purge();
             return;
         }
+        
+        
+        
 
         currentTask = tasks.peek();
         if (currentTask == null) {
@@ -138,8 +136,8 @@ public class ConstructionEntry implements IConstructionEntry {
     }
 
     @Override
-    public IPlacementSource getPlacementSource() {
-        return source;
+    public boolean hasNextTask() {
+        return tasks.peek() != null;
     }
 
 }

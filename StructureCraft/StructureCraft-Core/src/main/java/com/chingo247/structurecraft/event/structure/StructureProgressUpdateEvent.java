@@ -7,15 +7,23 @@ package com.chingo247.structurecraft.event.structure;
 
 import com.chingo247.structurecraft.event.StructureEvent;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.util.IProgressable;
 
 /**
  *
  * @author Chingo
  */
-public class StructureRestoringEvent extends StructureEvent{
+public class StructureProgressUpdateEvent extends StructureEvent {
+    
+    private IProgressable progressable;
 
-    public StructureRestoringEvent(IStructure structure) {
+    public StructureProgressUpdateEvent(IStructure structure, IProgressable progressable) {
         super(structure);
+        this.progressable = progressable;
+    }
+
+    public IProgressable getProgressable() {
+        return progressable;
     }
     
 }

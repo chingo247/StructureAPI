@@ -5,17 +5,17 @@
  */
 package com.chingo247.structurecraft.event.structure;
 
-import com.chingo247.structurecraft.event.StructureEvent;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.util.IProgressable;
 
 /**
  *
  * @author Chingo
  */
-public class StructureDemolishingEvent extends StructureEvent {
+public class StructureBuildProgressUpdateEvent extends StructureProgressUpdateEvent {
 
-    public StructureDemolishingEvent(IStructure structure) {
-        super(structure);
+    public StructureBuildProgressUpdateEvent(IStructure structure, IProgressable progressable) {
+        super(structure, progressable);
     }
     
 }

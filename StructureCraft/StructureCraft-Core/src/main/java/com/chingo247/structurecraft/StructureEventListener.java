@@ -10,10 +10,14 @@ import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.event.StructureStateChangeEvent;
 import com.chingo247.structurecraft.event.structure.StructureBuildCompleteEvent;
+import com.chingo247.structurecraft.event.structure.StructureBuildProgressUpdateEvent;
 import com.chingo247.structurecraft.event.structure.StructureBuildingEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
-import com.chingo247.structurecraft.event.structure.StructureDemolishingEvent;
+import com.chingo247.structurecraft.event.structure.StructureDemolishEvent;
 import com.chingo247.structurecraft.event.structure.StructureDemolitionCompleteEvent;
+import com.chingo247.structurecraft.event.structure.StructureDemolitionProgressUpdateEvent;
+import com.chingo247.structurecraft.event.structure.StructureRollbackEvent;
+import com.chingo247.structurecraft.event.structure.StructureRollbackProgressUpdateEvent;
 import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;
 import com.chingo247.structurecraft.model.owner.Ownership;
@@ -23,6 +27,7 @@ import static com.chingo247.structurecraft.model.structure.ConstructionStatus.BU
 import static com.chingo247.structurecraft.model.structure.ConstructionStatus.DEMOLISHING;
 import static com.chingo247.structurecraft.model.structure.ConstructionStatus.QUEUED;
 import static com.chingo247.structurecraft.model.structure.ConstructionStatus.REMOVED;
+import static com.chingo247.structurecraft.model.structure.ConstructionStatus.ROLLING_BACK;
 import static com.chingo247.structurecraft.model.structure.ConstructionStatus.STOPPED;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
@@ -32,6 +37,7 @@ import com.chingo247.xplatform.core.IPlayer;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +51,7 @@ import org.neo4j.graphdb.Transaction;
 class StructureEventListener {
 
     private static final Logger LOG = Logger.getLogger(StructureEventListener.class.getName());
+    private static final DecimalFormat TWO_DECIMAL = new DecimalFormat("#.##");
     private final IEconomyProvider economyProvider;
     private final IStructureAPI structureAPI;
     private final KeyPool<Long> structureEventPool;
@@ -167,6 +174,16 @@ class StructureEventListener {
         String message = colors.yellow() + "BUILDING " + colors.reset() + getStructureString(structure);
         handleStructure(structure, message, BUILDING);
     }
+    
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onStructureBuildingUpdate(StructureBuildProgressUpdateEvent sde) {
+        IColors colors = structureAPI.getPlatform().getChatColors();
+        IStructure structure = sde.getStructure();
+        String progress = TWO_DECIMAL.format(sde.getProgressable().getProgress());
+        String message = colors.yellow() + "BUILDING " + colors.reset() + progress + "% " + getStructureString(structure);
+        handleStructure(structure, message, BUILDING);
+    }
 
     @AllowConcurrentEvents
     @Subscribe
@@ -179,10 +196,20 @@ class StructureEventListener {
 
     @AllowConcurrentEvents
     @Subscribe
-    public void onStructureDemolition(StructureDemolishingEvent sde) {
+    public void onStructureDemolition(StructureDemolishEvent sde) {
         IColors colors = structureAPI.getPlatform().getChatColors();
         IStructure structure = sde.getStructure();
         String message = colors.yellow() + "DEMOLISHING " + colors.reset() + getStructureString(structure);
+        handleStructure(structure, message, DEMOLISHING);
+    }
+    
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onStructureDemolitionUpdate(StructureDemolitionProgressUpdateEvent sde) {
+        IColors colors = structureAPI.getPlatform().getChatColors();
+        IStructure structure = sde.getStructure();
+        String progress = TWO_DECIMAL.format(sde.getProgressable().getProgress());
+        String message = colors.yellow() + "DEMOLISHING " + colors.reset() + progress + "% " + getStructureString(structure);
         handleStructure(structure, message, DEMOLISHING);
     }
 
@@ -202,6 +229,34 @@ class StructureEventListener {
         IStructure structure = scq.getStructure();
         String message = colors.red() + "STOPPED " + colors.reset() + getStructureString(structure);
         handleStructure(structure, message, STOPPED);
+    }
+    
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onStructureRollbackComplete(StructureBuildCompleteEvent bce) {
+        IColors colors = structureAPI.getPlatform().getChatColors();
+        IStructure structure = bce.getStructure();
+        String message = colors.green() + "COMPLETE " + colors.reset() + getStructureString(structure);
+        handleStructure(bce.getStructure(), message, ConstructionStatus.COMPLETED);
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onStructureRollback(StructureRollbackEvent sbe) {
+        IColors colors = structureAPI.getPlatform().getChatColors();
+        IStructure structure = sbe.getStructure();
+        String message = colors.yellow() + "ROLLING BACK " + colors.reset() + getStructureString(structure);
+        handleStructure(structure, message, ROLLING_BACK);
+    }
+    
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onStructureRollbackUpdate(StructureRollbackProgressUpdateEvent sde) {
+        IColors colors = structureAPI.getPlatform().getChatColors();
+        IStructure structure = sde.getStructure();
+        String progress = TWO_DECIMAL.format(sde.getProgressable().getProgress());
+        String message = colors.yellow() + "ROLLING BACK " + colors.reset() + progress + "% " + getStructureString(structure);
+        handleStructure(structure, message, ROLLING_BACK);
     }
 
 }

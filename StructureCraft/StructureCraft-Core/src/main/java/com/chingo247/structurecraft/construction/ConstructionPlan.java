@@ -5,12 +5,8 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.IConstructionExecutor;
-import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.options.Traversal;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
@@ -21,14 +17,6 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 public class ConstructionPlan implements IConstructionPlan {
     
-    private static final IPlaceOptionsAssigner DEFAULT_OPTIONS_ASSIGNER = new IPlaceOptionsAssigner() {
-
-        @Override
-        public PlaceOptions getPlaceOptionsFor(IConstructionEntry entry) {
-            return new PlaceOptions();
-        }
-    };
-    
     private final IStructure structure;
     private final IConstructionExecutor executor;
     private final ITaskAssigner assigner;
@@ -36,7 +24,6 @@ public class ConstructionPlan implements IConstructionPlan {
     private UUID player;
     private AsyncEditSession editSession;
     private Traversal traveral;
-    private IPlaceOptionsAssigner optionsAssigner;
     private boolean useForce;
     
     
@@ -131,13 +118,6 @@ public class ConstructionPlan implements IConstructionPlan {
     }
     
     @Override
-    public IConstructionPlan setOptionsAssigner(IPlaceOptionsAssigner optionsAssigner) {
-        this.optionsAssigner = optionsAssigner;
-        return this;
-    }
-
-    
-    @Override
     public void execute() {
         executor.execute(this);
     }
@@ -147,13 +127,6 @@ public class ConstructionPlan implements IConstructionPlan {
         return traveral;
     }
 
-    @Override
-    public IPlaceOptionsAssigner getOptionsAssigner() {
-        if(optionsAssigner == null) {
-            return DEFAULT_OPTIONS_ASSIGNER;
-        }
-        return optionsAssigner;
-    }
 
     
     

@@ -5,7 +5,6 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.options.IPlaceOptionsAssigner;
 import com.chingo247.structurecraft.construction.assigner.awe.AWEAssignerFactory;
 import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
 import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
@@ -115,7 +114,6 @@ public class ConstructionExecutor implements IConstructionExecutor {
         final IPlayer player = plan.getPlayer() != null ? platform.getPlayer(plan.getPlayer()) : null;
         final UUID playerOrRandomUUID;
         final ICommandSender sender;
-        final IPlaceOptionsAssigner placeOptionsAssigner = plan.getOptionsAssigner();
 
         // Set the person who should receive a message if anything fails
         if (player != null) {
@@ -232,7 +230,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                                     if (startEntry == null) {
                                                         startEntry = currentEntry;
                                                     }
-                                                    plan.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry, placeOptionsAssigner);
+                                                    plan.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry);
                                                     if (prevEntry != null) {
                                                         prevEntry.setNextEntry(currentEntry);
                                                     }
@@ -254,7 +252,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                             IConstructionEntry entry = getOrCreateEntry(structure);
                                             ITaskAssigner assigner = plan.getAssigner();
                                             try {
-                                                assigner.assignTasks(editSession, playerOrRandomUUID, entry, placeOptionsAssigner);
+                                                assigner.assignTasks(editSession, playerOrRandomUUID, entry);
                                                 startEntry = entry;
                                             } catch (StructureException ex) {
                                                 startEntry = null;
