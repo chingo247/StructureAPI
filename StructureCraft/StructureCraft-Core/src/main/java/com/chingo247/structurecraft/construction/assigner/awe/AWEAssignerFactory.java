@@ -5,8 +5,6 @@
  */
 package com.chingo247.structurecraft.construction.assigner.awe;
 
-import com.chingo247.structurecraft.construction.assigner.awe.SimpleAWEBuildAss;
-import com.chingo247.structurecraft.construction.assigner.awe.SimpleAWEDemolitionAss;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
 import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
@@ -34,9 +32,4 @@ public class AWEAssignerFactory implements IAssignerFactory {
         return new SimpleAWEDemolitionAss();
     }
 
-    @Override
-    public ITaskAssigner newSimpleRestoreAssigner() {
-        return new SimpleAWERollbackAss();
-    }
-    
 }

@@ -41,7 +41,6 @@ import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;
 import com.chingo247.structurecraft.event.StructurePlansReloadEvent;
-import com.chingo247.structurecraft.model.logging.BlockLogNode;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.platform.services.AsyncEditSessionFactoryProvider;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
@@ -83,21 +82,22 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
  * @author Chingo
  */
 public class StructureAPI implements IStructureAPI {
+
     public static final String PLUGIN_NAME = "SettlerCraft";
     public static final String PLANS_DIRECTORY = "plans";
     private static final Logger LOG = Logger.getLogger(StructureAPI.class.getName());
 
-    private final IConstructionExecutor constructionExecutor;
+    private IConstructionExecutor constructionExecutor;
     private final Lock loadLock = new ReentrantLock();
     private final Set<StructureRestriction> restrictions;
     private final APlatform platform;
     private final IColors COLORS;
     private final Map<String, Monitor> monitors;
-    private final IStructurePlacerFactory structurePlacerFactory;
-    private final IConstructionZonePlacerFactory constructionZonePlacerFactory;
+    private IStructurePlacerFactory structurePlacerFactory;
+    private IConstructionZonePlacerFactory constructionZonePlacerFactory;
     private final ExecutorService executor;
     private final GraphDatabaseService graph;
-    
+
     private IPlugin plugin;
     private ConfigProvider config;
     private StructurePlanMenuFactory planMenuFactory;
@@ -107,7 +107,7 @@ public class StructureAPI implements IStructureAPI {
     private IEventDispatcher eventDispatcher;
     private EventBus eventBus, asyncEventBus;
     private IAsyncWorldEditIntegration asyncWorldEditIntegration;
-    
+
     private static StructureAPI instance;
 
     private StructureAPI() {
@@ -119,17 +119,13 @@ public class StructureAPI implements IStructureAPI {
         this.restrictions = Sets.newHashSet();
         this.eventDispatcher = new EventDispatcher();
         this.asyncEventBus = new AsyncEventBus(executor, new DefaultSubscriberExceptionHandler());
-        this.eventBus = new EventBus( new DefaultSubscriberExceptionHandler());
+        this.eventBus = new EventBus(new DefaultSubscriberExceptionHandler());
         this.eventDispatcher.register(eventBus);
         this.eventDispatcher.register(asyncEventBus);
         this.asyncEventBus.register(new StructurePlanManagerHandler());
         setupSchema();
         applyUpdates();
-        
-        this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
-        this.structurePlacerFactory = new StructurePlacerFactory(this);
-        this.constructionExecutor = new ConstructionExecutor(this, executor);
-        this.asyncEventBus.register(new StructureEventListener(SettlerCraft.getInstance().getEconomyProvider(), this));
+
     }
 
     @Override
@@ -141,26 +137,22 @@ public class StructureAPI implements IStructureAPI {
     public EventBus getEventBus() {
         return eventBus;
     }
-    
-    
 
     @Override
     public Iterable<StructureRestriction> getRestrictions() {
         return new ArrayList<>(restrictions);
     }
-    
-    
 
     @Override
     public IConstructionZonePlacerFactory getConstructionZonePlacerFactory() {
         return constructionZonePlacerFactory;
     }
-    
+
     @Override
     public GraphDatabaseService getGraphDatabase() {
         return SettlerCraft.getInstance().getNeo4j();
     }
-    
+
     @Override
     public IEventDispatcher getEventDispatcher() {
         return eventDispatcher;
@@ -168,19 +160,18 @@ public class StructureAPI implements IStructureAPI {
 
     @Override
     public IStructurePlacerFactory getStructurePlacerFactory() {
-       return structurePlacerFactory;
+        return structurePlacerFactory;
     }
-    
+
     public synchronized Monitor getMonitor(String world) {
         Monitor monitor = monitors.get(world);
-        if(monitor == null) {
+        if (monitor == null) {
             monitor = new Monitor();
             monitors.put(world, monitor);
         }
         return monitor;
     }
-    
-    
+
     private void setupSchema() {
         // Create indexes, each index creation needs to be executed in a seperate transaction!
         try (Transaction tx = graph.beginTx()) {
@@ -195,10 +186,7 @@ public class StructureAPI implements IStructureAPI {
             Neo4jHelper.createUniqueIndexIfNotExist(graph, ConstructionZoneNode.label(), ConstructionZoneNode.ID_PROPERTY);
             tx.success();
         }
-        try (Transaction tx = graph.beginTx()) {
-            Neo4jHelper.createIndexIfNotExist(graph, BlockLogNode.label(), BlockLogNode.DATE_PROPERTY);
-            tx.success();
-        }
+
         setupIdGenerator("STRUCTURE_ID");
         setupIdGenerator("CONSTRUCTIONZONE_ID");
     }
@@ -259,11 +247,19 @@ public class StructureAPI implements IStructureAPI {
             // Load StructurePlans
             StructurePlanMenuReader reader = new StructurePlanMenuReader();
 
+            // Setup menu
             this.menuTemplate = reader.read(new File(getWorkingDirectory(), "menu.xml"));
             this.planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
+            reload();
+            
+
+            this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
+            this.structurePlacerFactory = new StructurePlacerFactory(this);
+            this.constructionExecutor = new ConstructionExecutor(this, executor);
             
             IEconomyProvider economyProvider = SettlerCraft.getInstance().getEconomyProvider();
-            reload();
+            this.asyncEventBus.register(new StructureEventListener(economyProvider));
+            
             this.initialized = true;
         }
     }
@@ -361,9 +357,9 @@ public class StructureAPI implements IStructureAPI {
     public void registerConfigProvider(ConfigProvider configProvider) {
         this.config = configProvider;
     }
-    
+
     public void registerAWE(IAsyncWorldEditIntegration asyncWorldEditIntegration) {
-        if(this.asyncWorldEditIntegration != null) {
+        if (this.asyncWorldEditIntegration != null) {
             throw new RuntimeException("Already registered AWE");
         }
         this.asyncWorldEditIntegration = asyncWorldEditIntegration;
@@ -372,7 +368,7 @@ public class StructureAPI implements IStructureAPI {
     public IAsyncWorldEditIntegration getAsyncWorldEditIntegration() {
         return asyncWorldEditIntegration;
     }
-    
+
     @Override
     public boolean isQueueLocked(UUID player) {
         return asyncWorldEditIntegration.isQueueLocked(player);
@@ -407,7 +403,7 @@ public class StructureAPI implements IStructureAPI {
     public IWorldConfig loadOrGetConfig(String world) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     private class StructurePlanManagerHandler {
 
         @Subscribe

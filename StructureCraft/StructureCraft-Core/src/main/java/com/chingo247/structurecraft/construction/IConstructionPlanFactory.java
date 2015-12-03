@@ -20,6 +20,5 @@ public interface IConstructionPlanFactory {
     
     IConstructionPlan newDemolitionPlan(IStructure structure);
     
-    IConstructionPlan newRestorePlan(IStructure structure);
     
 }

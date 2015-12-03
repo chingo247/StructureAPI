@@ -44,12 +44,7 @@ class ConstructionPlanFactory implements IConstructionPlanFactory {
         return new ConstructionPlan(executor, structure, assigner);
     }
 
-    @Override
-    public IConstructionPlan newRestorePlan(IStructure structure) {
-        ITaskAssigner assigner = executor.getAssignerFactory().newSimpleRestoreAssigner();
-        return new ConstructionPlan(executor, structure, assigner)
-                .setRecursive(false);
-    }
+    
     
     
     
