@@ -52,9 +52,9 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 class SimpleAWERollbackAss implements ITaskAssigner {
 
-    private static final int MAX_BLOCKS = 200_000;
+    private static final int MAX_BLOCKS = 50_000;
 
-    private long countBlocks(UUID world, long structure, Date from, Date to) {
+    private long countBlocks(long structure, Date from, Date to) {
         final IStructureAPI structureAPI = StructureAPI.getInstance();
         Map<String, Object> params = Maps.newHashMap();
         params.put("sid", structure);
@@ -65,11 +65,8 @@ class SimpleAWERollbackAss implements ITaskAssigner {
             params.put("to", to.getTime());
         }
 
-        params.put("world", world.toString());
         String query
-                = "MATCH (w:" + WorldNode.LABEL + " {" + WorldNode.UUID_PROPERTY + ":{world}}) "
-                + "WITH w "
-                + "MATCH (w)<-[:" + RelTypes.WITHIN + "]-(s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {sid} }) "
+                = "MATCH (s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {sid} }) "
                 + "WITH s "
                 + "MATCH (s)-[:" + RelTypes.HAS_BLOCK + "]->(b:" + BlockLogNode.LABEL + ") ";
 
@@ -107,7 +104,7 @@ class SimpleAWERollbackAss implements ITaskAssigner {
         long start = System.currentTimeMillis();
         long total;
         try (Transaction tx = structureAPI.getGraphDatabase().beginTx()) {
-            total = countBlocks(structure.getWorldUUID(), structure.getId(), from, to);
+            total = countBlocks(structure.getId(), from, to);
             tx.success();
         }
         System.out.println("count rollback blocks in " + (System.currentTimeMillis() - start) + "ms");
@@ -115,14 +112,13 @@ class SimpleAWERollbackAss implements ITaskAssigner {
 
         if (total != 0) {
             System.out.println("Assigning rollback tasks");
-            UUID worldUUID = structure.getWorldUUID();
             int skip = 0;
             int tasks = 0;
             while (skip < total) {
-
+                final int blocksToSkip = skip;
                 final Progress progress = new Progress((double) total, (double) Math.min(skip + MAX_BLOCKS, total));
 
-                AWERollbackPlacement placement = new AWERollbackPlacement(structure, worldUUID, from, to, skip, MAX_BLOCKS);
+                AWERollbackPlacement placement = new AWERollbackPlacement(structure, from, to, skip, MAX_BLOCKS);
                 AWEPlacementTask task = new AWEPlacementTask(
                         asyncWorldEdit,
                         entry,
@@ -152,12 +148,16 @@ class SimpleAWERollbackAss implements ITaskAssigner {
 
                             @Override
                             public void onStarted() {
-                                structureAPI.getEventDispatcher().dispatchEvent(new StructureRollbackEvent(entry.getStructure()));
+                                if(blocksToSkip == 0) {
+                                    structureAPI.getEventDispatcher().dispatchEvent(new StructureRollbackEvent(entry.getStructure()));
+                                }
                             }
 
                             @Override
                             public void onQueued() {
-                                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+                                if(blocksToSkip == 0) {
+                                    structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+                                }
                             }
                         }
                 );
@@ -175,13 +175,11 @@ class SimpleAWERollbackAss implements ITaskAssigner {
         private final long limit, skip;
         private Date from, to;
         private IStructure structure;
-        private UUID worldUUID;
 
-        public AWERollbackPlacement(IStructure structure, UUID worldUUID, Date from, Date to, long skip, long limit) {
+        public AWERollbackPlacement(IStructure structure, Date from, Date to, long skip, long limit) {
             this.limit = limit;
             this.skip = skip;
             this.structure = structure;
-            this.worldUUID = worldUUID;
             this.from = from;
             this.to = to;
         }
@@ -189,8 +187,13 @@ class SimpleAWERollbackAss implements ITaskAssigner {
         @Override
         public void place(final EditSession session, Vector pos, PlaceOptions option) {
             List<StructureBlock> blocks = Lists.newArrayList();
+            int count = 0;
+            long start = System.currentTimeMillis();
             try (Transaction tx = StructureAPI.getInstance().getGraphDatabase().beginTx()) {
-                Result r = getBlocksResult(worldUUID, structure.getId(), from, to, skip, limit, Order.DATE_ASCENDING);
+                long queryTime = System.currentTimeMillis();
+                Result r = getBlocksResult(structure.getId(), from, to, skip, limit, Order.DATE_ASCENDING);
+                System.out.println("Blocks query in " + (System.currentTimeMillis() - queryTime));
+                
                 while (r.hasNext()) {
                     Node n = (Node) r.next().get("block");
                     BlockLogNode bln = new BlockLogNode(n);
@@ -199,18 +202,16 @@ class SimpleAWERollbackAss implements ITaskAssigner {
                             bln.getOldMaterial(),
                             bln.getOldData()
                     );
+
+                    session.rawSetBlock(blockPos, block);
+                    count++;
+
                     blocks.add(new StructureBlock(blockPos, block));
                 }
                 tx.success();
             }
-
-            System.out.println("Setting blocks...");
-            int count = 0;
-            for (StructureBlock block : blocks) {
-                session.rawSetBlock(block.getPosition(), block.getBlock());
-                count++;
-            }
-            System.out.println("Done... (" + count + ")");
+            
+            System.out.println("Done... (" + count + ") in " + (System.currentTimeMillis() - start) + "ms");
 
         }
 
@@ -244,7 +245,7 @@ class SimpleAWERollbackAss implements ITaskAssigner {
             return structure.getCuboidRegion();
         }
 
-        private Result getBlocksResult(UUID world, long structure, Date from, Date to, long skip, long limit, Order order) {
+        private Result getBlocksResult(long structure, Date from, Date to, long skip, long limit, Order order) {
             final IStructureAPI structureAPI = StructureAPI.getInstance();
             Map<String, Object> params = Maps.newHashMap();
             params.put("sid", structure);
@@ -254,7 +255,6 @@ class SimpleAWERollbackAss implements ITaskAssigner {
             if (to != null) {
                 params.put("to", to.getTime());
             }
-            params.put("world", world.toString());
             if (skip > 0) {
                 params.put("skip", skip);
             }
@@ -263,9 +263,7 @@ class SimpleAWERollbackAss implements ITaskAssigner {
             }
 
             String query
-                    = "MATCH (w:" + WorldNode.LABEL + " {" + WorldNode.UUID_PROPERTY + ":{world}}) "
-                    + "WITH w "
-                    + "MATCH (w)<-[:" + RelTypes.WITHIN + "]-(s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {sid} }) "
+                    = "MATCH (s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {sid} }) "
                     + "WITH s "
                     + "MATCH (s)-[:" + RelTypes.HAS_BLOCK + "]->(b:" + BlockLogNode.LABEL + ") ";
 
@@ -278,9 +276,9 @@ class SimpleAWERollbackAss implements ITaskAssigner {
             }
 
             query += "RETURN b as block ";
-            
+
             query += " ORDER BY b.d " + (order == Order.DATE_ASCENDING ? "ASC" : "DESC");
-            
+
             if (skip > 0) {
                 query += " SKIP {skip} ";
             }

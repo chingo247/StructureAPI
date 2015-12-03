@@ -41,6 +41,7 @@ import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;
 import com.chingo247.structurecraft.event.StructurePlansReloadEvent;
+import com.chingo247.structurecraft.model.logging.BlockLogNode;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.platform.services.AsyncEditSessionFactoryProvider;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
@@ -192,6 +193,10 @@ public class StructureAPI implements IStructureAPI {
         }
         try (Transaction tx = graph.beginTx()) {
             Neo4jHelper.createUniqueIndexIfNotExist(graph, ConstructionZoneNode.label(), ConstructionZoneNode.ID_PROPERTY);
+            tx.success();
+        }
+        try (Transaction tx = graph.beginTx()) {
+            Neo4jHelper.createIndexIfNotExist(graph, BlockLogNode.label(), BlockLogNode.DATE_PROPERTY);
             tx.success();
         }
         setupIdGenerator("STRUCTURE_ID");

@@ -12,10 +12,12 @@ import com.chingo247.structurecraft.event.StructureStateChangeEvent;
 import com.chingo247.structurecraft.event.structure.StructureBuildCompleteEvent;
 import com.chingo247.structurecraft.event.structure.StructureBuildProgressUpdateEvent;
 import com.chingo247.structurecraft.event.structure.StructureBuildingEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.StructureDemolishEvent;
 import com.chingo247.structurecraft.event.structure.StructureDemolitionCompleteEvent;
 import com.chingo247.structurecraft.event.structure.StructureDemolitionProgressUpdateEvent;
+import com.chingo247.structurecraft.event.structure.StructureRollbackCompleteEvent;
 import com.chingo247.structurecraft.event.structure.StructureRollbackEvent;
 import com.chingo247.structurecraft.event.structure.StructureRollbackProgressUpdateEvent;
 import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
@@ -224,7 +226,7 @@ class StructureEventListener {
 
     @AllowConcurrentEvents
     @Subscribe
-    public void onStructureConstructionCancelled(StructureConstructionQueued scq) {
+    public void onStructureConstructionCancelled(StructureConstructionCancelledEvent scq) {
         IColors colors = structureAPI.getPlatform().getChatColors();
         IStructure structure = scq.getStructure();
         String message = colors.red() + "STOPPED " + colors.reset() + getStructureString(structure);
@@ -233,11 +235,11 @@ class StructureEventListener {
     
     @AllowConcurrentEvents
     @Subscribe
-    public void onStructureRollbackComplete(StructureBuildCompleteEvent bce) {
+    public void onStructureRollbackComplete(StructureRollbackCompleteEvent bce) {
         IColors colors = structureAPI.getPlatform().getChatColors();
         IStructure structure = bce.getStructure();
-        String message = colors.green() + "COMPLETE " + colors.reset() + getStructureString(structure);
-        handleStructure(bce.getStructure(), message, ConstructionStatus.COMPLETED);
+        String message = colors.red() + "ROLLBACK COMPLETE " + colors.reset() + getStructureString(structure);
+        handleStructure(bce.getStructure(), message, ConstructionStatus.REMOVED);
     }
 
     @AllowConcurrentEvents
