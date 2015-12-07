@@ -31,8 +31,8 @@ public class ConstructionEntry implements IConstructionEntry {
     private IConstructionExecutor constructionExecutor;
     private ConstructionEntry nextEntry;
     private ConstructionEntry prevEntry;
-    private StructureBlockPlacingTask currentTask;
-    private Queue<StructureBlockPlacingTask> tasks;
+    private StructureTask currentTask;
+    private Queue<StructureTask> tasks;
     
 
     protected ConstructionEntry(IConstructionExecutor executor, IStructure structure) {
@@ -49,7 +49,7 @@ public class ConstructionEntry implements IConstructionEntry {
     }
 
     @Override
-    public void addTask(StructureBlockPlacingTask task) {
+    public void addTask(StructureTask task) {
         System.out.println("[ConstructionEntry]: adding " + task.getClass().getSimpleName() + " to structure #" + structure.getId());
         this.tasks.add(task);
     }
@@ -138,6 +138,11 @@ public class ConstructionEntry implements IConstructionEntry {
     @Override
     public boolean hasNextTask() {
         return tasks.peek() != null;
+    }
+
+    @Override
+    public int numTasks() {
+        return tasks.size();
     }
 
 }

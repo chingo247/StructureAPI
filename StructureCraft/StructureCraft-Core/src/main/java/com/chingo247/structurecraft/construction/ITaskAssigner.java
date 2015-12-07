@@ -14,20 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.event.task;
+package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.StructureTask;
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.exeption.StructureException;
+import java.io.IOException;
+import java.util.UUID;
+import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
 /**
  *
  * @author Chingo
  */
-public class StructureTaskStartEvent extends StructureTaskEvent {
-
-    public StructureTaskStartEvent(StructureTask task) {
-        super(task);
-    }
+public interface ITaskAssigner {
     
     
+    void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException;
     
 }

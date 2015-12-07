@@ -31,9 +31,13 @@ import com.chingo247.structurecraft.commands.StructurePlanCommands;
 import com.chingo247.structurecraft.exeption.StructureAPIException;
 import com.chingo247.structurecraft.plan.PlanGenerator;
 import com.chingo247.structurecraft.platform.ConfigProvider;
+import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
 import com.chingo247.structurecraft.platform.permission.PermissionManager;
 import com.chingo247.structurecraft.platform.services.holograms.StructureHologramManager;
+import com.chingo247.xplatform.core.APlatform;
+import com.chingo247.xplatform.core.IScheduler;
 import com.chingo247.xplatform.platforms.bukkit.BukkitConsoleSender;
+import com.chingo247.xplatform.platforms.bukkit.BukkitPlatform;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlayer;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlugin;
 import com.chingo247.xplatform.platforms.bukkit.BukkitServer;
@@ -61,7 +65,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
  *
  * @author Chingo
  */
-public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
+public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlugin {
 
     public static final Level LOG_LEVEL = Level.SEVERE;
     public static final String MSG_PREFIX = "[SettlerCraft]: ";
@@ -126,7 +130,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
         // Register plugin & ConfigProvider
         StructureAPI structureAPI = (StructureAPI) StructureAPI.getInstance();
         try {
-            structureAPI.registerStructureAPIPlugin(new BukkitPlugin(this));
+            structureAPI.registerStructureAPIPlugin(this);
         } catch (StructureAPIException ex) {
             this.setEnabled(false);
             System.out.println("[SettlerCraft]: Disabling SettlerCraft-StructureAPI");
@@ -237,6 +241,18 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
     public ConfigProvider getConfigProvider() {
         return configProvider;
     }
+
+    @Override
+    public IScheduler getScheduler() {
+        return getPlatform().getServer().getScheduler(this);
+    }
+
+    @Override
+    public APlatform getPlatform() {
+        return new BukkitPlatform(Bukkit.getServer());
+    }
+    
+    
 
   
 

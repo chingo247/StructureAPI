@@ -58,10 +58,7 @@ public enum ConstructionStatus {
      * Structure is rolling back
      */
     ROLLING_BACK(8, true),
-    PLACING(9, true),
-    CREATING_BACKUP(10, true),
-    PERFORMING_OPERATION(11, true),
-    RESTORING(12, true);
+    PERFORMING_OPERATION(9, true);
     
     
 
@@ -84,8 +81,6 @@ public enum ConstructionStatus {
     
     public static ConstructionStatus getStatus(String status) {
         switch(status.replaceAll(" ", "_")) {
-            case "CREATING_BACKUP":
-                return CREATING_BACKUP;
             case "ON_HOLD":
                 return ON_HOLD;
             case "BUILDING":
@@ -104,10 +99,6 @@ public enum ConstructionStatus {
                 return PLACING_FENCE;
             case "ROLLING_BACK":
                 return ROLLING_BACK;
-            case "PLACING":
-                return PLACING;
-            case "RESTORING":
-                return RESTORING;
             default:
                 return PERFORMING_OPERATION;
         }
@@ -125,10 +116,7 @@ public enum ConstructionStatus {
             case 6: return REMOVED;
             case 7: return PLACING_FENCE;
             case 8: return ROLLING_BACK;
-            case 9: return PLACING;
-            case 10: return CREATING_BACKUP;
             case 11: return PERFORMING_OPERATION;
-            case 12: return RESTORING;
             default: throw new AssertionError("Unreachable");
         }
     }

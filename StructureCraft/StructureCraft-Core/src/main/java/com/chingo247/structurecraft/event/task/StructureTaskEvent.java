@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.event.task;
 
-import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
+import com.chingo247.structurecraft.construction.StructureTask;
 import org.parboiled.common.Preconditions;
 
 /**
@@ -25,14 +25,14 @@ import org.parboiled.common.Preconditions;
  */
 public class StructureTaskEvent {
     
-    private final StructureBlockPlacingTask task;
+    private final StructureTask task;
 
-    public StructureTaskEvent(StructureBlockPlacingTask task) {
+    public StructureTaskEvent(StructureTask task) {
         Preconditions.checkNotNull(task, "StructureTask may not be null");
         this.task = task;
     }
 
-    public StructureBlockPlacingTask getTask() {
+    public StructureTask getTask() {
         return task;
     }
     

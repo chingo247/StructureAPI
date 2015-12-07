@@ -50,6 +50,7 @@ import com.chingo247.structurecraft.schematic.Schematic;
 import com.chingo247.structurecraft.schematic.SchematicManager;
 import com.chingo247.structurecraft.platform.ConfigProvider;
 import com.chingo247.structurecraft.placing.structure.IStructurePlacerFactory;
+import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
 import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
 import com.chingo247.xplatform.core.IColors;
 import com.google.common.base.Preconditions;
@@ -87,25 +88,30 @@ public class StructureAPI implements IStructureAPI {
     public static final String PLANS_DIRECTORY = "plans";
     private static final Logger LOG = Logger.getLogger(StructureAPI.class.getName());
 
-    private IConstructionExecutor constructionExecutor;
+    private final ExecutorService executor;
+    private final GraphDatabaseService graph;
     private final Lock loadLock = new ReentrantLock();
-    private final Set<StructureRestriction> restrictions;
+    
     private final APlatform platform;
     private final IColors COLORS;
     private final Map<String, Monitor> monitors;
+    
+    private final Set<StructureRestriction> restrictions;
     private IStructurePlacerFactory structurePlacerFactory;
     private IConstructionZonePlacerFactory constructionZonePlacerFactory;
-    private final ExecutorService executor;
-    private final GraphDatabaseService graph;
-
-    private IPlugin plugin;
+    private IConstructionExecutor constructionExecutor;
+   
+    private IStructureAPIPlugin plugin;
     private ConfigProvider config;
     private StructurePlanMenuFactory planMenuFactory;
-    private AsyncEditSessionFactoryProvider sessionFactoryProvider;
+    
     private CategoryMenu menuTemplate;
     private boolean isLoadingPlans = false, initialized = false;
+    
     private IEventDispatcher eventDispatcher;
     private EventBus eventBus, asyncEventBus;
+    
+    private AsyncEditSessionFactoryProvider sessionFactoryProvider;
     private IAsyncWorldEditIntegration asyncWorldEditIntegration;
 
     private static StructureAPI instance;
@@ -337,7 +343,7 @@ public class StructureAPI implements IStructureAPI {
         return planMenuFactory.createPlanMenu();
     }
 
-    public void registerStructureAPIPlugin(IPlugin plugin) throws StructureAPIException {
+    public void registerStructureAPIPlugin(IStructureAPIPlugin plugin) throws StructureAPIException {
         if (this.plugin != null) {
             throw new StructureAPIException("Already registered a Plugin for the StructureAPI, NOTE that this method should only be used by StructureAPI Plugin itself!");
         }
@@ -402,6 +408,11 @@ public class StructureAPI implements IStructureAPI {
     @Override
     public IWorldConfig loadOrGetConfig(String world) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public IStructureAPIPlugin getPlugin() {
+        return plugin;
     }
 
     private class StructurePlanManagerHandler {

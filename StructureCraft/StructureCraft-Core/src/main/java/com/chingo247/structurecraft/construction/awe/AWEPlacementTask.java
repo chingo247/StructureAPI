@@ -20,6 +20,7 @@ import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
+import com.chingo247.structurecraft.construction.StructureTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
 import com.chingo247.structurecraft.event.async.StructureJobAddedEvent;
 import com.chingo247.structurecraft.construction.options.PlaceOptions;

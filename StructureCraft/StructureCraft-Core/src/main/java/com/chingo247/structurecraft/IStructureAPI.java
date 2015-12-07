@@ -26,6 +26,7 @@ import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePl
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.platform.ConfigProvider;
 import com.chingo247.structurecraft.placing.structure.IStructurePlacerFactory;
+import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
 import com.chingo247.xplatform.core.APlatform;
 import com.google.common.eventbus.EventBus;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -81,7 +82,9 @@ public interface IStructureAPI {
      *
      * @param player The player UUID or PlayerEntry UUID
      * @return True if the queue was locked
+     * @deprecated Will be removed in the future, instead use {@link #getAsyncWorldEditIntegration()}
      */
+    @Deprecated
     boolean isQueueLocked(UUID player);
 
     /**
@@ -120,7 +123,7 @@ public interface IStructureAPI {
     File getGenerationDirectory();
 
     /**
-     * The directory where plans are generated from schematics
+     * The directory of the plugin
      *
      * @return The directory
      */
@@ -174,7 +177,6 @@ public interface IStructureAPI {
     
     /**
      * Loads a schematic file
-     *
      * @param schematicFile The schematic file to load
      * @return The schematicPlacement
      * @throws IOException
@@ -192,5 +194,6 @@ public interface IStructureAPI {
     
     ExecutorService getExecutor();
 
-
+    IStructureAPIPlugin getPlugin();
+    
 }

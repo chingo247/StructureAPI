@@ -163,6 +163,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         StructurePlaceResult placeResult = new StructurePlaceResult();
 
         ILocation spawn = world.getSpawn();
+        
 
         try {
             

@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.event.task;
 
-import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
+import com.chingo247.structurecraft.construction.StructureTask;
 
 /**
  *
@@ -24,7 +24,7 @@ import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
  */
 public class StructureTaskCancelledEvent extends StructureTaskEvent {
 
-    public StructureTaskCancelledEvent(StructureBlockPlacingTask task) {
+    public StructureTaskCancelledEvent(StructureTask task) {
         super(task);
     }
     

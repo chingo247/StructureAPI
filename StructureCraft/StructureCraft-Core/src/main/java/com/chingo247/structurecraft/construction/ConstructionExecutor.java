@@ -5,9 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.assigner.awe.AWEAssignerFactory;
-import com.chingo247.structurecraft.construction.assigner.ITaskAssigner;
-import com.chingo247.structurecraft.construction.assigner.IAssignerFactory;
+import com.chingo247.structurecraft.construction.awe.AWEAssignerFactory;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;

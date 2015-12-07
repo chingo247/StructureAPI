@@ -18,7 +18,6 @@ package com.chingo247.structurecraft.platform.services.holograms;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.structurecraft.event.StructureCreateEvent;
-import com.chingo247.structurecraft.event.StructureStateChangeEvent;
 import com.chingo247.structurecraft.model.hologram.StructureHologram;
 import com.chingo247.structurecraft.model.hologram.StructureHologramNode;
 import com.chingo247.structurecraft.model.hologram.StructureHologramRepository;
@@ -28,6 +27,7 @@ import com.chingo247.structurecraft.model.hologram.IStructureHologram;
 import com.chingo247.structurecraft.model.hologram.IStructureHologramRepository;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
