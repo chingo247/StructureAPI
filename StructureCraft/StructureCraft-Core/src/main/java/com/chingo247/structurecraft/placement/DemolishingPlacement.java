@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.placement.interfaces.IBlockPlacement;
 import com.chingo247.structurecraft.util.iterator.TopDownCuboidIterator;
 import com.sk89q.worldedit.EditSession;
@@ -30,7 +30,7 @@ import java.util.Iterator;
  *
  * @author Chingo
  */
-public class DemolishingPlacement extends AbstractPlacement implements IBlockPlacement {
+public class DemolishingPlacement extends BlockPlacement implements IBlockPlacement {
     
 
     public DemolishingPlacement(Vector size) {
@@ -74,9 +74,8 @@ public class DemolishingPlacement extends AbstractPlacement implements IBlockPla
     }
 
     @Override
-    public int getBlocks() {
-        return width * height * length;
+    public boolean hasBlock(Vector position) {
+        return true;
     }
-    
     
 }

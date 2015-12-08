@@ -65,11 +65,6 @@ public class ConstructionExecutor implements IConstructionExecutor {
         this.entries = Maps.newHashMap();
     }
 
-    @Override
-    public IAssignerFactory getAssignerFactory() {
-        return assFactory;
-    }
-
     ConstructionEntry getOrCreateEntry(IStructure structure) {
         synchronized (entryMutex) {
             ConstructionEntry entry = entries.get(structure.getId());
@@ -104,8 +99,8 @@ public class ConstructionExecutor implements IConstructionExecutor {
     @Override
     public void execute(final IConstructionPlan plan) {
         final IStructure structure = plan.getStructure();
-        System.out.println("plan structure: " + plan.getStructure());
-        System.out.println("plan structure id: " + plan.getStructure().getId());
+//        System.out.println("plan structure: " + plan.getStructure());
+//        System.out.println("plan structure id: " + plan.getStructure().getId());
 
         final APlatform platform = structureAPI.getPlatform();
         final IColors colors = platform.getChatColors();
@@ -145,7 +140,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                     try {
                         tx = graph.beginTx();
                         StructureNode structureNode = new StructureNode(structure.getUnderlyingNode());
-                        System.out.println("Structure: " + structureNode);
+//                        System.out.println("Structure: " + structureNode);
                         StructureNode rootNode = structureNode.getRoot();
                         lockId = rootNode.getId();
                     } catch (Exception ex) {

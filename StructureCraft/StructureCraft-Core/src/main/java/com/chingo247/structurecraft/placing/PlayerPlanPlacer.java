@@ -195,7 +195,7 @@ public class PlayerPlanPlacer {
                                 IStructure structure = placeResult.getPlacedStructure();
                                 if (!structureAPI.isQueueLocked(player.getUniqueId())) {
                                     structureAPI.getConstructionExecutor().getConstructionPlanFactory()
-                                            .newBuildPlan(structure)
+                                            .newSavingBuildPlan(structure)
                                             .setRecursive(true)
                                             .setPlayer(playerUUID)
                                             .execute();

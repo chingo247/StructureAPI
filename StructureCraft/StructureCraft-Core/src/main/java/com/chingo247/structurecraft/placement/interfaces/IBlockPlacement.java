@@ -29,6 +29,8 @@ public interface IBlockPlacement extends IPlacement {
     
     public BaseBlock getBlock(Vector position);
     
+    public boolean hasBlock(Vector position);
+    
     public int getBlocks();
     
     

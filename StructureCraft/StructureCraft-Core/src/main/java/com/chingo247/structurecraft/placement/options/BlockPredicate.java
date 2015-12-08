@@ -14,15 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.options;
+package com.chingo247.structurecraft.placement.options;
+
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
 
 /**
  *
  * @author Chingo
  */
-public enum Traversal {
+public interface BlockPredicate {
     
-    DEPTH_FIRST,
-    BREADTH_FIRST,
+    public static final BlockPredicate TRUE = new BlockPredicate() {
+
+        @Override
+        public boolean evaluate(Vector position, Vector worldPosition, BaseBlock block) {
+            return true;
+        }
+    };
+    
+    /**
+     * Evaluates the position
+     * @param position The relative position to evaluate
+     * @param worldPosition
+     * @param block The block to evaluate
+     * @return true if evaluation expression is true
+     */
+    public boolean evaluate(Vector position, Vector worldPosition, BaseBlock block);
     
 }

@@ -17,7 +17,7 @@
 
 package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.iterator.TopDownCuboidIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;

@@ -7,6 +7,8 @@ package com.chingo247.structurecraft.construction;
 
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
+import com.chingo247.structurecraft.construction.awe.AWEAssignerFactory;
+import com.chingo247.structurecraft.construction.safe.schematic.SchematicSavingAssignerFactory;
 import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**
@@ -17,10 +19,14 @@ class ConstructionPlanFactory implements IConstructionPlanFactory {
     
     private final IConstructionExecutor executor;
     private final IStructureAPI structureAPI;
+    private IAssignerFactory defaultAssignerFactory;
+    private SchematicSavingAssignerFactory schematicSavingAssignerFactory;
 
     public ConstructionPlanFactory(IStructureAPI structureAPI, IConstructionExecutor executor) {
         this.executor = executor;
         this.structureAPI = structureAPI;
+        this.defaultAssignerFactory = new AWEAssignerFactory(structureAPI);
+        this.schematicSavingAssignerFactory = new SchematicSavingAssignerFactory();
     }
     
     
@@ -33,13 +39,25 @@ class ConstructionPlanFactory implements IConstructionPlanFactory {
 
     @Override
     public IConstructionPlan newBuildPlan(IStructure structure) {
-        ITaskAssigner assigner = executor.getAssignerFactory().newSimpleBuildAssigner();
+        ITaskAssigner assigner = defaultAssignerFactory.newSimpleBuildAssigner();
         return new ConstructionPlan(executor, structure, assigner);
     }
 
     @Override
     public IConstructionPlan newDemolitionPlan(IStructure structure) {
-        ITaskAssigner assigner = executor.getAssignerFactory().newSimpleDemolitionAssigner();
+        ITaskAssigner assigner = defaultAssignerFactory.newSimpleDemolitionAssigner();
+        return new ConstructionPlan(executor, structure, assigner);
+    }
+
+    @Override
+    public IConstructionPlan newSavingBuildPlan(IStructure structure) {
+        ITaskAssigner assigner = schematicSavingAssignerFactory.createSavingSchematicBuildAssigner();
+        return new ConstructionPlan(executor, structure, assigner);
+    }
+
+    @Override
+    public IConstructionPlan newSavingDemolitionPlan(IStructure structure) {
+        ITaskAssigner assigner = schematicSavingAssignerFactory.createSavingSchematicBuildAssigner();
         return new ConstructionPlan(executor, structure, assigner);
     }
 

@@ -89,6 +89,10 @@ public class SchematicPlacement extends BlockPlacement implements FilePlacement,
     public File[] getFiles() {
         return new File[]{schematic.getFile()};
     }
+    
+    public boolean hasBlock(Vector position) {
+        return clipboard.hasBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+    }
 
     @Override
     public BaseBlock getBlock(Vector position) {

@@ -125,12 +125,4 @@ public class SchematicFileWriter {
         outputStream.writeNamedTag("Schematic", schematicTag);
     }
 
-    public static void main(String[] args) {
-        byte[] bytes = new byte[1000];
-        
-        for(int i = 0; i < bytes.length; i++) {
-            System.out.println("byte: " + bytes[i]);
-        }
-    }
-
 }

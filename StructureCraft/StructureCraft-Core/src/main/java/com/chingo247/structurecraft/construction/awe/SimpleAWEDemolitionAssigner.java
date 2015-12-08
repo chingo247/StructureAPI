@@ -11,7 +11,7 @@ import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;

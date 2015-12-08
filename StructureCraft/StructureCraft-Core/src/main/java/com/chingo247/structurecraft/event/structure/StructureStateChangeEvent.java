@@ -19,6 +19,7 @@ public class StructureStateChangeEvent extends StructureEvent {
     
     public StructureStateChangeEvent(IStructure structure, ConstructionStatus newStatus) {
         super(structure);
+        this.newStatus = newStatus;
     }
 
     public ConstructionStatus getNewStatus() {

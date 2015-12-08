@@ -78,6 +78,10 @@ public class FastClipboard {
     public BaseBlock getBlock(Vector pos) {
         return getBlock(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ());
     }
+    
+    public boolean hasBlock(int x, int y, int z) {
+        return ((y * width * length) + z * width + x) < blockIds.length;
+    }
 
     public BaseBlock getBlock(int x, int y, int z) {
         int index = (y * width * length) + z * width + x;

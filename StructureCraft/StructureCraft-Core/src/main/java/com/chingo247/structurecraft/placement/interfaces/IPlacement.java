@@ -17,7 +17,7 @@
  */
 package com.chingo247.structurecraft.placement.interfaces;
 
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;

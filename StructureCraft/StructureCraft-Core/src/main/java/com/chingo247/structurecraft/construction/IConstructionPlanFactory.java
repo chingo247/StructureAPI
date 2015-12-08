@@ -19,5 +19,9 @@ public interface IConstructionPlanFactory {
     
     IConstructionPlan newDemolitionPlan(IStructure structure);
     
+    IConstructionPlan newSavingBuildPlan(IStructure structure);
+    
+    IConstructionPlan newSavingDemolitionPlan(IStructure structure);
+    
     
 }

@@ -23,9 +23,9 @@ import static com.chingo247.settlercraft.core.Direction.NORTH;
 import static com.chingo247.settlercraft.core.Direction.SOUTH;
 import static com.chingo247.settlercraft.core.Direction.WEST;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
-import com.chingo247.structurecraft.construction.options.BlockMask;
-import com.chingo247.structurecraft.construction.options.BlockPredicate;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.BlockMask;
+import com.chingo247.structurecraft.placement.options.BlockPredicate;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
@@ -206,9 +206,8 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
             bm.apply(blockPosition, p, block);
         }
 
-        
         editSession.rawSetBlock(p, block);
-
     }
+    
 
 }

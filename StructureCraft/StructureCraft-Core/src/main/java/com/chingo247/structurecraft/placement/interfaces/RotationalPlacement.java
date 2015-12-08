@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.placement.interfaces;
 
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 
 
 

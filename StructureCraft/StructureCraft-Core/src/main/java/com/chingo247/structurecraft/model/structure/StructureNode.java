@@ -279,15 +279,9 @@ public class StructureNode extends PlotNode {
     }
 
     public StructureNode getParent() {
-        // (this)-[:substructure of]-(parent)
-        
-        System.out.println("NODE ID: " + underlyingNode.getId());
-        
-        if(!underlyingNode
-                .hasRelationship(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING)) {
+        if(!underlyingNode.hasRelationship(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING)) {
             return null;
         }
-        
         Relationship rel = underlyingNode.getSingleRelationship(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.OUTGOING);
         Node parentNode = rel.getOtherNode(underlyingNode);
         return new StructureNode(parentNode);

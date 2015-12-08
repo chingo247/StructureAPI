@@ -23,7 +23,7 @@ import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
 import com.chingo247.structurecraft.construction.StructureTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
 import com.chingo247.structurecraft.event.async.StructureJobAddedEvent;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
@@ -95,7 +95,7 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
             @Override
             public void onJobAdded(AWEJobEntry job) {
                 setJobId(job.getJobId());
-                System.out.println("Added task " + t.getUUID() + ", jobId: " + jobId);
+//                System.out.println("Added task " + t.getUUID() + ", jobId: " + jobId);
                 AWEJobManager.getInstance().register(t);
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
                 if(callback != null) {

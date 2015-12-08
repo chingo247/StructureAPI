@@ -242,7 +242,7 @@ public class Structure extends Plot implements IStructure {
     @Override
     public IStructurePlan getStructurePlan() throws StructureException {
         File planFile = new File(getDirectory(), "structureplan.xml");
-        if(planFile == null) {
+        if(!planFile.exists()) {
             throw new StructureException("Structure #" + getId() + " doesn't have a plan!");
         }
 

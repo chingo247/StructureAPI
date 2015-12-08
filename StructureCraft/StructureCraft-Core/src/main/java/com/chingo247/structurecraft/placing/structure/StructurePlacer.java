@@ -334,10 +334,15 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
 
     private void copyResources(IStructure structure, IStructurePlan plan) throws IOException {
         // Give this structure a directory!
-        File structureDir = structure.getDirectory();
-        structureDir.mkdirs();
+        File structureDirectory = structure.getDirectory();
+        if (structureDirectory.exists()) {
+            FileUtils.deleteDirectory(structureDirectory);
+        }
+        
+        structureDirectory = structure.getDirectory();
+        structureDirectory.mkdirs();
 
-        Files.copy(plan.getFile(), new File(structureDir, "structureplan.xml"));
+        Files.copy(plan.getFile(), new File(structureDirectory, "structureplan.xml"));
         IPlacement placement = plan.getPlacement();
 
         // Move the resources if applicable!
@@ -345,7 +350,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
             FilePlacement filePlacement = (FilePlacement) placement;
             File[] files = filePlacement.getFiles();
             for (File f : files) {
-                Files.copy(f, new File(structureDir, f.getName()));
+                Files.copy(f, new File(structureDirectory, f.getName()));
             }
         }
     }

@@ -6,6 +6,7 @@
 package com.chingo247.structurecraft.event.structure;
 
 import com.chingo247.structurecraft.event.StructureEvent;
+import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.util.IProgressable;
 
@@ -15,13 +16,19 @@ import com.chingo247.structurecraft.util.IProgressable;
  */
 public class StructureProgressUpdateEvent extends StructureEvent {
     
+    private ConstructionStatus status;
     private IProgressable progressable;
 
-    public StructureProgressUpdateEvent(IStructure structure, IProgressable progressable) {
+    public StructureProgressUpdateEvent(IStructure structure, IProgressable progressable, ConstructionStatus status) {
         super(structure);
         this.progressable = progressable;
+        this.status = status;
     }
 
+    public ConstructionStatus getStatus() {
+        return status;
+    }
+    
     public IProgressable getProgressable() {
         return progressable;
     }

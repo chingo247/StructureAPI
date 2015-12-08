@@ -17,7 +17,7 @@
 package com.chingo247.structurecraft.construction;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.options.PlaceOptions;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.event.task.StructureTaskCancelledEvent;
 import com.chingo247.structurecraft.event.task.StructureTaskCompleteEvent;
 import com.google.common.base.Preconditions;
@@ -111,10 +111,14 @@ public abstract class StructureTask {
             started = false;
             finished = true;
             if (isCancelled()) {
-                callback.onCancelled();
+                if(callback != null) {
+                    callback.onCancelled();
+                }
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskCancelledEvent(this));
             } else {
-                callback.onComplete();
+                if(callback != null) {
+                    callback.onComplete();
+                }
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskCompleteEvent(this));
             }
             

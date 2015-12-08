@@ -150,19 +150,20 @@ class SchematicSavingTask extends StructureTask {
         public void execute() throws Exception {
             long start = System.currentTimeMillis();
             // Cube traverse this clipboard
+            
             Vector min = toSave.getMinimumPoint();
             Vector max = toSave.getMaximumPoint();
-            for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
-                for (int z = min.getBlockX(); z < max.getBlockX(); z++) {
-                    for (int y = min.getBlockX(); y < max.getBlockX(); y++) {
-                        Vector currentPos = new BlockVector(x, y, z);
+            
+            for (int x = min.getBlockX(), relX = 0; x < max.getBlockX(); x++, relX++) {
+                for (int z = min.getBlockX(), relZ = 0; z < max.getBlockX(); z++, relZ++) {
+                    for (int y = min.getBlockX(), relY = 0; y < max.getBlockX(); y++, relY++) {
+                        Vector relativePosition = new BlockVector(relX, relY, relZ);
                         Vector worldPos = new BlockVector(x + pos.getBlockX(), y + pos.getBlockY(), z + pos.getBlockZ());
                         BaseBlock b = world.getBlock(worldPos);
-                        safeBlockData.setBlock(currentPos, b);
+                        safeBlockData.setBlock(relativePosition, b);
                     }
                 }
             }
-            System.out.println("Blocks set in " + (System.currentTimeMillis() - start) + " ms");
         }
 
     }

@@ -56,7 +56,8 @@ public interface IStructure extends IPlot {
     Direction getDirection();
 
     /**
-     * The construction status
+     * The construction status, <b> NOTE that this value is not up-to-date.</b>
+     * 
      *
      * @return
      */

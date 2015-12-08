@@ -42,7 +42,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-class StructureEventListener  {
+class StructureEventListener {
 
     private static final Logger LOG = Logger.getLogger(StructureEventListener.class.getName());
     private static final DecimalFormat TWO_DECIMAL = new DecimalFormat("#.##");
@@ -97,6 +97,10 @@ class StructureEventListener  {
     }
 
     private void handleStructure(final IStructure structure, final String message, final ConstructionStatus newStatus) {
+        handleStructure(structure, message, newStatus, false);
+    }
+
+    private void handleStructure(final IStructure structure, final String message, final ConstructionStatus newStatus, final boolean forceTell) {
         structureEventPool.execute(structure.getId(), new Runnable() {
             @Override
             public void run() {
@@ -124,11 +128,11 @@ class StructureEventListener  {
                             tx.close();
                         }
                     }
-                    boolean shouldTell = oldStatus != newStatus;
+                    boolean shouldTell = (oldStatus != newStatus);
                     if (newStatus == ConstructionStatus.STOPPED && (oldStatus == ConstructionStatus.ON_HOLD || oldStatus == ConstructionStatus.STOPPED)) {
                         shouldTell = false;
                     }
-                    if (shouldTell) {
+                    if (shouldTell || forceTell) {
                         // Tell the starter
                         for (IPlayer p : owners) {
                             p.sendMessage(message);
@@ -178,19 +182,19 @@ class StructureEventListener  {
     public void onStructureProgressUpdate(StructureProgressUpdateEvent sde) {
         IColors colors = StructureAPI.getInstance().getPlatform().getChatColors();
         IStructure structure = sde.getStructure();
-        String progress = TWO_DECIMAL.format(sde.getProgressable().getProgress());
+        int progress = (int) (sde.getProgressable().getProgress());
         String message;
-        switch (sde.getStructure().getStatus()) {
+        switch (sde.getStatus()) {
             case BUILDING:
                 message = colors.yellow() + "BUILDING " + colors.reset() + progress + "% " + getStructureString(structure);
-                handleStructure(structure, message, BUILDING);
+                handleStructure(structure, message, BUILDING, true);
                 break;
             case DEMOLISHING:
                 message = colors.yellow() + "DEMOLISHING " + colors.reset() + progress + "% " + getStructureString(structure);
-                handleStructure(structure, message, DEMOLISHING);
+                handleStructure(structure, message, DEMOLISHING, true);
                 break;
+            default:break;
         }
-
     }
 
     @AllowConcurrentEvents

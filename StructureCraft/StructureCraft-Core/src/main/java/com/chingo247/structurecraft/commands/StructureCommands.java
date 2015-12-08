@@ -282,7 +282,7 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
         structureAPI.getConstructionExecutor().getConstructionPlanFactory()
-                .newBuildPlan(structure)
+                .newSavingBuildPlan(structure)
                 .setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
@@ -335,7 +335,7 @@ public class StructureCommands {
 
         // Start demolition
         structureAPI.getConstructionExecutor().getConstructionPlanFactory()
-                .newDemolitionPlan(structure)
+                .newSavingDemolitionPlan(structure)
                 .setRecursive(true)
                 .setRestrictive(true)
                 .setReversedOrder(true)

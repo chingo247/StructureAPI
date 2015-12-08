@@ -244,7 +244,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
 
     @Override
     public IScheduler getScheduler() {
-        return getPlatform().getServer().getScheduler(this);
+        return getPlatform().getServer().getScheduler(new BukkitPlugin(this));
     }
 
     @Override

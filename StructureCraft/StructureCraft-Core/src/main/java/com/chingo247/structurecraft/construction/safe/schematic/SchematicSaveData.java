@@ -5,6 +5,7 @@
  */
 package com.chingo247.structurecraft.construction.safe.schematic;
 
+import com.chingo247.structurecraft.util.RegionUtil;
 import com.chingo247.structurecraft.util.concurrent.ILoadable;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -42,12 +43,12 @@ public class SchematicSaveData implements ILoadable {
     private byte[] data;
     private byte[] addBlocks;
     private List<Tag> tileEntities;
-    private CuboidRegion cube;
+    private Vector cube;
     private File file;
 
     public SchematicSaveData(File file, CuboidRegion cube) {
         this.file = file;
-        this.cube = cube;
+        this.cube = RegionUtil.getSize(cube).subtract(Vector.ONE);
     }
 
     @Override
@@ -73,7 +74,7 @@ public class SchematicSaveData implements ILoadable {
             tileEntities = getChildTag(schematic, "TileEntities", ListTag.class).getValue();
             addBlocks = schematic.containsKey("AddBlocks") ? getChildTag(schematic, "AddBlocks", ByteArrayTag.class).getValue() : new byte[0];
         } else {
-            int size = cube.getWidth() * cube.getHeight() * cube.getLength();
+            int size = cube.getBlockX()* cube.getBlockY()* cube.getBlockZ();
             blockIds = new byte[size];
             data = new byte[size];
             done = new byte[size];
@@ -82,14 +83,14 @@ public class SchematicSaveData implements ILoadable {
     }
     
     public void write() throws IOException {
-        file.mkdirs();
         try(NBTOutputStream outputStream = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
             Map<String,Tag> schematic = Maps.newHashMap();
-            schematic.put("Width", new ShortTag((short) cube.getWidth()));
-            schematic.put("Length", new ShortTag((short) cube.getLength()));
-            schematic.put("Height", new ShortTag((short) cube.getHeight()));
+            schematic.put("Width", new ShortTag((short) cube.getBlockX()));
+            schematic.put("Length", new ShortTag((short) cube.getBlockZ()));
+            schematic.put("Height", new ShortTag((short) cube.getBlockY()));
             schematic.put("Blocks", new ByteArrayTag(blockIds));
             schematic.put("Data", new ByteArrayTag(data));
+            schematic.put("Done", new ByteArrayTag(done));
             schematic.put("TileEntities", new ListTag(CompoundTag.class, tileEntities));
             if (addBlocks != null) {
                 schematic.put("AddBlocks", new ByteArrayTag(addBlocks));
@@ -100,8 +101,8 @@ public class SchematicSaveData implements ILoadable {
     }
 
     public void setBlock(Vector vector, BaseBlock block) {
-        int index = (vector.getBlockY() * cube.getWidth() * cube.getLength()) 
-                + vector.getBlockZ() * cube.getWidth() + vector.getBlockX();
+        int index = (vector.getBlockY() * cube.getBlockX() * cube.getBlockZ()) 
+                + vector.getBlockZ() * cube.getBlockX() + vector.getBlockX();
         
         if(this.done[index] == 0) {
             this.data[index] = (byte) block.getData();

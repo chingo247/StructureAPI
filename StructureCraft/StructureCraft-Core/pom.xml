@@ -38,14 +38,7 @@
         </plugins>
     </build>
     
-    <dependencies>
-        <dependency>
-            <groupId>org.primesoft</groupId>
-            <artifactId>blocksHub</artifactId>
-            <version>1.2</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+ 
     
     <name>StructureCraft-Core</name>
     <reporting>

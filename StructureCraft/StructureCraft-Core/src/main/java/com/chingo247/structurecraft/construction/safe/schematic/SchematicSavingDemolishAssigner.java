@@ -40,14 +40,15 @@ public class SchematicSavingDemolishAssigner extends SchematicSavingAssigner {
     @Override
     public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException {
         IStructure structure = constructionEntry.getStructure();
-        IStructurePlan plan = structure.getStructurePlan();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         
-        IBlockPlacement placement = new DemolishingPlacement(Vector.ZERO);
+        BlockPlacement placement = new DemolishingPlacement(Vector.ZERO);
         
         CuboidRegion affectedArea = structure.getCuboidRegion();
         // Prepare backup resources
-        File backup = new File(structure.getDirectory(), "backup.schematic");
+        File backupDir = new File(structure.getDirectory(), "backups");
+        backupDir.mkdirs();
+        File backup = new File(backupDir, "backup.schematic");
         SchematicSaveData safeBlockData = new SchematicSaveData(backup, affectedArea);
         
         // Create place areas...
@@ -62,7 +63,7 @@ public class SchematicSavingDemolishAssigner extends SchematicSavingAssigner {
             if(Math.abs(progress.getProgress() - previousPCT) > MIN_PCT_DIFFERENCE) {
                 previousPCT = progress.getProgress();
             } else {
-                progress.setReportable(false);
+                progress = null;
             }
             constructionEntry.addTask(new SchematicSavingTask(constructionEntry, playerOrRandomUUID, region, session.getWorld(), safeBlockData, null));
             constructionEntry.addTask(new AWEPlacementTask(
@@ -87,7 +88,7 @@ public class SchematicSavingDemolishAssigner extends SchematicSavingAssigner {
                 if(!entry.hasNextTask()) {
                     StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.REMOVED));
                 } else if (progress != null) {
-                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), progress));
+                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), progress, ConstructionStatus.DEMOLISHING));
                 }
             }
 

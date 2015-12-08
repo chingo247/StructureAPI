@@ -5,7 +5,7 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.options.Traversal;
+import com.chingo247.structurecraft.placement.options.Traversal;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;

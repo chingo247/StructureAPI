@@ -50,7 +50,7 @@ public class ConstructionEntry implements IConstructionEntry {
 
     @Override
     public void addTask(StructureTask task) {
-        System.out.println("[ConstructionEntry]: adding " + task.getClass().getSimpleName() + " to structure #" + structure.getId());
+//        System.out.println("[ConstructionEntry]: adding " + task.getClass().getSimpleName() + " to structure #" + structure.getId());
         this.tasks.add(task);
     }
 
@@ -82,7 +82,7 @@ public class ConstructionEntry implements IConstructionEntry {
 
     @Override
     public void proceed() {
-        System.out.println("[ConstructionEntry]: Proceed!");
+//        System.out.println("[ConstructionEntry]: Proceed!");
         if (currentTask != null && (currentTask.hasFailed() || currentTask.isCancelled())) {
             purge();
             return;
@@ -93,12 +93,12 @@ public class ConstructionEntry implements IConstructionEntry {
 
         currentTask = tasks.peek();
         if (currentTask == null) {
-            System.out.println("[ConstructionEntry]: Current task is null!");
-            System.out.println("[ConstructionEntry]: Removing current task!");
+//            System.out.println("[ConstructionEntry]: Current task is null!");
+//            System.out.println("[ConstructionEntry]: Removing current task!");
             constructionExecutor.remove(this);
 
             if (nextEntry != null) {
-                System.out.println("[ConstructionEntry]: Moving to next entry");
+//                System.out.println("[ConstructionEntry]: Moving to next entry");
                 nextEntry.proceed();
 
                 // Clean up
@@ -107,7 +107,7 @@ public class ConstructionEntry implements IConstructionEntry {
                 currentTask = null;
             }
         } else {
-            System.out.println("[ConstructionEntry]: Starting new task!");
+//            System.out.println("[ConstructionEntry]: Starting new task!");
             tasks.poll();
             currentTask.start();
         }
@@ -119,9 +119,9 @@ public class ConstructionEntry implements IConstructionEntry {
      */
     @Override
     public void purge() {
-        System.out.println("[ConstructionEntry]: PURGE TASK HERE");
+//        System.out.println("[ConstructionEntry]: PURGE TASK HERE");
         if (currentTask != null && !currentTask.isCancelled()) {
-            System.out.println("[ConstructionEntry]: Not yet cancelled");
+//            System.out.println("[ConstructionEntry]: Not yet cancelled");
             currentTask.cancel();
 
         }

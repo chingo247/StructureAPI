@@ -18,6 +18,7 @@ import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.BlockPlacement;
 import com.chingo247.structurecraft.placement.interfaces.IBlockPlacement;
+import com.chingo247.structurecraft.placement.interfaces.RotationalPlacement;
 import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.util.Progress;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -40,19 +41,28 @@ class SchematicSavingBuildAssigner extends SchematicSavingAssigner {
     @Override
     public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws StructureException, IOException {
         IStructure structure = constructionEntry.getStructure();
+        
+        
         IStructurePlan plan = structure.getStructurePlan();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         
-        IBlockPlacement placement;
+        BlockPlacement placement;
         if (plan.getPlacement() instanceof BlockPlacement) {
             placement = (BlockPlacement) plan.getPlacement();
         } else {
             throw new StructureException("Structure placement must inherit from BlockPlacement");
         }
         
-        CuboidRegion affectedArea = structure.getCuboidRegion();
+        if (placement instanceof RotationalPlacement) {
+            RotationalPlacement rt = (RotationalPlacement) placement;
+            rt.rotate(constructionEntry.getStructure().getDirection().getRotation());
+        }
+        
+        CuboidRegion affectedArea = placement.getCuboidRegion();
         // Prepare backup resources
-        File backup = new File(structure.getDirectory(), "backup.schematic");
+        File backupDir = new File(structure.getDirectory(), "backups");
+        backupDir.mkdirs();
+        File backup = new File(backupDir, "backup.schematic");
         SchematicSaveData safeBlockData = new SchematicSaveData(backup, affectedArea);
         
         // Create place areas...
@@ -62,12 +72,12 @@ class SchematicSavingBuildAssigner extends SchematicSavingAssigner {
         int total = chunks.size() * 2; // Total amount of tasks
         double previousPCT = 0;
         for(CuboidRegion region : chunks) {
-            // Define the reportable progress... we don't want to 
+            // Define the reportable progress... we don't want to spam the player...
             Progress progress = new Progress(total, count);
             if(Math.abs(progress.getProgress() - previousPCT) > MIN_PCT_DIFFERENCE) {
                 previousPCT = progress.getProgress();
             } else {
-                progress.setReportable(false);
+                progress = null;
             }
             constructionEntry.addTask(new SchematicSavingTask(constructionEntry, playerOrRandomUUID, region, session.getWorld(), safeBlockData, null));
             constructionEntry.addTask(new AWEPlacementTask(
@@ -92,7 +102,7 @@ class SchematicSavingBuildAssigner extends SchematicSavingAssigner {
                 if(!entry.hasNextTask()) {
                     StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.COMPLETED));
                 } else if (progress != null) {
-                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), progress));
+                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), progress, ConstructionStatus.BUILDING));
                 }
             }
 
@@ -103,12 +113,16 @@ class SchematicSavingBuildAssigner extends SchematicSavingAssigner {
 
             @Override
             public void onStarted() {
-                StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.BUILDING));
+                if(progress != null && progress.getProgress() == 0.0) {
+                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.BUILDING));
+                }
             }
 
             @Override
             public void onQueued() {
-                StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+                if(progress != null && progress.getProgress() == 0.0) {
+                    StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+                }
             }
         
     }

@@ -88,7 +88,6 @@ public class StructureRepository implements IStructureRepository {
     public StructureNode addStructure(String name, Vector position, CuboidRegion region, Direction direction, double price) {
         long id = nextId();
         Node stNode = graph.createNode(StructureNode.label(), DynamicLabel.label(PlotNode.LABEL_PLOT));
-        System.out.println("Adding structure with id: " + id);
         stNode.setProperty(StructureNode.ID_PROPERTY, id);
         stNode.setProperty(StructureNode.NAME_PROPERTY, name);
         stNode.setProperty(StructureNode.CONSTRUCTION_STATUS_PROPERTY, ConstructionStatus.ON_HOLD.getStatusId());

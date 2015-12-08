@@ -62,44 +62,4 @@ public class SettlerCommands {
         }
     }
     
-    @CommandPermissions(Permissions.SETTLER_ME)
-    @CommandExtras(async = false, senderType = CommandSenderType.PLAYER)
-    @Command(aliases = {"settler:test"}, usage = "/settler:test [num]", desc = "Display your settler id", max = 1)
-    public static void meTest(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
-        
-        IPlayer player = (IPlayer) sender;
-        
-        ILocation loc = player.getLocation();
-        IWorld w = loc.getWorld();
-        
-        int x = (loc.getBlockX() >> 4) * 16;
-        int z = (loc.getBlockX() >> 4) * 16;
-        
-        int distance = args.getInteger(0);
-        
-        World world = Bukkit.getWorld(w.getUUID());
-        long time = 0;
-        int count = 0;
-        for(int xPos = x; xPos < x + (16 * distance); xPos++) {
-            for(int zPos = z; zPos < z + (16 * distance); zPos++) {
-                
-                long start = System.currentTimeMillis();
-                Chunk c = world.getChunkAt(xPos, zPos);
-                c.getChunkSnapshot();
-                long saveTime = (System.currentTimeMillis() - start);
-                
-//                System.out.println("Snapshot ("+xPos+"," + zPos + ") in " + saveTime + " ms");
-                time += saveTime;
-                count++;
-                
-            }
-        }
-        System.out.println("Total time = " + time + " ms");
-        System.out.println("Total chunks = " + count);
-        System.out.println("Average time = " + (time > 0 ? time / count : 0) + " ms");
-        
-        
-        
-    }
-
 }

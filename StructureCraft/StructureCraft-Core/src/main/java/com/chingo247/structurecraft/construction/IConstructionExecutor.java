@@ -15,8 +15,6 @@ public interface IConstructionExecutor {
     
     void remove(IConstructionEntry entry);
     
-    IAssignerFactory getAssignerFactory();
-    
     IConstructionPlanFactory getConstructionPlanFactory();
     
     void execute(IConstructionPlan plan);
