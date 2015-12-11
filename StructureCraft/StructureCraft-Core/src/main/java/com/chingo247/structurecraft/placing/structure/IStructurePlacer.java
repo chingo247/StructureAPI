@@ -7,8 +7,8 @@ package com.chingo247.structurecraft.placing.structure;
 
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.model.structure.IStructure;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.export.UnsupportedPlacementException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;

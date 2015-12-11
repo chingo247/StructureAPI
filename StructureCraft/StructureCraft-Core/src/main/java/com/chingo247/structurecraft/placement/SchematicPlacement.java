@@ -17,10 +17,7 @@
 
 package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.placement.interfaces.IBlockPlacement;
-import com.chingo247.structurecraft.placement.interfaces.FilePlacement;
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.structurecraft.placement.interfaces.IWriteablePlacement;
 import com.chingo247.structurecraft.schematic.Schematic;
 import com.chingo247.structurecraft.schematic.FastClipboard;
 import com.chingo247.structurecraft.util.WorldUtil;
@@ -33,7 +30,7 @@ import java.io.File;
  *
  * @author Chingo
  */
-public class SchematicPlacement extends BlockPlacement implements FilePlacement, IBlockPlacement, IWriteablePlacement {
+public class SchematicPlacement extends BlockPlacement implements FilePlacement, IBlockPlacement, IExportablePlacement {
 
     private final Schematic schematic;
     private FastClipboard clipboard;

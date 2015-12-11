@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft.placement;
 
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.placement.interfaces.IBlockPlacement;
 import com.chingo247.structurecraft.util.iterator.TopDownCuboidIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
@@ -73,9 +72,4 @@ public class DemolishingPlacement extends BlockPlacement implements IBlockPlacem
         return new BaseBlock(0); 
     }
 
-    @Override
-    public boolean hasBlock(Vector position) {
-        return true;
-    }
-    
 }

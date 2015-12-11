@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft;
 
 import com.chingo247.structurecraft.exeption.StructureAPIException;
-import com.chingo247.structurecraft.restriction.StructureRestriction;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.menuapi.menu.CategoryMenu;
@@ -37,7 +36,7 @@ import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.construction.ConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;
 import com.chingo247.structurecraft.event.StructurePlansReloadEvent;
@@ -51,7 +50,7 @@ import com.chingo247.structurecraft.schematic.SchematicManager;
 import com.chingo247.structurecraft.platform.ConfigProvider;
 import com.chingo247.structurecraft.placing.structure.IStructurePlacerFactory;
 import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
-import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
+import com.chingo247.structurecraft.exeption.StructureRestrictionException;
 import com.chingo247.xplatform.core.IColors;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

@@ -17,7 +17,7 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;

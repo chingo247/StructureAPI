@@ -17,7 +17,6 @@
 
 package com.chingo247.structurecraft.plan;
 
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.settlercraft.core.util.XXHasher;
 import java.io.File;
 

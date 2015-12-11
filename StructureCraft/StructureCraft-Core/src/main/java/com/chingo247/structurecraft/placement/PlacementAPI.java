@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.plan;
+package com.chingo247.structurecraft.placement;
 
 import com.chingo247.structurecraft.plan.io.document.PlacementElement;
-import com.chingo247.structurecraft.plan.exception.PlacementException;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.PlacementException;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.plan.io.parser.SchematicPlacementParser;
 import com.chingo247.structurecraft.placement.PlacementTypes;
-import com.chingo247.structurecraft.placement.interfaces.IWriteablePlacement;
+import com.chingo247.structurecraft.placement.IExportablePlacement;
 import com.chingo247.structurecraft.plan.io.parser.PlacementParser;
 import com.chingo247.structurecraft.plan.io.handlers.PlacementXMLHandler;
 import com.chingo247.structurecraft.plan.io.handlers.SchematicPlacementXMLHandler;
@@ -66,7 +66,7 @@ public class PlacementAPI {
         }
     }
     
-    public Element handle(IWriteablePlacement p) {
+    public Element handle(IExportablePlacement p) {
         String type = p.getTypeName();
         PlacementXMLHandler handler = writers.get(type);
         if(handler == null) {

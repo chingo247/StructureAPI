@@ -14,24 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package com.chingo247.structurecraft.placement.interfaces;
-
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+package com.chingo247.structurecraft.exeption;
 
 /**
  *
  * @author Chingo
- * @param <T>
  */
-public interface IBlockPlacement extends IPlacement {
-    
-    public BaseBlock getBlock(Vector position);
-    
-    public boolean hasBlock(Vector position);
-    
-    public int getBlocks();
-    
+public class WorldRestrictionException extends RestrictionException {
+
+    public WorldRestrictionException(String string) {
+        super(string);
+    }
     
 }

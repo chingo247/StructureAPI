@@ -3,15 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.model;
+package com.chingo247.structurecraft.construction.rollback.schematic;
 
 /**
  *
  * @author Chingo
  */
-public enum Order {
-    
-    DATE_ASCENDING,
-    DATE_DESCENDING
-    
+public enum RollbackType {
+    SCHEMATIC,
+    REGION
 }

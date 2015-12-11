@@ -14,18 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.placement.interfaces;
+package com.chingo247.structurecraft.placement;
 
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import java.io.File;
+
+
 
 /**
  *
  * @author Chingo
- * @param <T> The placement options
+ * @param <T>
  */
-public interface FilePlacement<T extends PlaceOptions> extends IPlacement {
+public interface RotationalPlacement extends IPlacement {
     
-    public File[] getFiles();
+    public int getRotation();
+    
+    public void rotate(int rotation);
     
 }

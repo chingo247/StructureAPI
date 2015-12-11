@@ -61,10 +61,6 @@ public class DefaultSchematic implements Schematic {
         this.length = length;
     }
 
-    protected DefaultSchematic(File schematicFile, FastClipboard clipboard) {
-        this(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength());
-    }
-
     @Override
     public File getFile() {
         return schematicFile;

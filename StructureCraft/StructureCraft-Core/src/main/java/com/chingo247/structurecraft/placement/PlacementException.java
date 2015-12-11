@@ -14,16 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.restriction.exception;
+package com.chingo247.structurecraft.placement;
+
+import com.chingo247.structurecraft.plan.io.exception.PlanException;
 
 /**
  *
  * @author Chingo
  */
-public class WorldRestrictionException extends RestrictionViolationException {
+public class PlacementException extends PlanException {
 
-    public WorldRestrictionException(String string) {
-        super(string);
+    public PlacementException(String message) {
+        super(message);
     }
+ 
+    
     
 }

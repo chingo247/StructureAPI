@@ -19,7 +19,7 @@ package com.chingo247.structurecraft.plan.io;
 import com.chingo247.settlercraft.core.util.LogLevel;
 import com.chingo247.settlercraft.core.util.SCLogger;
 import com.chingo247.structurecraft.plan.io.exception.ElementValueException;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.plan.io.document.PlacementElement;
 import com.chingo247.structurecraft.plan.io.document.LineElement;
 import com.chingo247.structurecraft.plan.io.document.StructurePlanDocument;
@@ -28,8 +28,8 @@ import com.chingo247.structurecraft.plan.io.exception.PlanException;
 import com.chingo247.structurecraft.schematic.SchematicManager;
 import com.chingo247.structurecraft.plan.DefaultStructurePlan;
 import com.chingo247.structurecraft.plan.DefaultSubstructuresPlan;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
-import com.chingo247.structurecraft.plan.PlacementAPI;
+import com.chingo247.structurecraft.plan.IStructurePlan;
+import com.chingo247.structurecraft.placement.PlacementAPI;
 import com.google.common.base.Preconditions;
 import java.io.File;
 import java.util.ArrayList;
@@ -194,9 +194,9 @@ public class StructurePlanReader {
                     }
 
                     // Recursive process SubStructurePlans
-                    if (parent == null) {
+//                    if (parent == null) {
 //                StructurePlanUtil.validate(plan);
-                    }
+//                    }
 
 //                    LOG.print(LogLevel.INFO, structurePlanFile, "StructurePlan", System.currentTimeMillis() - start);
                     return plan;

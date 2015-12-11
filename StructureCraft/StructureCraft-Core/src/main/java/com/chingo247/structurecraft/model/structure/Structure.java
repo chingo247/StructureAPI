@@ -19,8 +19,9 @@ package com.chingo247.structurecraft.model.structure;
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.model.plot.Plot;
 import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structurecraft.construction.rollback.schematic.RollbackType;
 import com.chingo247.structurecraft.exeption.StructureException;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.chingo247.xplatform.core.IWorld;
@@ -36,6 +37,8 @@ import org.neo4j.graphdb.Node;
  * @author Chingo
  */
 public class Structure extends Plot implements IStructure {
+    
+    private static final String BACKUPS_DIR = "backups";
     
     private Long id;
     private String name;
@@ -250,6 +253,16 @@ public class Structure extends Plot implements IStructure {
         IStructurePlan plan = reader.readFile(planFile);
 
         return plan;
+    }
+
+    @Override
+    public File getRollbackFile(RollbackType type) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public File getBackupDirectory() {
+        return new File(getDirectory(), BACKUPS_DIR);
     }
 
     

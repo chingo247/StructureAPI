@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.restriction.exception;
+package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.exeption.StructureAPIException;
+import java.io.File;
 
 /**
  *
  * @author Chingo
+ * @param <T> The placement options
  */
-public class RestrictionViolationException extends StructureAPIException {
-
-    public RestrictionViolationException(String string) {
-        super(string);
-    }
+public interface FilePlacement extends IPlacement {
+    
+    public File[] getFiles();
     
 }

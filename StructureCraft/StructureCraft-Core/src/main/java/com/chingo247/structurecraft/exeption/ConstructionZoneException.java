@@ -16,8 +16,6 @@
  */
 package com.chingo247.structurecraft.exeption;
 
-import com.chingo247.structurecraft.exeption.StructureAPIException;
-
 /**
  *
  * @author Chingo

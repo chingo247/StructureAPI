@@ -16,8 +16,7 @@
  */
 package com.chingo247.structurecraft;
 
-import com.chingo247.structurecraft.restriction.StructureRestriction;
-import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
+import com.chingo247.structurecraft.exeption.StructureRestrictionException;
 import com.chingo247.menuapi.menu.CategoryMenu;
 import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;

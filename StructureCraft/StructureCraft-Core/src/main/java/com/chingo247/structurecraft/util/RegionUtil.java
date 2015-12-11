@@ -17,13 +17,28 @@
 package com.chingo247.structurecraft.util;
 
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import java.util.Comparator;
 
 /**
  *
  * @author Chingo
  */
 public class RegionUtil {
+
+    
+    public static final Comparator<Vector2D> ORDERED_XZ = new Comparator<Vector2D>() {
+
+        @Override
+        public int compare(Vector2D t, Vector2D t1) {
+            int v = Integer.compare(t.getBlockZ(), t1.getBlockZ());
+            if (v == 0) {
+                return Integer.compare(t.getBlockX(), t1.getBlockX());
+            }
+            return v;
+        }
+    };
 
     private RegionUtil() {
     }
@@ -53,10 +68,10 @@ public class RegionUtil {
 
         Vector pMax = p.getMaximumPoint();
         Vector pMin = p.getMinimumPoint();
-        
+
         Vector cMax = c.getMaximumPoint();
         Vector cMin = c.getMinimumPoint();
-        
+
         return pMax.getBlockX() >= cMin.getBlockX() && pMin.getBlockX() <= cMax.getBlockX()
                 && pMax.getBlockY() >= cMin.getBlockY() && pMin.getBlockY() <= cMax.getBlockY()
                 && pMax.getBlockZ() >= cMin.getBlockZ() && pMin.getBlockZ() <= cMax.getBlockZ();

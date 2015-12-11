@@ -20,7 +20,7 @@ import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.IStructureAPI;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.getPlanID;

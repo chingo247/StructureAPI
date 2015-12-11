@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.restriction.exception;
 
-import com.chingo247.structurecraft.restriction.exception.RestrictionViolationException;
+package com.chingo247.structurecraft.placement;
+
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
 
 /**
  *
  * @author Chingo
+ * @param <T>
  */
-public class StructureRestrictionException extends RestrictionViolationException {
-
-    public StructureRestrictionException(String message) {
-        super(message);
-    }
+public interface IBlockPlacement extends IPlacement {
     
-    
+    public BaseBlock getBlock(Vector position);
     
 }

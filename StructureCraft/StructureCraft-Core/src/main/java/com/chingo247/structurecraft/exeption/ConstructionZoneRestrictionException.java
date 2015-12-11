@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.restriction.exception;
-
-import com.chingo247.structurecraft.restriction.exception.RestrictionViolationException;
-import com.chingo247.structurecraft.restriction.exception.RestrictionViolationException;
+package com.chingo247.structurecraft.exeption;
 
 /**
  *
  * @author Chingo
  */
-public class ConstructionZoneRestrictionException extends RestrictionViolationException {
+public class ConstructionZoneRestrictionException extends RestrictionException {
 
+    /**
+     * Constructor.
+     * @param string 
+     */
     public ConstructionZoneRestrictionException(String string) {
         super(string);
     }

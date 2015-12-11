@@ -16,9 +16,9 @@
  */
 package com.chingo247.structurecraft.plan.io.handlers;
 
-import com.chingo247.structurecraft.placement.interfaces.RotationalPlacement;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
-import com.chingo247.structurecraft.placement.interfaces.IWriteablePlacement;
+import com.chingo247.structurecraft.placement.RotationalPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.placement.IExportablePlacement;
 import com.chingo247.structurecraft.plan.io.PlacementXMLConstants;
 import com.sk89q.worldedit.Vector;
 import org.dom4j.Element;
@@ -29,7 +29,7 @@ import org.dom4j.tree.BaseElement;
  * @author Chingo
  * @param <T>
  */
-public abstract class AbstractPlacementXMLHandler<T extends IWriteablePlacement> implements PlacementXMLHandler<T> {
+public abstract class AbstractPlacementXMLHandler<T extends IExportablePlacement> implements PlacementXMLHandler<T> {
 
     @Override
     public Element handle(T placement) {

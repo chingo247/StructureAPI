@@ -1,4 +1,4 @@
-package com.chingo247.structurecraft.plan.interfaces;
+package com.chingo247.structurecraft.plan;
 /*
  * Copyright (C) 2015 Chingo
  *
@@ -16,7 +16,7 @@ package com.chingo247.structurecraft.plan.interfaces;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import java.util.Collection;
 
 /**

@@ -24,7 +24,7 @@ import com.chingo247.structurecraft.construction.StructureTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
 import com.chingo247.structurecraft.event.async.StructureJobAddedEvent;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import java.util.UUID;

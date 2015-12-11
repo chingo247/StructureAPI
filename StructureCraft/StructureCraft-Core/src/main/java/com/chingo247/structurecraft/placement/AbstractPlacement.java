@@ -16,8 +16,6 @@
  */
 package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.placement.interfaces.RotationalPlacement;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
@@ -89,17 +87,17 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
     }
 
     @Override
-    public int getHeight() {
+    public final int getHeight() {
         return height;
     }
 
     @Override
-    public int getLength() {
+    public final int getLength() {
         return length;
     }
 
     @Override
-    public int getWidth() {
+    public final int getWidth() {
         return width;
     }
     

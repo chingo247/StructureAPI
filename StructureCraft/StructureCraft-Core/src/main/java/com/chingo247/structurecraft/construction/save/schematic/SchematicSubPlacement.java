@@ -3,19 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.safe.schematic;
+package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.BlockPlacement;
-import com.chingo247.structurecraft.placement.interfaces.IBlockPlacement;
+import com.chingo247.structurecraft.placement.IBlockPlacement;
+import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import org.parboiled.common.Preconditions;
 
 /**
  *
@@ -24,9 +23,9 @@ import org.parboiled.common.Preconditions;
 class SchematicSubPlacement extends BlockPlacement {
 
     private CuboidRegion toPlace;
-    private BlockPlacement placement;
+    private IBlockPlacement placement;
 
-    public SchematicSubPlacement(BlockPlacement placement, CuboidRegion toPlace) {
+    public SchematicSubPlacement(IBlockPlacement placement, CuboidRegion toPlace) {
         super(placement.getWidth(), placement.getHeight(), placement.getLength());
         this.placement = placement;
         this.toPlace = toPlace;
@@ -59,7 +58,10 @@ class SchematicSubPlacement extends BlockPlacement {
 
     @Override
     public int getRotation() {
-        return placement.getRotation();
+        if(placement instanceof RotationalPlacement) {
+            return ((RotationalPlacement) placement).getRotation();
+        }
+        return 0;
     }
 
     @Override
@@ -77,9 +79,5 @@ class SchematicSubPlacement extends BlockPlacement {
         return placement.getBlock(position);
     }
 
-    @Override
-    public boolean hasBlock(Vector position) {
-        return placement.hasBlock(position);
-    }
 
 }

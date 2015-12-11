@@ -17,10 +17,10 @@
 
 package com.chingo247.structurecraft.plan.io.export;
 
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
-import com.chingo247.structurecraft.placement.interfaces.IWriteablePlacement;
-import com.chingo247.structurecraft.plan.PlacementAPI;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.placement.IExportablePlacement;
+import com.chingo247.structurecraft.placement.PlacementAPI;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 //import com.chingo247.structureapi.structure.plan.SubStructuresPlan;
 import java.io.File;
 import org.dom4j.Document;
@@ -44,7 +44,7 @@ public class StructurePlanExporter {
         Preconditions.checkArgument(destinationDirectory.isDirectory());
         
         IPlacement placement = plan.getPlacement();
-        if( !(placement instanceof IWriteablePlacement)) {
+        if( !(placement instanceof IExportablePlacement)) {
             throw new UnsupportedPlacementException("Placement does not implement IWriteablePlacement");
         }
         
@@ -73,7 +73,7 @@ public class StructurePlanExporter {
         
         
         
-        Element placementElement = PlacementAPI.getInstance().handle((IWriteablePlacement) plan.getPlacement());
+        Element placementElement = PlacementAPI.getInstance().handle((IExportablePlacement) plan.getPlacement());
         root.add(placementElement);
         
 //        if (plan instanceof SubStructuresPlan) {

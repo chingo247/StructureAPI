@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.restriction;
+package com.chingo247.structurecraft;
 
-import com.chingo247.structurecraft.restriction.exception.StructureRestrictionException;
+import com.chingo247.structurecraft.exeption.StructureRestrictionException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;

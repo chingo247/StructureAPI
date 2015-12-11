@@ -81,7 +81,7 @@ public class SchematicManager {
             Schematic schematic = getSchematic(checksum);
             if (schematic == null) {
                 FastClipboard clipboard = FastClipboard.read(schematicFile);
-                schematic = new DefaultSchematic(schematicFile, clipboard);
+                schematic = new DefaultSchematic(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength());
                 schematics.put(checksum, schematic);
                 clipboard = null;
             }
@@ -212,10 +212,10 @@ public class SchematicManager {
         @Override
         protected Schematic compute() {
             try {
-                long start = System.currentTimeMillis();
                 FastClipboard clipboard = FastClipboard.read(schematicFile);
-//                LOG.print(LogLevel.INFO, schematicFile, "Schematic", System.currentTimeMillis() - start);
-                return new DefaultSchematic(schematicFile, clipboard);
+                DefaultSchematic schematic =  new DefaultSchematic(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength());
+                clipboard = null;
+                return schematic;
             } catch (Exception ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);
             }

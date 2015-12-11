@@ -17,7 +17,7 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.xplatform.core.IScheduler;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;

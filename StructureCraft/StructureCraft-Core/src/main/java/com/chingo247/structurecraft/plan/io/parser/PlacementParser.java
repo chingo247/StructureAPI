@@ -17,7 +17,7 @@
 package com.chingo247.structurecraft.plan.io.parser;
 
 import com.chingo247.structurecraft.plan.io.document.PlacementElement;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import java.io.File;
 import org.dom4j.Document;
 

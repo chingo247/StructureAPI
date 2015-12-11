@@ -17,7 +17,7 @@
 
 package com.chingo247.structurecraft.plan.io.handlers;
 
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import org.dom4j.Element;
 
 /**

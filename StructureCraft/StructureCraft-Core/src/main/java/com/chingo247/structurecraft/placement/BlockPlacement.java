@@ -17,7 +17,6 @@
 
 package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.placement.interfaces.IBlockPlacement;
 import static com.chingo247.settlercraft.core.Direction.EAST;
 import static com.chingo247.settlercraft.core.Direction.NORTH;
 import static com.chingo247.settlercraft.core.Direction.SOUTH;
@@ -53,16 +52,15 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
 
     public BlockPlacement(int width, int height, int length) {
         super(width, height, length);
-        this.BLOCK_BETWEEN = Math.round((float) ((getBlocks() * 0.001)));
+        this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.001)));
     }
 
     public BlockPlacement(int rotation, Vector relativePosition, int width, int height, int length) {
         super(rotation, relativePosition, width, height, length);
-        this.BLOCK_BETWEEN = Math.round((float) ((getBlocks() * 0.01)));
+        this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.01)));
     }
 
-    @Override
-    public final int getBlocks() {
+    public final int numBlocks() {
         return getWidth() * getHeight() * getLength();
     }
 

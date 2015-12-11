@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.safe.schematic;
+package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.chingo247.structurecraft.util.concurrent.ILoadable;
@@ -126,6 +126,8 @@ public class SchematicSaveData implements ILoadable {
             this.done[index] = 1;
         }
     }
+    
+    
     
     
     

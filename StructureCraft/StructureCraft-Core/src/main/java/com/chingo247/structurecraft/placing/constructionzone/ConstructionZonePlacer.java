@@ -22,7 +22,7 @@ import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneRepository;
 import com.chingo247.structurecraft.model.zone.IConstructionZoneRepository;
 import com.chingo247.structurecraft.placing.AbstractPlacer;
-import com.chingo247.structurecraft.restriction.exception.ConstructionZoneRestrictionException;
+import com.chingo247.structurecraft.exeption.ConstructionZoneRestrictionException;
 import com.chingo247.xplatform.core.IWorld;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
@@ -30,6 +30,8 @@ import com.google.common.util.concurrent.Monitor;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -38,6 +40,8 @@ import org.neo4j.graphdb.Transaction;
  * @author Chingo
  */
 public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlacer> implements IConstructionZonePlacer {
+    
+    private static final Logger LOG = Logger.getLogger(ConstructionZonePlacer.class.getName());
 
     private AccessType accessType;
     private IWorld world;
@@ -48,6 +52,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
         this.accessType = AccessType.PRIVATE;
         this.structureAPI = (StructureAPI) StructureAPI.getInstance();
         this.monitor = structureAPI.getMonitor(world.getName());
+        this.world = world;
     }
 
     @Override
@@ -137,6 +142,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 if (tx != null) {
                     tx.failure();
                 }
+                LOG.log(Level.SEVERE, ex.getMessage(), ex);
             } finally {
                 if (tx != null) {
                     tx.close();

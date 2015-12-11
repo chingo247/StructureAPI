@@ -17,9 +17,10 @@
 package com.chingo247.structurecraft.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
+import com.chingo247.structurecraft.construction.rollback.schematic.RollbackType;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.plot.IPlot;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.sk89q.worldedit.Vector;
 import java.io.File;
 import java.util.Date;
@@ -29,6 +30,8 @@ import java.util.Date;
  * @author Chingo
  */
 public interface IStructure extends IPlot {
+    
+    
 
     /**
      * Gets the id of the structure.
@@ -54,7 +57,9 @@ public interface IStructure extends IPlot {
     double getPrice();
 
     Direction getDirection();
-
+    
+    File getRollbackFile(RollbackType type);
+    
     /**
      * The construction status, <b> NOTE that this value is not up-to-date.</b>
      * 
@@ -72,6 +77,8 @@ public interface IStructure extends IPlot {
     IStructurePlan getStructurePlan() throws StructureException;
 
     File getDirectory();
+    
+    File getBackupDirectory();
 
     Vector translateRelativeLocation(Vector position);
     

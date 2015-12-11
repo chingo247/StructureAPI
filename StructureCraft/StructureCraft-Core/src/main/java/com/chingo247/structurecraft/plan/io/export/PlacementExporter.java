@@ -18,7 +18,7 @@
 package com.chingo247.structurecraft.plan.io.export;
 
 import com.chingo247.structurecraft.plan.DefaultStructurePlan;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import java.io.File;
 import java.io.IOException;
 

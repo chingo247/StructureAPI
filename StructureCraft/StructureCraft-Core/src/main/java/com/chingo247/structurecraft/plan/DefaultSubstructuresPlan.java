@@ -18,10 +18,8 @@
 
 package com.chingo247.structurecraft.plan;
 
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
-import com.chingo247.structurecraft.plan.interfaces.ISubstructurePlan;
 import com.chingo247.structurecraft.plan.io.exception.PlanException;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.plan.io.export.StructurePlanExporter;
 import com.chingo247.structurecraft.plan.io.export.UnsupportedPlacementException;
 import com.google.common.collect.Sets;

@@ -21,9 +21,9 @@ package com.chingo247.structurecraft.menu;
 import com.chingo247.menuapi.menu.CategoryMenu;
 import com.chingo247.menuapi.menu.DefaultCategoryMenu;
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.xplatform.core.APlatform;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.regions.CuboidRegion;
 

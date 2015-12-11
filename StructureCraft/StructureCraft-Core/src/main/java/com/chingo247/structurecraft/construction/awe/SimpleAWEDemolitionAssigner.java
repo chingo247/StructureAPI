@@ -18,7 +18,7 @@ import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.placement.DemolishingPlacement;
-import com.chingo247.structurecraft.placement.interfaces.IPlacement;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.sk89q.worldedit.Vector;
 import java.io.IOException;

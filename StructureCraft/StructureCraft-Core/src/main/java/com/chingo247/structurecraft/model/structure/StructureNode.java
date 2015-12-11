@@ -12,7 +12,7 @@ import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.plot.PlotNode;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.exeption.StructureException;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
+import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.chingo247.structurecraft.util.WorldUtil;
@@ -175,6 +175,7 @@ public class StructureNode extends PlotNode {
         }
     }
 
+    @Override
     public Node getNode() {
         return underlyingNode;
     }
@@ -207,8 +208,11 @@ public class StructureNode extends PlotNode {
     }
 
     public int getSize() {
-        Object o = underlyingNode.getProperty(SIZE_PROPERTY);
-        return o != null ? (int) o : null;
+        if(underlyingNode.hasProperty(SIZE_PROPERTY)) {
+            int o = (int) underlyingNode.getProperty(SIZE_PROPERTY);
+            return o;
+        }
+        return -1;
     }
 
     protected void setSize(int size) {
@@ -477,7 +481,7 @@ public class StructureNode extends PlotNode {
 
     public IStructurePlan getStructurePlan() throws StructureException {
         File planFile = new File(getDirectory(), "structureplan.xml");
-        if(planFile == null) {
+        if(!planFile.exists()) {
             throw new StructureException("Structure #" + getId() + " doesn't have a plan!");
         }
         StructurePlanReader reader = new StructurePlanReader();

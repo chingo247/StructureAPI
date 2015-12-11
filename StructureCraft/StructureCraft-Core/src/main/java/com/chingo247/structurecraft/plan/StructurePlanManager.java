@@ -16,8 +16,6 @@
  */
 package com.chingo247.structurecraft.plan;
 
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlanProvider;
-import com.chingo247.structurecraft.plan.interfaces.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;

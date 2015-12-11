@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.placement.interfaces;
+package com.chingo247.structurecraft.placement;
 
 /**
  *
  * @author Chingo
  */
-public interface IWriteablePlacement extends IPlacement {
+public interface IExportablePlacement extends IPlacement {
     
     String getTypeName();
     

@@ -8,7 +8,7 @@ package com.chingo247.structurecraft.construction;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.awe.AWEAssignerFactory;
-import com.chingo247.structurecraft.construction.safe.schematic.SchematicSavingAssignerFactory;
+import com.chingo247.structurecraft.construction.save.schematic.SchematicSavingAssignerFactory;
 import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**
