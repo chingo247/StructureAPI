@@ -6,7 +6,6 @@
 package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.util.RegionUtil;
-import com.chingo247.structurecraft.util.concurrent.ILoadable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -22,11 +21,11 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.DataException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +87,11 @@ public class SchematicSaveData {
     
      public BaseBlock getBlock(int x, int y, int z) {
         int index = (y * width * length) + z * width + x;
+        
+        if(done[index] == 0) {
+            return null;
+        }
+        
         BaseBlock b = new BaseBlock(blockIds[index], data[index]);
 
         Map<String, Tag> tileMap = tileEntities.get(new BlockVector(x, y, z));
@@ -126,7 +130,13 @@ public class SchematicSaveData {
 
     }
 
-    public void setBlock(Vector vector, BaseBlock block) {
+    /**
+     * Sets the block, but only if it's not already set
+     * @param vector The position of the block
+     * @param block The block
+     * @return True if block has been set, false if block was already set
+     */
+    public boolean setBlock(Vector vector, BaseBlock block) {
         int index = (vector.getBlockY() * width * length)
                 + vector.getBlockZ() * width + vector.getBlockX();
 
@@ -152,7 +162,9 @@ public class SchematicSaveData {
             }
 
             this.done[index] = 1;
+            return true;
         }
+        return false;
     }
 
     /**

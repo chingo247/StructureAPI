@@ -37,7 +37,6 @@ import org.neo4j.graphdb.Node;
  */
 public class Structure extends Plot implements IStructure {
     
-    private static final String BACKUPS_DIR = "backups";
     
     private Long id;
     private String name;
@@ -254,9 +253,10 @@ public class Structure extends Plot implements IStructure {
         return plan;
     }
 
+
     @Override
-    public File getBackupDirectory() {
-        return new File(getDirectory(), BACKUPS_DIR);
+    public IRollbackData getRollbackData() {
+        return new RollbackData(this);
     }
 
     

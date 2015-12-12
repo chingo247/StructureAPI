@@ -14,6 +14,8 @@ import com.chingo247.structurecraft.model.structure.IStructure;
  */
 public interface IConstructionPlanFactory {
     
+    IConstructionPlan newRollbackPlan(IStructure structure) throws StructureException, Exception;
+    
     IConstructionPlan newBuildPlan(IStructure structure) throws StructureException, Exception;
     
     IConstructionPlan newDemolitionPlan(IStructure structure) throws StructureException, Exception;

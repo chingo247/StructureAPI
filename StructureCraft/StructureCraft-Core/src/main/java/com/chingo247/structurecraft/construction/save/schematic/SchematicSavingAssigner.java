@@ -88,12 +88,10 @@ public class SchematicSavingAssigner implements ITaskAssigner {
         
         IBlockPlacement placement = (IBlockPlacement) constructionEntry.getConstructionPlan().getPlacement(structure);
         CuboidRegion affectedArea = placement.getCuboidRegion();
-        // Prepare backup resources
-        File backupDir = new File(structure.getDirectory(), "backups");
-        backupDir.mkdirs();
-        File backup = new File(backupDir, "rollback.schematic");
-        SchematicSaveData safeBlockData = backup.exists() ? 
-                SchematicSaveData.load(backup) : new SchematicSaveData(backup, affectedArea);
+        
+        File rollback = structure.getRollbackData().getRollbackSchematic();
+        SchematicSaveData safeBlockData = rollback.exists() ? 
+                SchematicSaveData.load(rollback) : new SchematicSaveData(rollback, affectedArea);
 
         // Create place areas...
         List<CuboidRegion> chunks = getChunkedAreas(affectedArea, CHUNK_SIZE);

@@ -75,7 +75,7 @@ public interface IStructure extends IPlot {
 
     File getDirectory();
     
-    File getBackupDirectory();
+    IRollbackData getRollbackData();
 
     Vector translateRelativeLocation(Vector position);
     

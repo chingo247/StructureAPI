@@ -16,11 +16,24 @@
  */
 package com.chingo247.structurecraft.construction.plan;
 
+import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
+import com.chingo247.structurecraft.construction.IConstructionListener;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
+import com.chingo247.structurecraft.construction.save.schematic.SchematicSaveData;
+import com.chingo247.structurecraft.construction.save.schematic.SchematicSavePlacement;
+import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionFailedEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
+import com.chingo247.structurecraft.event.structure.StructureProgressUpdateEvent;
+import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
+import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.IPlacement;
+import java.io.File;
 
 /**
  *
@@ -34,12 +47,49 @@ public class RollbackPlan extends ConstructionPlan {
 
     @Override
     public IPlacement getPlacement(IStructure structure) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        File rollbackSchematic = structure.getRollbackData().getRollbackSchematic();
+        if(!rollbackSchematic.exists()) {
+            throw new StructureException("Structure doesn't have a rollback schematic");
+        }
+        SchematicSaveData schematicSaveData = SchematicSaveData.load(rollbackSchematic);
+        return new SchematicSavePlacement(schematicSaveData);
     }
 
     @Override
     public void register(IConstructionEntry entry) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        final IStructureAPI structureAPI = StructureAPI.getInstance();
+        entry.addListener(new IConstructionListener() {
+
+            @Override
+            public void onComplete(IConstructionEntry entry) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.REMOVED));
+            }
+
+            @Override
+            public void onCancelled(IConstructionEntry entry) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionCancelledEvent(entry.getStructure()));
+            }
+
+            @Override
+            public void onStarted(IConstructionEntry entry) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.ROLLING_BACK));
+            }
+
+            @Override
+            public void onQueued(IConstructionEntry entry) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+            }
+
+            @Override
+            public void onProgress(IConstructionEntry entry) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.ROLLING_BACK));
+            }
+
+            @Override
+            public void onFailed(IConstructionEntry entry) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionFailedEvent(entry.getStructure()));
+            }
+        });
     }
     
 }

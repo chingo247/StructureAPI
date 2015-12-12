@@ -72,7 +72,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
         this.structurePool = new KeyPool<>(es);
         this.es = es;
         this.structureAPI = structureAPI;
-        this.planFactory = new ConstructionPlanFactory(structureAPI, this);
+        this.planFactory = new ConstructionPlanFactory(this);
         this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
         this.entries = Maps.newHashMap();
     }

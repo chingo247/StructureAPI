@@ -288,8 +288,53 @@ public class StructureCommands {
                 .setForced(useForce)
                 .setPlayer(uuid)
                 .execute();
-     
+    }
+    
+    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandExtras(async = true)
+    @Command(aliases = {"structure:rollback", "stt:rollback"}, desc = "Restores the area back to before the structure was placed", min = 1, max = 1, flags = "f")
+    public static void rollback(final CommandContext args, final ICommandSender sender, final IStructureAPI structureAPI) throws Exception {
+        final UUID uuid = getUUID(sender);
+        final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+        final StructureRepository structureRepository = new StructureRepository(graph);
 
+        final Structure structure;
+        String structureIdArg = args.getString(0);
+        if (!NumberUtils.isNumber(structureIdArg)) {
+            throw new CommandException("Expected a number but got '" + structureIdArg + "' \n" + "/structure:build [id]");
+        }
+        long id = Long.parseLong(structureIdArg);
+        long start = System.currentTimeMillis();
+        try (Transaction tx = graph.beginTx()) {
+            StructureNode sn = structureRepository.findById(id);
+
+            if (sn == null) {
+                tx.success();
+                throw new CommandException("Couldn't find a structure for #" + structureIdArg);
+            }
+
+            if (isPlayer(sender) && !isOP(sender) && sender instanceof IPlayer && !sn.getOwnerDomain().isOwnerOfType(uuid, OwnerType.MASTER)) {
+                tx.success();
+                throw new CommandException("You are not the 'MASTER' owner of this structure...");
+            }
+            structure = new Structure(sn);
+            tx.success();
+        }
+        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
+
+        if(!structure.getRollbackData().hasRollbackFiles()) {
+            throw new CommandException("Rollback not available for this structure");
+        }
+        
+        String force = args.hasFlag('f') ? args.getFlag('f') : null;
+        final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
+        structureAPI.getConstructionExecutor().getConstructionPlanFactory()
+                .newRollbackPlan(structure)
+                .setRecursive(true)
+                .setRestrictive(true)
+                .setForced(useForce)
+                .setPlayer(uuid)
+                .execute();
     }
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)

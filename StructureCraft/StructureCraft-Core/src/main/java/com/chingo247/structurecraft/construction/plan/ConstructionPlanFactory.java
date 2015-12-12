@@ -34,17 +34,23 @@ import com.chingo247.structurecraft.plan.IStructurePlan;
 public class ConstructionPlanFactory implements IConstructionPlanFactory {
     
     private final IConstructionExecutor executor;
-    private final IStructureAPI structureAPI;
 
-    public ConstructionPlanFactory(IStructureAPI structureAPI, IConstructionExecutor executor) {
+    public ConstructionPlanFactory(IConstructionExecutor executor) {
         this.executor = executor;
-        this.structureAPI = structureAPI;
     }
     
     private boolean isSupported(IStructure structure) throws StructureException {
         IPlacement placement = structure.getStructurePlan().getPlacement();
         return (placement instanceof IBlockPlacement);
     }
+
+    @Override
+    public IConstructionPlan newRollbackPlan(IStructure structure) throws StructureException, Exception {
+        ITaskAssigner assigner = new AWETaskAssigner();
+        return new RollbackPlan(executor, structure, assigner);
+    }
+    
+    
     
     @Override
     public IConstructionPlan newBuildPlan(IStructure structure) throws StructureException {
