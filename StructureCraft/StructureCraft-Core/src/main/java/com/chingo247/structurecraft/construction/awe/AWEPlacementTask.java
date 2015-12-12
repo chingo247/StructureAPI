@@ -17,10 +17,9 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.StructureBlockPlacingTask;
-import com.chingo247.structurecraft.construction.StructureTask;
+import com.chingo247.structurecraft.construction.ITaskStartedListener;
+import com.chingo247.structurecraft.construction.StructurePlacingTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
 import com.chingo247.structurecraft.event.async.StructureJobAddedEvent;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
@@ -39,7 +38,7 @@ import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
  * @author Chingo
  * @param <T> The Options Type
  */
-public class AWEPlacementTask extends StructureBlockPlacingTask {
+public class AWEPlacementTask extends StructurePlacingTask {
 
     private final IPlacement placement;
     private final PlayerEntry playerEntry;
@@ -61,8 +60,8 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IConstructionEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position, ITaskCallback callback) {
-        super(callback, connstructionEntry, playerOrRandomUUID);
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IConstructionEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
+        super(connstructionEntry, playerOrRandomUUID);
         this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;
         this.placement = placement;
@@ -98,23 +97,17 @@ public class AWEPlacementTask extends StructureBlockPlacingTask {
 //                System.out.println("Added task " + t.getUUID() + ", jobId: " + jobId);
                 AWEJobManager.getInstance().register(t);
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
-                if(callback != null) {
-                    callback.onQueued();
-                }
             }
 
             @Override
             public void onCancelled() {
                 cancel();
-                if(callback != null) {
-                    callback.onCancelled();
-                }
             }
 
             @Override
             public void onStarted() {
-                if(callback != null) {
-                    callback.onStarted();
+                for(ITaskStartedListener listener : getListeners()) {
+                    listener.onStarted(AWEPlacementTask.this);
                 }
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskStartEvent(t));
             }

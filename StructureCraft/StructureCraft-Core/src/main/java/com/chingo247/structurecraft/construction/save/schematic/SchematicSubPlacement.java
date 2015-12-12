@@ -6,8 +6,8 @@
 package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.placement.BlockPlacement;
-import com.chingo247.structurecraft.placement.IBlockPlacement;
+import com.chingo247.structurecraft.placement.block.BlockPlacement;
+import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.sk89q.worldedit.BlockVector;
@@ -57,7 +57,7 @@ class SchematicSubPlacement extends BlockPlacement {
     }
 
     @Override
-    public int getRotation() {
+    public final int getRotation() {
         if(placement instanceof RotationalPlacement) {
             return ((RotationalPlacement) placement).getRotation();
         }

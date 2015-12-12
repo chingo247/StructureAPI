@@ -14,18 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.exception;
-
-import com.chingo247.structurecraft.construction.exception.ConstructionException;
+package com.chingo247.structurecraft.construction;
 
 /**
  *
  * @author Chingo
  */
-public class StructureTaskException extends ConstructionException {
-
-    public StructureTaskException(String message) {
-        super(message);
-    }
+public interface ITaskStartedListener {
+    
+    void onStarted(StructureTask task);
     
 }

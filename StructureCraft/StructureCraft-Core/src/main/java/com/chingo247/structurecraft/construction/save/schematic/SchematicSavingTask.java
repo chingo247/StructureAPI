@@ -7,7 +7,6 @@ package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.ITaskCallback;
 import com.chingo247.structurecraft.construction.StructureTask;
 import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
 import com.chingo247.structurecraft.util.concurrent.AsyncLoad;
@@ -57,8 +56,8 @@ class SchematicSavingTask extends StructureTask {
      * @param safeBlockData The safe block data that will be used to save
      * @param callback
      */
-    public SchematicSavingTask(IConstructionEntry entry, UUID submitter, CuboidRegion toSave, World world, SchematicSaveData safeBlockData, ITaskCallback callback) {
-        super(callback, entry, submitter);
+    public SchematicSavingTask(IConstructionEntry entry, UUID submitter, CuboidRegion toSave, World world, SchematicSaveData safeBlockData) {
+        super(entry, submitter);
         this.toSave = toSave;
         this.world = world;
         this.safeBlockData = safeBlockData;
@@ -67,62 +66,44 @@ class SchematicSavingTask extends StructureTask {
     @Override
     protected void execute() {
         final ExecutorService executorService = StructureAPI.getInstance().getExecutor();
-        AsyncLoad load = new AsyncLoad(safeBlockData) {
+        final IStructureAPIPlugin plugin = StructureAPI.getInstance().getPlugin();
+        final IScheduler scheduler = plugin.getScheduler();
+        final Vector pos = getConstructionEntry().getStructure().getMin();
+
+        // run sync as we use the platform's API
+        scheduler.runSync(new SchematicSavingRunnable(pos) {
             /**
-             * Executes when the loader has finished
+             * We retrieved blocks from the world
              */
             @Override
             public void succes() {
-                final IStructureAPIPlugin plugin = StructureAPI.getInstance().getPlugin();
-                final IScheduler scheduler = plugin.getScheduler();
-                final Vector pos = getConstructionEntry().getStructure().getMin();
-
-                // run sync as we use the platform's API
-                scheduler.runSync(new SchematicSavingRunnable(pos) {
-                    /**
-                     * We retrieved blocks from the world
-                     */
+                // IO Operation should be performed async
+                ExecutorService es = StructureAPI.getInstance().getExecutor();
+                es.execute(new Runnable() {
                     @Override
-                    public void succes() {
-                        // IO Operation should be performed async
-                        ExecutorService es = StructureAPI.getInstance().getExecutor();
-                        es.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    safeBlockData.write();
-                                } catch (Exception e) {
-                                    setFailed(true);
-                                    safeBlockData = null;
-                                    LOG.log(Level.SEVERE, e.getMessage(), e);
-                                } finally {
-                                    finish();
-                                }
-                            }
-                        });
-                    }
-
-                    /**
-                     * Retrieving blocks from the world has failed
-                     */
-                    @Override
-                    public void fail() {
-                        setFailed(true);
-                        finish();
+                    public void run() {
+                        try {
+                            safeBlockData.write();
+                        } catch (Exception e) {
+                            setFailed(true);
+                            safeBlockData = null;
+                            LOG.log(Level.SEVERE, e.getMessage(), e);
+                        } finally {
+                            finish();
+                        }
                     }
                 });
             }
 
             /**
-             * Executed when the loading has failed
+             * Retrieving blocks from the world has failed
              */
             @Override
             public void fail() {
                 setFailed(true);
                 finish();
             }
-        };
-        executorService.execute(load);
+        });
 
     }
 
@@ -136,7 +117,7 @@ class SchematicSavingTask extends StructureTask {
     private abstract class SchematicSavingRunnable extends AsyncTask {
 
         private final Vector pos;
-        
+
         /**
          * Constructor.
          *
@@ -148,12 +129,10 @@ class SchematicSavingTask extends StructureTask {
 
         @Override
         public void execute() throws Exception {
-            long start = System.currentTimeMillis();
             // Cube traverse this clipboard
-            
             Vector min = toSave.getMinimumPoint();
             Vector max = toSave.getMaximumPoint();
-            
+
             for (int x = min.getBlockX(), relX = 0; x < max.getBlockX(); x++, relX++) {
                 for (int z = min.getBlockX(), relZ = 0; z < max.getBlockX(); z++, relZ++) {
                     for (int y = min.getBlockX(), relY = 0; y < max.getBlockX(); y++, relY++) {

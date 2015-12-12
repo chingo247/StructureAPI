@@ -27,7 +27,7 @@ import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.placement.IPlacement;
-import com.chingo247.structurecraft.placement.SchematicPlacement;
+import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.schematic.FastClipboard;
 import com.chingo247.structurecraft.platform.permission.Permissions;
 import com.chingo247.xplatform.core.IColors;

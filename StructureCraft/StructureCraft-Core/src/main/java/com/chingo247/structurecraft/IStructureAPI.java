@@ -20,7 +20,7 @@ import com.chingo247.structurecraft.exeption.StructureRestrictionException;
 import com.chingo247.menuapi.menu.CategoryMenu;
 import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
-import com.chingo247.structurecraft.placement.SchematicPlacement;
+import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlacerFactory;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.platform.ConfigProvider;

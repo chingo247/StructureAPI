@@ -1,12 +1,27 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2015 Chingo
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.plan;
 
+import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.IConstructionExecutor;
+import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.placement.options.Traversal;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.placement.IPlacement;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
@@ -14,7 +29,7 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  *
  * @author Chingo
  */
-public class ConstructionPlan implements IConstructionPlan {
+public abstract class ConstructionPlan implements IConstructionPlan {
     
     private final IStructure structure;
     private final IConstructionExecutor executor;
@@ -25,103 +40,99 @@ public class ConstructionPlan implements IConstructionPlan {
     private Traversal traveral;
     private boolean useForce;
     
-    
-
     public ConstructionPlan(IConstructionExecutor executor, IStructure structure, ITaskAssigner assigner) {
         this.structure = structure;
         this.executor = executor;
         this.assigner = assigner;
     }
+    
+    @Override
+    public abstract IPlacement getPlacement(IStructure structure) throws Exception;
+    
+    public abstract void register(IConstructionEntry entry) throws Exception;
 
     @Override
     public boolean isForced() {
         return useForce;
     }
 
-
-    @Override
-    public IConstructionPlan setStructureTraversal(Traversal traversal) {
+    public ConstructionPlan setStructureTraversal(Traversal traversal) {
         this.traveral = traversal;
         return this;
     }
 
-    @Override
-    public IConstructionPlan setForced(boolean useForce) {
+    public ConstructionPlan setForced(boolean useForce) {
         this.useForce = useForce;
         return this;
     }
     
-    @Override
     public ITaskAssigner getAssigner() {
         return assigner;
     }
 
-    @Override
     public AsyncEditSession getEditSession() {
         return editSession;
     }
 
-    @Override
     public UUID getPlayer() {
         return player;
     }
 
-    @Override
     public IStructure getStructure() {
         return structure;
     }
     
-    @Override
     public boolean isRecursive() {
         return recursive;
     }
 
-    @Override
     public boolean isRestrictive() {
         return restrictive;
     }
 
-    @Override
+    
     public boolean isReversed() {
         return reversed;
     }
     
-    @Override
-    public IConstructionPlan setRestrictive(boolean restrictive) {
+    
+    public ConstructionPlan setRestrictive(boolean restrictive) {
         this.restrictive = restrictive;
         return this;
     }
 
-    @Override
-    public IConstructionPlan setRecursive(boolean recursive) {
+    
+    public ConstructionPlan setRecursive(boolean recursive) {
         this.recursive = recursive;
         return this;
     }
 
-    @Override
-    public IConstructionPlan setReversedOrder(boolean reversed) {
+    
+    public ConstructionPlan setReversedOrder(boolean reversed) {
         this.reversed = reversed;
         return this;
     }
 
-    @Override
-    public IConstructionPlan setPlayer(UUID player) {
+    
+    public ConstructionPlan setPlayer(UUID player) {
         this.player = player;
         return this;
     }
+    
+    
 
-    @Override
-    public IConstructionPlan setEditsession(AsyncEditSession aes) {
+    
+    public ConstructionPlan setEditsession(AsyncEditSession aes) {
         this.editSession = aes;
         return this;
     }
     
-    @Override
+    
     public void execute() {
         executor.execute(this);
     }
 
-    @Override
+    
     public Traversal getStructureTraversal() {
         return traveral;
     }

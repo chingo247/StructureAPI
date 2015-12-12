@@ -21,7 +21,7 @@ import com.sk89q.worldedit.Vector;
 import java.io.File;
 import java.io.IOException;
 import com.chingo247.structurecraft.plan.exception.SchematicException;
-import com.chingo247.structurecraft.placement.SchematicPlacement;
+import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NamedTag;

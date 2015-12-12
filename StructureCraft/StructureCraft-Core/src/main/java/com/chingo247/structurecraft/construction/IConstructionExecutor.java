@@ -5,6 +5,8 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.plan.IConstructionPlanFactory;
+import com.chingo247.structurecraft.construction.plan.ConstructionPlan;
 import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**
@@ -17,7 +19,7 @@ public interface IConstructionExecutor {
     
     IConstructionPlanFactory getConstructionPlanFactory();
     
-    void execute(IConstructionPlan plan);
+    void execute(ConstructionPlan plan);
     
     void purge(IStructure structure);
 }

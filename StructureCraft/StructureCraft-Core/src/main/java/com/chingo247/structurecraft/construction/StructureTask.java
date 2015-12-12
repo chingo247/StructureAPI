@@ -17,10 +17,12 @@
 package com.chingo247.structurecraft.construction;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.event.task.StructureTaskCancelledEvent;
 import com.chingo247.structurecraft.event.task.StructureTaskCompleteEvent;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -32,65 +34,67 @@ public abstract class StructureTask {
     private IConstructionEntry constructionEntry;
     private final UUID submitter, uuid;
     private boolean cancelled = false, failed = false, finished = false, started = false;
-    protected final ITaskCallback callback;
-   
-    
+    private List<ITaskStartedListener> listeners;
+
     public StructureTask(IConstructionEntry constructionEntry, UUID submitter) {
-        this(null, constructionEntry, submitter);
-    }
-    
-    public StructureTask(ITaskCallback callback, IConstructionEntry constructionEntry, UUID submitter) {
         Preconditions.checkNotNull(constructionEntry, "ConstructionEntry may not be null");
         Preconditions.checkNotNull(submitter, "Submitter may not be null");
         this.constructionEntry = constructionEntry;
         this.uuid = UUID.randomUUID();
-        this.callback = callback;
+//        this.callback = callback;
         this.submitter = submitter;
-    }
-
-   
-    public UUID getSubmitter() {
-        return submitter;
+        this.listeners = Lists.newArrayList();
     }
     
-    public IConstructionEntry getConstructionEntry() {
+    public void addListener(ITaskStartedListener listener) {
+        this.listeners.add(listener);
+    }
+    
+    protected Iterable<ITaskStartedListener> getListeners() {
+        return new ArrayList<>(listeners);
+    }
+    
+    public final UUID getSubmitter() {
+        return submitter;
+    }
+
+    public final IConstructionEntry getConstructionEntry() {
         return constructionEntry;
     }
 
-
-    public UUID getUUID() {
+    public final UUID getUUID() {
         return uuid;
     }
 
-    public boolean isFinished() {
+    public final boolean isFinished() {
         return finished;
     }
 
-    public boolean isCancelled() {
+    public final boolean isCancelled() {
         return cancelled;
     }
 
-    public void setCancelled(boolean cancelled) {
+    public final void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
 
-    public void setFailed(boolean failed) {
+    public final void setFailed(boolean failed) {
         this.failed = false;
     }
 
-    public boolean hasFailed() {
+    public final boolean hasFailed() {
         return failed;
     }
 
     public synchronized final void start() {
-        if(started == false) {
+        if (started == false) {
             started = true;
             execute();
         }
     }
-    
+
     protected abstract void execute();
-    
+
     protected abstract void onCancel();
 
     public synchronized final void cancel() {
@@ -99,7 +103,7 @@ public abstract class StructureTask {
             onCancel();
             constructionEntry.getConstructionExecutor().remove(constructionEntry);
             finish();
-        } 
+        }
     }
 
     /**
@@ -111,22 +115,12 @@ public abstract class StructureTask {
             started = false;
             finished = true;
             if (isCancelled()) {
-                if(callback != null) {
-                    callback.onCancelled();
-                }
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskCancelledEvent(this));
             } else {
-                if(callback != null) {
-                    callback.onComplete();
-                }
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskCompleteEvent(this));
             }
-            
-            if(!isCancelled() && !failed) {
-                constructionEntry.proceed();
-            } else {
-                constructionEntry.purge();
-            }
+            listeners.clear();
+            constructionEntry.proceed();
         }
     }
 

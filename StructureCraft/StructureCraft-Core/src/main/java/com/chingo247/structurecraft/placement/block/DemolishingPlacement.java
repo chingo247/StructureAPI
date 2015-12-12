@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.placement;
+package com.chingo247.structurecraft.placement.block;
 
+import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.iterator.TopDownCuboidIterator;
 import com.sk89q.worldedit.EditSession;

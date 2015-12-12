@@ -12,15 +12,11 @@ import java.util.UUID;
  *
  * @author Chingo
  */
-public abstract class StructureBlockPlacingTask extends StructureTask {
+public abstract class StructurePlacingTask extends StructureTask {
 
     private PlaceOptions options;
     
-    public StructureBlockPlacingTask(ITaskCallback callback, IConstructionEntry constructionEntry, UUID submitter) {
-        super(callback, constructionEntry, submitter);
-    }
-
-    public StructureBlockPlacingTask(IConstructionEntry constructionEntry, UUID submitter) {
+    public StructurePlacingTask(IConstructionEntry constructionEntry, UUID submitter) {
         super(constructionEntry, submitter);
     }
 

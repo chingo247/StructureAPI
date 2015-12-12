@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.plan.io.handlers;
 
-import com.chingo247.structurecraft.placement.SchematicPlacement;
+import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.plan.io.PlacementXMLConstants;
 import org.dom4j.Element;
 import org.dom4j.tree.BaseElement;

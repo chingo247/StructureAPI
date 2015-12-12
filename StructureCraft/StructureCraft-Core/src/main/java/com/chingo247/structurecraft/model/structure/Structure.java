@@ -19,7 +19,6 @@ package com.chingo247.structurecraft.model.structure;
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.model.plot.Plot;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.rollback.schematic.RollbackType;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
@@ -253,11 +252,6 @@ public class Structure extends Plot implements IStructure {
         IStructurePlan plan = reader.readFile(planFile);
 
         return plan;
-    }
-
-    @Override
-    public File getRollbackFile(RollbackType type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

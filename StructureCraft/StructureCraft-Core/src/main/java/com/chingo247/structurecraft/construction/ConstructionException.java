@@ -1,3 +1,8 @@
+package com.chingo247.structurecraft.construction;
+
+import com.chingo247.structurecraft.exeption.StructureException;
+
+
 /*
  * Copyright (C) 2015 Chingo
  *
@@ -14,25 +19,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.schematic;
-
-import com.chingo247.structurecraft.placement.block.SchematicPlacement;
-import com.sk89q.worldedit.Vector;
-import java.io.File;
 
 /**
  *
  * @author Chingo
  */
-public interface Schematic {
-    
-    public long getHash();
-    public FastClipboard getClipboard();
-    public SchematicPlacement createPlacement();
-    public Vector getSize();
-    public int getWidth();
-    public int getHeight();
-    public int getLength();
-    public File getFile();
-    
+public class ConstructionException extends StructureException {
+
+    public ConstructionException(String message) {
+        super(message);
+    }
+
 }

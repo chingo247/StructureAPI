@@ -43,7 +43,7 @@ import com.chingo247.structurecraft.event.StructurePlansReloadEvent;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.platform.services.AsyncEditSessionFactoryProvider;
 import com.chingo247.structurecraft.model.zone.ConstructionZoneNode;
-import com.chingo247.structurecraft.placement.SchematicPlacement;
+import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlacerFactory;
 import com.chingo247.structurecraft.schematic.Schematic;
 import com.chingo247.structurecraft.schematic.SchematicManager;

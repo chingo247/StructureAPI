@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.plan;
 
+import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.placement.options.Traversal;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.placement.IPlacement;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
@@ -40,6 +42,8 @@ public interface IConstructionPlan {
     void execute();
     
     AsyncEditSession getEditSession();
+    
+    IPlacement getPlacement(IStructure structure) throws Exception;
 
     UUID getPlayer();
     

@@ -1,8 +1,3 @@
-package com.chingo247.structurecraft.construction.exception;
-
-import com.chingo247.structurecraft.exeption.StructureException;
-
-
 /*
  * Copyright (C) 2015 Chingo
  *
@@ -19,15 +14,24 @@ import com.chingo247.structurecraft.exeption.StructureException;
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.chingo247.structurecraft.construction;
 
 /**
  *
  * @author Chingo
  */
-public class ConstructionException extends StructureException {
+public interface IConstructionListener {
 
-    public ConstructionException(String message) {
-        super(message);
-    }
+    void onStarted(IConstructionEntry entry);
+
+    void onQueued(IConstructionEntry entry);
+
+    void onComplete(IConstructionEntry entry);
+
+    void onProgress(IConstructionEntry entry);
+
+    void onCancelled(IConstructionEntry entry);
+    
+    void onFailed(IConstructionEntry entry);
 
 }

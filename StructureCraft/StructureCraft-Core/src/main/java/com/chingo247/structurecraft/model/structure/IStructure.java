@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.structurecraft.construction.rollback.schematic.RollbackType;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.plot.IPlot;
 import com.chingo247.structurecraft.plan.IStructurePlan;
@@ -57,8 +56,6 @@ public interface IStructure extends IPlot {
     double getPrice();
 
     Direction getDirection();
-    
-    File getRollbackFile(RollbackType type);
     
     /**
      * The construction status, <b> NOTE that this value is not up-to-date.</b>

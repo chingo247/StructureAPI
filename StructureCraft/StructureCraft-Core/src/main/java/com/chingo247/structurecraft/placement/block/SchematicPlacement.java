@@ -15,9 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.chingo247.structurecraft.placement;
+package com.chingo247.structurecraft.placement.block;
 
+import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.settlercraft.core.Direction;
+import com.chingo247.structurecraft.placement.FilePlacement;
+import com.chingo247.structurecraft.placement.IExportablePlacement;
+import com.chingo247.structurecraft.placement.PlacementTypes;
 import com.chingo247.structurecraft.schematic.Schematic;
 import com.chingo247.structurecraft.schematic.FastClipboard;
 import com.chingo247.structurecraft.util.WorldUtil;

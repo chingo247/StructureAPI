@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.plan.io.parser;
 
-import com.chingo247.structurecraft.placement.SchematicPlacement;
+import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.plan.io.document.PlacementElement;
 import com.chingo247.structurecraft.plan.io.exception.PlanException;
 import com.chingo247.structurecraft.placement.PlacementTypes;

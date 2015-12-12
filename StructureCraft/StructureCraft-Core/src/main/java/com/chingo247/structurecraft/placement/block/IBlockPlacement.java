@@ -15,8 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.chingo247.structurecraft.placement;
+package com.chingo247.structurecraft.placement.block;
 
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 

@@ -15,8 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.chingo247.structurecraft.placement;
+package com.chingo247.structurecraft.placement.block;
 
+import com.chingo247.structurecraft.placement.AbstractPlacement;
+import com.chingo247.structurecraft.placement.StructureBlock;
 import static com.chingo247.settlercraft.core.Direction.EAST;
 import static com.chingo247.settlercraft.core.Direction.NORTH;
 import static com.chingo247.settlercraft.core.Direction.SOUTH;

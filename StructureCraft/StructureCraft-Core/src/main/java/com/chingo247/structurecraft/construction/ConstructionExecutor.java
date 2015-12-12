@@ -1,14 +1,28 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2015 Chingo
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.awe.AWEAssignerFactory;
+import com.chingo247.structurecraft.construction.plan.IConstructionPlanFactory;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.construction.plan.ConstructionPlan;
+import com.chingo247.structurecraft.construction.plan.ConstructionPlanFactory;
+import com.chingo247.structurecraft.construction.plan.IConstructionPlan;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -52,24 +66,22 @@ public class ConstructionExecutor implements IConstructionExecutor {
     private Map<Long, ConstructionEntry> entries;
     private KeyPool<Long> structurePool;
     private ExecutorService es;
-    private IConstructionPlanFactory planFactory;
-    private IAssignerFactory assFactory;
+    private ConstructionPlanFactory planFactory;
 
     public ConstructionExecutor(IStructureAPI structureAPI, ExecutorService es) {
         this.structurePool = new KeyPool<>(es);
         this.es = es;
         this.structureAPI = structureAPI;
-        this.assFactory = new AWEAssignerFactory(structureAPI);
         this.planFactory = new ConstructionPlanFactory(structureAPI, this);
         this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
         this.entries = Maps.newHashMap();
     }
 
-    ConstructionEntry getOrCreateEntry(IStructure structure) {
+    ConstructionEntry getOrCreateEntry(IStructure structure, IConstructionPlan plan) {
         synchronized (entryMutex) {
             ConstructionEntry entry = entries.get(structure.getId());
             if (entry == null) {
-                entry = new ConstructionEntry(this, structure);
+                entry = new ConstructionEntry(this, structure, plan);
                 entries.put(structure.getId(), entry);
             }
             return entry;
@@ -97,7 +109,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
     }
 
     @Override
-    public void execute(final IConstructionPlan plan) {
+    public void execute(final ConstructionPlan plan) {
         final IStructure structure = plan.getStructure();
 //        System.out.println("plan structure: " + plan.getStructure());
 //        System.out.println("plan structure id: " + plan.getStructure().getId());
@@ -219,7 +231,10 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                             ConstructionEntry prevEntry = null;
                                             try {
                                                 for (Structure s : structures) {
-                                                    ConstructionEntry currentEntry = getOrCreateEntry(s);
+                                                    ConstructionEntry currentEntry = getOrCreateEntry(s, plan);
+                                                    
+                                                    plan.register(currentEntry);
+                                                    
                                                     if (startEntry == null) {
                                                         startEntry = currentEntry;
                                                     }
@@ -242,7 +257,9 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                                 Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
                                             }
                                         } else {
-                                            IConstructionEntry entry = getOrCreateEntry(structure);
+                                            IConstructionEntry entry = getOrCreateEntry(structure, plan);
+                                            plan.register(entry);
+                                            
                                             ITaskAssigner assigner = plan.getAssigner();
                                             try {
                                                 assigner.assignTasks(editSession, playerOrRandomUUID, entry);

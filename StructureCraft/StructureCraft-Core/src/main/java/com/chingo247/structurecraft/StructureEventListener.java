@@ -9,6 +9,7 @@ import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
+import com.chingo247.structurecraft.event.structure.StructureConstructionFailedEvent;
 import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.StructureProgressUpdateEvent;
 import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
@@ -212,6 +213,15 @@ class StructureEventListener {
         IColors colors = StructureAPI.getInstance().getPlatform().getChatColors();
         IStructure structure = scq.getStructure();
         String message = colors.red() + "STOPPED " + colors.reset() + getStructureString(structure);
+        handleStructure(structure, message, STOPPED);
+    }
+    
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onStructureConstructionFailed(StructureConstructionFailedEvent scq) {
+        IColors colors = StructureAPI.getInstance().getPlatform().getChatColors();
+        IStructure structure = scq.getStructure();
+        String message = colors.red() + "FAILED " + colors.reset() + getStructureString(structure);
         handleStructure(structure, message, STOPPED);
     }
 

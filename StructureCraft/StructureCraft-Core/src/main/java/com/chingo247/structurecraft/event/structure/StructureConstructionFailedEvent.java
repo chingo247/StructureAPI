@@ -14,25 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.schematic;
+package com.chingo247.structurecraft.event.structure;
 
-import com.chingo247.structurecraft.placement.block.SchematicPlacement;
-import com.sk89q.worldedit.Vector;
-import java.io.File;
+import com.chingo247.structurecraft.event.StructureEvent;
+import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**
  *
  * @author Chingo
  */
-public interface Schematic {
-    
-    public long getHash();
-    public FastClipboard getClipboard();
-    public SchematicPlacement createPlacement();
-    public Vector getSize();
-    public int getWidth();
-    public int getHeight();
-    public int getLength();
-    public File getFile();
+public class StructureConstructionFailedEvent extends StructureEvent {
+
+    public StructureConstructionFailedEvent(IStructure structure) {
+        super(structure);
+    }
     
 }
