@@ -8,7 +8,7 @@ package com.chingo247.structurecraft.placing.structure;
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.event.StructureCreateEvent;
+import com.chingo247.structurecraft.event.structure.StructureCreateEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;

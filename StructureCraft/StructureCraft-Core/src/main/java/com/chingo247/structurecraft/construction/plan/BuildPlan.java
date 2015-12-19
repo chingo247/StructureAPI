@@ -22,10 +22,10 @@ import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionListener;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
-import com.chingo247.structurecraft.event.structure.StructureConstructionCancelledEvent;
-import com.chingo247.structurecraft.event.structure.StructureConstructionFailedEvent;
-import com.chingo247.structurecraft.event.structure.StructureConstructionQueued;
-import com.chingo247.structurecraft.event.structure.StructureProgressUpdateEvent;
+import com.chingo247.structurecraft.event.structure.construction.StructureConstructionCancelledEvent;
+import com.chingo247.structurecraft.event.structure.construction.StructureConstructionFailedEvent;
+import com.chingo247.structurecraft.event.structure.construction.StructureConstructionQueued;
+import com.chingo247.structurecraft.event.structure.construction.StructureProgressUpdateEvent;
 import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
@@ -60,7 +60,7 @@ public class BuildPlan extends ConstructionPlan {
 
             @Override
             public void onComplete(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.COMPLETED));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.COMPLETED));
             }
 
             @Override
@@ -69,8 +69,8 @@ public class BuildPlan extends ConstructionPlan {
             }
 
             @Override
-            public void onStarted(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureStateChangeEvent(entry.getStructure(), ConstructionStatus.BUILDING));
+            public void onStarted(IConstructionEntry entry) {                               
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.BUILDING));
             }
 
             @Override
@@ -89,5 +89,7 @@ public class BuildPlan extends ConstructionPlan {
             }
         });
     }
+    
+    
 
 }

@@ -18,8 +18,8 @@ package com.chingo247.structurecraft.plan;
 
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.event.StructurePlansLoadedEvent;
-import com.chingo247.structurecraft.event.StructurePlansReloadEvent;
+import com.chingo247.structurecraft.event.structure.plan.StructurePlansLoadedEvent;
+import com.chingo247.structurecraft.event.structure.plan.StructurePlansReloadEvent;
 import com.chingo247.structurecraft.plan.io.exception.PlanException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;

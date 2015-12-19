@@ -14,10 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.event;
+package com.chingo247.structurecraft.event.structure;
+
+import com.chingo247.structurecraft.model.structure.IStructure;
+
 
 /**
- * Fired when structure plans are loaded
+ *
  * @author Chingo
  */
-public class StructurePlansLoadedEvent {}
+public class StructureEvent {
+    
+    private final IStructure structure;
+
+    public StructureEvent(IStructure structure) {
+        this.structure = structure;
+    }
+
+    public IStructure getStructure() {
+        return structure;
+    }
+    
+    
+    
+    
+    
+}

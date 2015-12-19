@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.event.structure;
+package com.chingo247.structurecraft.event.structure.construction;
 
-import com.chingo247.structurecraft.event.StructureEvent;
+import com.chingo247.structurecraft.event.structure.StructureEvent;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.util.IProgressable;

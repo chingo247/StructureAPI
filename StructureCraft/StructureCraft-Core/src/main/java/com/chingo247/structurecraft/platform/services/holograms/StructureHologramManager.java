@@ -17,7 +17,7 @@
 package com.chingo247.structurecraft.platform.services.holograms;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.structurecraft.event.StructureCreateEvent;
+import com.chingo247.structurecraft.event.structure.StructureCreateEvent;
 import com.chingo247.structurecraft.model.hologram.StructureHologram;
 import com.chingo247.structurecraft.model.hologram.StructureHologramNode;
 import com.chingo247.structurecraft.model.hologram.StructureHologramRepository;

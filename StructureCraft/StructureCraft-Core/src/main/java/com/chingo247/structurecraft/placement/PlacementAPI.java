@@ -17,11 +17,7 @@
 package com.chingo247.structurecraft.placement;
 
 import com.chingo247.structurecraft.plan.io.document.PlacementElement;
-import com.chingo247.structurecraft.placement.PlacementException;
-import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.plan.io.parser.SchematicPlacementParser;
-import com.chingo247.structurecraft.placement.PlacementTypes;
-import com.chingo247.structurecraft.placement.IExportablePlacement;
 import com.chingo247.structurecraft.plan.io.parser.PlacementParser;
 import com.chingo247.structurecraft.plan.io.handlers.PlacementXMLHandler;
 import com.chingo247.structurecraft.plan.io.handlers.SchematicPlacementXMLHandler;
@@ -34,7 +30,9 @@ import org.dom4j.Element;
 /**
  *
  * @author Chingo
+ * @deprecated Subject to changes in near future
  */
+@Deprecated
 public class PlacementAPI {
     
     private static PlacementAPI instance;

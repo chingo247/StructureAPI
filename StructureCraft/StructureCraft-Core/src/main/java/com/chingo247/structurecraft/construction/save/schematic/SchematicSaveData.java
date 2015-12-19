@@ -210,9 +210,9 @@ public class SchematicSaveData {
         byte[] data = getChildTag(schematic, "Data", ByteArrayTag.class).getValue();
         byte[] done = getChildTag(schematic, "Done", ByteArrayTag.class).getValue();
         
-        int width = getChildTag(schematic, "Width", IntTag.class).getValue();
-        int height = getChildTag(schematic, "Height", IntTag.class).getValue();
-        int length = getChildTag(schematic, "Length", IntTag.class).getValue();
+        int width = getChildTag(schematic, "Width", ShortTag.class).getValue();
+        int height = getChildTag(schematic, "Height", ShortTag.class).getValue();
+        int length = getChildTag(schematic, "Length", ShortTag.class).getValue();
         Vector cube = new BlockVector(width, height, length);
         
         List<Tag> tileEntitiesList = getChildTag(schematic, "TileEntities", ListTag.class).getValue();

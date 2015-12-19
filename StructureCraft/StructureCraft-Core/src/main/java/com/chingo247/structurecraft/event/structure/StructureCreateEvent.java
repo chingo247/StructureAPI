@@ -14,17 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.event;
+package com.chingo247.structurecraft.event.structure;
+
+import com.chingo247.structurecraft.model.structure.IStructure;
+
 
 /**
- * Fired when StructurePlans are being reloaded
+ * Fired when a structure was created
  * @author Chingo
  */
-public class StructurePlansReloadEvent {
+public class StructureCreateEvent extends StructureEvent {
 
-    public StructurePlansReloadEvent() {
+    public StructureCreateEvent(IStructure structure) {
+        super(structure);
     }
-    
-    
     
 }

@@ -5,7 +5,6 @@
  */
 package com.chingo247.structurecraft.event.structure;
 
-import com.chingo247.structurecraft.event.StructureEvent;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 

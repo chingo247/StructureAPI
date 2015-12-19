@@ -43,6 +43,12 @@ public interface IConstructionPlan {
     
     AsyncEditSession getEditSession();
     
+    /**
+     * Gets or creates a placement for a structure. 
+     * @param structure
+     * @return
+     * @throws Exception 
+     */
     IPlacement getPlacement(IStructure structure) throws Exception;
 
     UUID getPlayer();
