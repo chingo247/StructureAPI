@@ -16,17 +16,11 @@
  */
 package com.chingo247.structurecraft.construction.plan;
 
-import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionListener;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
-import com.chingo247.structurecraft.event.structure.construction.StructureConstructionCancelledEvent;
-import com.chingo247.structurecraft.event.structure.construction.StructureConstructionFailedEvent;
-import com.chingo247.structurecraft.event.structure.construction.StructureConstructionQueued;
-import com.chingo247.structurecraft.event.structure.construction.StructureProgressUpdateEvent;
-import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -51,6 +45,7 @@ public class BuildPlan extends ConstructionPlan {
         if (placement instanceof RotationalPlacement) {
             RotationalPlacement rt = (RotationalPlacement) placement;
             rt.rotate(structure.getDirection().getRotation());
+            System.out.println("ROTATED!");
         }
         return structure.getStructurePlan().getPlacement();
     }
@@ -82,15 +77,15 @@ public class BuildPlan extends ConstructionPlan {
             public void onStarted(IConstructionEntry newEntry) {
                 APlatform platform = StructureAPI.getInstance().getPlatform();
                 IColors colors = platform.getChatColors();
-                String message = colors.red()+ "BUILDING CANCELLED " + colors.reset() + getStructureString(structure);
-                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
+                String message = colors.yellow() + "BUILDING " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.BUILDING, false, message);
             }
 
             @Override
             public void onQueued(IConstructionEntry newEntry) {
                 APlatform platform = StructureAPI.getInstance().getPlatform();
                 IColors colors = platform.getChatColors();
-                String message = colors.yellow() + "BUILDING QUEUED " + colors.reset() + getStructureString(structure);
+                String message = colors.purple()+ "BUILDING QUEUED " + colors.reset() + getStructureString(structure);
                 handleEntry(newEntry, ConstructionStatus.QUEUED, false, message);
             }
 
@@ -109,7 +104,7 @@ public class BuildPlan extends ConstructionPlan {
                 APlatform platform = StructureAPI.getInstance().getPlatform();
                 IColors colors = platform.getChatColors();
                 String message = colors.red()+ "BUILDING FAILED " + colors.reset() + getStructureString(structure);
-                handleEntry(newEntry, ConstructionStatus.ON_HOLD, true, message);
+                handleEntry(newEntry, ConstructionStatus.ON_HOLD, false, message);
             }
         });
     }

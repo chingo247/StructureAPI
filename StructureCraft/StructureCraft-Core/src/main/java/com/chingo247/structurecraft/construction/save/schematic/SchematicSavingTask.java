@@ -134,8 +134,8 @@ class SchematicSavingTask extends StructureTask {
             Vector max = toSave.getMaximumPoint();
 
             for (int x = min.getBlockX(), relX = 0; x < max.getBlockX(); x++, relX++) {
-                for (int z = min.getBlockX(), relZ = 0; z < max.getBlockX(); z++, relZ++) {
-                    for (int y = min.getBlockX(), relY = 0; y < max.getBlockX(); y++, relY++) {
+                for (int z = min.getBlockZ(), relZ = 0; z < max.getBlockZ(); z++, relZ++) {
+                    for (int y = min.getBlockY(), relY = 0; y < max.getBlockY(); y++, relY++) {
                         Vector relativePosition = new BlockVector(relX, relY, relZ);
                         Vector worldPos = new BlockVector(x + pos.getBlockX(), y + pos.getBlockY(), z + pos.getBlockZ());
                         BaseBlock b = world.getBlock(worldPos);

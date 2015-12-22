@@ -16,17 +16,11 @@
  */
 package com.chingo247.structurecraft.construction.plan;
 
-import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionListener;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
-import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
-import com.chingo247.structurecraft.event.structure.construction.StructureConstructionCancelledEvent;
-import com.chingo247.structurecraft.event.structure.construction.StructureConstructionFailedEvent;
-import com.chingo247.structurecraft.event.structure.construction.StructureConstructionQueued;
-import com.chingo247.structurecraft.event.structure.construction.StructureProgressUpdateEvent;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.block.DemolishingPlacement;
@@ -66,7 +60,7 @@ public class DemolitionPlan extends ConstructionPlan {
                         colors.green() + "DEMOLITION COMPLETED " + colors.reset() + getStructureString(structure),
                         colors.red()+ "REMOVED " + colors.reset() + getStructureString(structure)
                 };
-                handleEntry(newEntry, ConstructionStatus.COMPLETED, false, message);
+                handleEntry(newEntry, ConstructionStatus.REMOVED, false, message);
             }
 
             @Override
@@ -81,15 +75,15 @@ public class DemolitionPlan extends ConstructionPlan {
             public void onStarted(IConstructionEntry newEntry) {
                 APlatform platform = StructureAPI.getInstance().getPlatform();
                 IColors colors = platform.getChatColors();
-                String message = colors.red()+ "DEMOLITION CANCELLED " + colors.reset() + getStructureString(structure);
-                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
+                String message = colors.yellow()+ "DEMOLISHING " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.DEMOLISHING, false, message);
             }
 
             @Override
             public void onQueued(IConstructionEntry newEntry) {
                 APlatform platform = StructureAPI.getInstance().getPlatform();
                 IColors colors = platform.getChatColors();
-                String message = colors.yellow() + "DEMOLITION QUEUED " + colors.reset() + getStructureString(structure);
+                String message = colors.purple() + "DEMOLITION QUEUED " + colors.reset() + getStructureString(structure);
                 handleEntry(newEntry, ConstructionStatus.QUEUED, false, message);
             }
 
@@ -99,7 +93,7 @@ public class DemolitionPlan extends ConstructionPlan {
                     APlatform platform = StructureAPI.getInstance().getPlatform();
                     IColors colors = platform.getChatColors();
                     String message = colors.yellow()+ "DEMOLISHING " + colors.reset() + newEntry.getProgress() + "% " + getStructureString(structure);
-                    handleEntry(newEntry, ConstructionStatus.BUILDING, true, message);
+                    handleEntry(newEntry, ConstructionStatus.DEMOLISHING, true, message);
                 }
             }
 
@@ -108,7 +102,7 @@ public class DemolitionPlan extends ConstructionPlan {
                 APlatform platform = StructureAPI.getInstance().getPlatform();
                 IColors colors = platform.getChatColors();
                 String message = colors.red()+ "DEMOLITION FAILED " + colors.reset() + getStructureString(structure);
-                handleEntry(newEntry, ConstructionStatus.ON_HOLD, true, message);
+                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
             }
         });
     }

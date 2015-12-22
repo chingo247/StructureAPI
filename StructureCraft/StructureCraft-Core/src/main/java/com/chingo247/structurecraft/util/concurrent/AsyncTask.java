@@ -17,6 +17,11 @@ public abstract class AsyncTask implements Runnable, ITask {
      * Logger.
      */
     private static final Logger LOG = Logger.getLogger(AsyncTask.class.getName());
+
+    public AsyncTask() {
+    }
+    
+    
     
     @Override
     public void run() {

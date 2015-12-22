@@ -79,7 +79,7 @@ public abstract class StructureTask {
     }
 
     public final void setFailed(boolean failed) {
-        this.failed = false;
+        this.failed = failed;
     }
 
     public final boolean hasFailed() {
