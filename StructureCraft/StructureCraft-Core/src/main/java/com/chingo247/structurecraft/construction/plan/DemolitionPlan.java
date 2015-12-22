@@ -22,16 +22,18 @@ import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.IConstructionListener;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
+import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
 import com.chingo247.structurecraft.event.structure.construction.StructureConstructionCancelledEvent;
 import com.chingo247.structurecraft.event.structure.construction.StructureConstructionFailedEvent;
 import com.chingo247.structurecraft.event.structure.construction.StructureConstructionQueued;
 import com.chingo247.structurecraft.event.structure.construction.StructureProgressUpdateEvent;
-import com.chingo247.structurecraft.event.structure.StructureStateChangeEvent;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.block.DemolishingPlacement;
 import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.util.RegionUtil;
+import com.chingo247.xplatform.core.APlatform;
+import com.chingo247.xplatform.core.IColors;
 
 /**
  *
@@ -42,7 +44,7 @@ public class DemolitionPlan extends ConstructionPlan {
     public DemolitionPlan(IConstructionExecutor executor, IStructure structure, ITaskAssigner assigner) {
         super(executor, structure, assigner);
     }
-    
+
     @Override
     public IPlacement getPlacement(IStructure structure) throws Exception {
         DemolishingPlacement placement = new DemolishingPlacement(RegionUtil.getSize(structure.getCuboidRegion()));
@@ -51,39 +53,64 @@ public class DemolitionPlan extends ConstructionPlan {
 
     @Override
     public void register(IConstructionEntry entry) throws Exception {
-         final IStructureAPI structureAPI = StructureAPI.getInstance();
+        final ProgressChecker checker = new ProgressChecker();
+        final double reportableProgress = getReportableProgress();
+        
         entry.addListener(new IConstructionListener() {
 
             @Override
-            public void onComplete(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.REMOVED));
+            public void onComplete(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String[] message = new String[] {
+                        colors.green() + "DEMOLITION COMPLETED " + colors.reset() + getStructureString(structure),
+                        colors.red()+ "REMOVED " + colors.reset() + getStructureString(structure)
+                };
+                handleEntry(newEntry, ConstructionStatus.COMPLETED, false, message);
             }
 
             @Override
-            public void onCancelled(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionCancelledEvent(entry.getStructure()));
+            public void onCancelled(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.red()+ "DEMOLITION CANCELLED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
             }
 
             @Override
-            public void onStarted(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.DEMOLISHING));
+            public void onStarted(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.red()+ "DEMOLITION CANCELLED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
             }
 
             @Override
-            public void onQueued(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+            public void onQueued(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.yellow() + "DEMOLITION QUEUED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.QUEUED, false, message);
             }
 
             @Override
-            public void onProgress(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.DEMOLISHING));
+            public void onProgress(IConstructionEntry newEntry) {
+                if (checker.checkProgress(newEntry.getProgress(), reportableProgress)) {                
+                    APlatform platform = StructureAPI.getInstance().getPlatform();
+                    IColors colors = platform.getChatColors();
+                    String message = colors.yellow()+ "DEMOLISHING " + colors.reset() + newEntry.getProgress() + "% " + getStructureString(structure);
+                    handleEntry(newEntry, ConstructionStatus.BUILDING, true, message);
+                }
             }
 
             @Override
-            public void onFailed(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionFailedEvent(entry.getStructure()));
+            public void onFailed(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.red()+ "DEMOLITION FAILED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.ON_HOLD, true, message);
             }
         });
     }
-    
+
 }

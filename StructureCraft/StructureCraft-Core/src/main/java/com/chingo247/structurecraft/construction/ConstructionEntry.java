@@ -41,6 +41,7 @@ public class ConstructionEntry implements IConstructionEntry {
     private IConstructionPlan plan;
     private int total = 0, done = 0;
     private List<IConstructionListener> listeners;
+    private boolean firstQueue = true, firstStarted = true;
 
     protected ConstructionEntry(IConstructionExecutor executor, IStructure structure, IConstructionPlan plan) {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
@@ -51,6 +52,14 @@ public class ConstructionEntry implements IConstructionEntry {
         this.listeners = Lists.newArrayList();
     }
 
+    @Override
+    public void update(IStructure structure) {
+        if(!structure.getId().equals(this.structure.getId())) {
+            throw new IllegalArgumentException("Structure id does not match with current structure!");
+        }
+        this.structure = structure;
+    }
+    
     @Override
     public IConstructionPlan getConstructionPlan() {
         return plan;
@@ -80,12 +89,11 @@ public class ConstructionEntry implements IConstructionEntry {
 
     @Override
     public double getProgress() {
-        if(done == 0 || total == 0) {
-            return 0; // Never divide by zero...
+        if (done == 0) {
+            return 0.0; // Never divide by zero...
         }
-        
-        double progress = ((double) (done / total)) * 100;
-        return progress;
+
+        return (double) ((done / total) * 100);
     }
 
     private boolean matchesAncestor(ConstructionEntry entry) {
@@ -110,8 +118,10 @@ public class ConstructionEntry implements IConstructionEntry {
         currentTask = null;
         listeners.clear();
         tasks.clear();
+        firstQueue = true;
+        firstStarted = true;
     }
-    
+
     @Override
     public void addListener(IConstructionListener listener) {
         this.listeners.add(listener);
@@ -119,9 +129,11 @@ public class ConstructionEntry implements IConstructionEntry {
 
     @Override
     public void proceed() {
-        
+
+        // If it was cancelled or has failed... abort all
         if (currentTask != null && (currentTask.hasFailed() || currentTask.isCancelled())) {
             purge();
+            clear();
             for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
                 IConstructionListener next = iterator.next();
                 if (currentTask.hasFailed()) {
@@ -130,7 +142,6 @@ public class ConstructionEntry implements IConstructionEntry {
                     next.onCancelled(this);
                 }
             }
-            
         } else {
 
             // If there already was a task... and proceed is called.
@@ -140,6 +151,7 @@ public class ConstructionEntry implements IConstructionEntry {
                 if (!currentTask.isFinished()) {
                     throw new RuntimeException("Proceed was called while current task hasn't finished yet!");
                 }
+
                 done++;
                 for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
                     IConstructionListener next = iterator.next();
@@ -154,9 +166,7 @@ public class ConstructionEntry implements IConstructionEntry {
                     IConstructionListener next = iterator.next();
                     next.onComplete(this);
                 }
-
-//            System.out.println("[ConstructionEntry]: Current task is null!");
-//            System.out.println("[ConstructionEntry]: Removing current task!");
+                clear();
                 constructionExecutor.remove(this);
                 if (nextEntry != null) {
 //                System.out.println("[ConstructionEntry]: Moving to next entry");
@@ -165,28 +175,32 @@ public class ConstructionEntry implements IConstructionEntry {
             } else {
 //            System.out.println("[ConstructionEntry]: Starting new task!");
                 tasks.poll();
-                
+
                 currentTask.addListener(new ITaskStartedListener() {
 
                     @Override
                     public void onStarted(StructureTask task) {
-                        for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
-                            IConstructionListener next = iterator.next();
-                            next.onStarted(ConstructionEntry.this);
+                        if (firstStarted) {
+                            firstStarted = false;
+                            for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
+                                IConstructionListener next = iterator.next();
+                                next.onStarted(ConstructionEntry.this);
+                            }
                         }
                     }
                 });
-                
+
                 currentTask.start();
-                for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
-                    IConstructionListener next = iterator.next();
-                    next.onQueued(this);
+                if (firstQueue) {
+                    firstQueue = false;
+                    for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
+                        IConstructionListener next = iterator.next();
+                        next.onQueued(this);
+                    }
                 }
             }
         }
     }
-    
-    
 
     /**
      * Stops running tasks, clears existing ones.
@@ -206,7 +220,7 @@ public class ConstructionEntry implements IConstructionEntry {
         }
 
         prevEntry = null;
-        clear();
+        
     }
 
     @Override

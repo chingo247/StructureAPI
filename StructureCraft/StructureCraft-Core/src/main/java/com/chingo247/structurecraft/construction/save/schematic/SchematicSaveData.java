@@ -48,7 +48,7 @@ public class SchematicSaveData {
 
     public SchematicSaveData(File file, CuboidRegion cube) {
         this.file = file;
-        Vector size = RegionUtil.getSize(cube).subtract(Vector.ONE);
+        Vector size = RegionUtil.getSize(cube);
         
         this.width = size.getBlockX();
         this.height = size.getBlockY();

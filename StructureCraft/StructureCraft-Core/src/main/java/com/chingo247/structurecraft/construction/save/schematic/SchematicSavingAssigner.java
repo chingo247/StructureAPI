@@ -87,14 +87,14 @@ public class SchematicSavingAssigner implements ITaskAssigner {
         }
         
         IBlockPlacement placement = (IBlockPlacement) constructionEntry.getConstructionPlan().getPlacement(structure);
-        CuboidRegion affectedArea = placement.getCuboidRegion();
+        CuboidRegion subarea = placement.getCuboidRegion();
         
         File rollback = structure.getRollbackData().getRollbackSchematic();
         SchematicSaveData safeBlockData = rollback.exists() ? 
-                SchematicSaveData.load(rollback) : new SchematicSaveData(rollback, affectedArea);
+                SchematicSaveData.load(rollback) : new SchematicSaveData(rollback, subarea);
 
         // Create place areas...
-        List<CuboidRegion> chunks = getChunkedAreas(affectedArea, CHUNK_SIZE);
+        List<CuboidRegion> chunks = getChunkedAreas(subarea, CHUNK_SIZE);
 
         for (CuboidRegion region : chunks) {
             constructionEntry.addTask(new SchematicSavingTask(constructionEntry, playerOrRandomUUID, region, session.getWorld(), safeBlockData));

@@ -39,8 +39,6 @@ public class AWETaskAssigner implements ITaskAssigner {
             );
         }
         
-        
-        
         AWEPlacementTask task = new AWEPlacementTask(
                         asyncWorldEdit,
                         constructionEntry,

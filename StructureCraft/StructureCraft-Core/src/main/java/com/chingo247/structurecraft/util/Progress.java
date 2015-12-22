@@ -5,9 +5,6 @@
  */
 package com.chingo247.structurecraft.util;
 
-import com.google.common.base.Preconditions;
-import java.text.DecimalFormat;
-
 /**
  *
  * @author Chingo
@@ -18,7 +15,6 @@ public class Progress implements IProgressable{
     
     private double total;
     private double count;
-    private boolean reportable = true;
 
     public Progress(double total, double count) {
         this.total = total;

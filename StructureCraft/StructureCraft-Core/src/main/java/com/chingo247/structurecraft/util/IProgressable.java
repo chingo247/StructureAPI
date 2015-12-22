@@ -15,6 +15,6 @@ public interface IProgressable {
      * Gets the current progress. Returns a value between 0 and 100
      * @return The progress
      */
-    double getProgress();
+    double getProgress();        
     
 }

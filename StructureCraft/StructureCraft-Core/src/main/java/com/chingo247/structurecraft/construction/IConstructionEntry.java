@@ -58,4 +58,11 @@ public interface IConstructionEntry extends IProgressable {
      */
     void purge();
     
+    /**
+     * Updates the entry with the given structure. Structure id must match current structure
+     * @param structure The structure
+     */
+    void update(IStructure structure);
+    
+    
 }

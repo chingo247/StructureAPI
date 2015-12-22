@@ -32,6 +32,8 @@ import com.chingo247.structurecraft.model.structure.ConstructionStatus;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
+import com.chingo247.xplatform.core.APlatform;
+import com.chingo247.xplatform.core.IColors;
 
 /**
  *
@@ -55,37 +57,59 @@ public class BuildPlan extends ConstructionPlan {
 
     @Override
     public void register(IConstructionEntry entry) throws Exception {
-        final IStructureAPI structureAPI = StructureAPI.getInstance();
+        final ProgressChecker checker = new ProgressChecker();
+        final double reportableProgress = getReportableProgress();
+        
         entry.addListener(new IConstructionListener() {
 
             @Override
-            public void onComplete(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.COMPLETED));
+            public void onComplete(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.green() + "BUILDING COMPLETED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.COMPLETED, false, message);
             }
 
             @Override
-            public void onCancelled(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionCancelledEvent(entry.getStructure()));
+            public void onCancelled(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.red()+ "BUILDING CANCELLED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
             }
 
             @Override
-            public void onStarted(IConstructionEntry entry) {                               
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.BUILDING));
+            public void onStarted(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.red()+ "BUILDING CANCELLED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
             }
 
             @Override
-            public void onQueued(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionQueued(entry.getStructure()));
+            public void onQueued(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.yellow() + "BUILDING QUEUED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.QUEUED, false, message);
             }
 
             @Override
-            public void onProgress(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureProgressUpdateEvent(entry.getStructure(), entry, ConstructionStatus.BUILDING));
+            public void onProgress(IConstructionEntry newEntry) {
+                if (checker.checkProgress(newEntry.getProgress(), reportableProgress)) {                
+                    APlatform platform = StructureAPI.getInstance().getPlatform();
+                    IColors colors = platform.getChatColors();
+                    String message = colors.yellow()+ "BUILDING " + colors.reset() + newEntry.getProgress() + "% " + getStructureString(structure);
+                    handleEntry(newEntry, ConstructionStatus.BUILDING, true, message);
+                }
             }
 
             @Override
-            public void onFailed(IConstructionEntry entry) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureConstructionFailedEvent(entry.getStructure()));
+            public void onFailed(IConstructionEntry newEntry) {
+                APlatform platform = StructureAPI.getInstance().getPlatform();
+                IColors colors = platform.getChatColors();
+                String message = colors.red()+ "BUILDING FAILED " + colors.reset() + getStructureString(structure);
+                handleEntry(newEntry, ConstructionStatus.ON_HOLD, true, message);
             }
         });
     }

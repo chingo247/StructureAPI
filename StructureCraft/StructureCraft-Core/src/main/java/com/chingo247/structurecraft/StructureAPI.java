@@ -24,6 +24,7 @@ import com.chingo247.menuapi.menu.MenuAPI;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IPlugin;
 import com.chingo247.settlercraft.core.SettlerCraft;
+import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.concurrent.ThreadPoolFactory;
 import com.chingo247.settlercraft.core.event.DefaultSubscriberExceptionHandler;
 import com.chingo247.settlercraft.core.event.EventDispatcher;
@@ -132,6 +133,7 @@ public class StructureAPI implements IStructureAPI {
         applyUpdates();
 
     }
+
 
     @Override
     public EventBus getAsyncEventBus() {
@@ -257,14 +259,9 @@ public class StructureAPI implements IStructureAPI {
             this.planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
             reload();
             
-
             this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
             this.structurePlacerFactory = new StructurePlacerFactory(this);
             this.constructionExecutor = new ConstructionExecutor(this, executor);
-            
-            IEconomyProvider economyProvider = SettlerCraft.getInstance().getEconomyProvider();
-            this.asyncEventBus.register(new StructureEventListener(economyProvider));
-            
             this.initialized = true;
         }
     }

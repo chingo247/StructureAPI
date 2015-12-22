@@ -18,6 +18,7 @@ package com.chingo247.structurecraft;
 
 import com.chingo247.structurecraft.exeption.StructureRestrictionException;
 import com.chingo247.menuapi.menu.CategoryMenu;
+import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.placement.block.SchematicPlacement;
