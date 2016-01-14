@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.plan;
+package com.chingo247.structurecraft.construction.actions;
 
 import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.IConstructionEntry;
-import com.chingo247.structurecraft.construction.IConstructionExecutor;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.StructureScheduler;
 import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
@@ -47,16 +45,18 @@ import java.util.logging.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
+import com.chingo247.structurecraft.construction.IContractor;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
  *
  * @author Chingo
  */
-public abstract class ConstructionPlan implements IConstructionPlan {
+public abstract class Construction implements IConstruction {
     
-    private static final Logger LOG = Logger.getLogger(ConstructionPlan.class.getName());
+    private static final Logger LOG = Logger.getLogger(Construction.class.getName());
     private double reportableProgress;
-    private final IConstructionExecutor executor;
+    private final IContractor executor;
     private final ITaskAssigner assigner;
     private boolean recursive, restrictive, reversed;
     private UUID player;
@@ -65,7 +65,7 @@ public abstract class ConstructionPlan implements IConstructionPlan {
     private boolean useForce;
     protected final IStructure structure;
     
-    public ConstructionPlan(IConstructionExecutor executor, IStructure structure, ITaskAssigner assigner) {
+    public Construction(IContractor executor, IStructure structure, ITaskAssigner assigner) {
         this.structure = structure;
         this.executor = executor;
         this.assigner = assigner;
@@ -89,19 +89,19 @@ public abstract class ConstructionPlan implements IConstructionPlan {
     @Override
     public abstract IPlacement getPlacement(IStructure structure) throws Exception;
     
-    public abstract void register(IConstructionEntry entry) throws Exception;
+    public abstract void register(IStructureEntry entry) throws Exception;
 
     @Override
     public boolean isForced() {
         return useForce;
     }
 
-    public ConstructionPlan setStructureTraversal(Traversal traversal) {
+    public Construction setStructureTraversal(Traversal traversal) {
         this.traveral = traversal;
         return this;
     }
 
-    public ConstructionPlan setForced(boolean useForce) {
+    public Construction setForced(boolean useForce) {
         this.useForce = useForce;
         return this;
     }
@@ -136,25 +136,25 @@ public abstract class ConstructionPlan implements IConstructionPlan {
     }
     
     
-    public ConstructionPlan setRestrictive(boolean restrictive) {
+    public Construction setRestrictive(boolean restrictive) {
         this.restrictive = restrictive;
         return this;
     }
 
     
-    public ConstructionPlan setRecursive(boolean recursive) {
+    public Construction setRecursive(boolean recursive) {
         this.recursive = recursive;
         return this;
     }
 
     
-    public ConstructionPlan setReversedOrder(boolean reversed) {
+    public Construction setReversedOrder(boolean reversed) {
         this.reversed = reversed;
         return this;
     }
 
     
-    public ConstructionPlan setPlayer(UUID player) {
+    public Construction setPlayer(UUID player) {
         this.player = player;
         return this;
     }
@@ -162,7 +162,7 @@ public abstract class ConstructionPlan implements IConstructionPlan {
     
 
     
-    public ConstructionPlan setEditsession(AsyncEditSession aes) {
+    public Construction setEditsession(AsyncEditSession aes) {
         this.editSession = aes;
         return this;
     }
@@ -178,7 +178,7 @@ public abstract class ConstructionPlan implements IConstructionPlan {
     }
     
     
-    protected void handleEntry(final IConstructionEntry entry, final ConstructionStatus newStatus, final boolean isProgressUpdate, final String... messages) {
+    protected void handleEntry(final IStructureEntry entry, final ConstructionStatus newStatus, final boolean isProgressUpdate, final String... messages) {
         StructureScheduler.getInstance().submit(entry.getStructure().getId(), new Runnable() {
             @Override
             public void run() {

@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskStartedListener;
 import com.chingo247.structurecraft.construction.StructurePlacingTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
@@ -30,6 +29,7 @@ import java.util.UUID;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
 import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
  * AWE Placement task, places a placement by using AsyncWorldEdit. Note this
@@ -60,7 +60,7 @@ public class AWEPlacementTask extends StructurePlacingTask {
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IConstructionEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IStructureEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
         super(connstructionEntry, playerOrRandomUUID);
         this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;
@@ -94,7 +94,6 @@ public class AWEPlacementTask extends StructurePlacingTask {
             @Override
             public void onJobAdded(AWEJobEntry job) {
                 setJobId(job.getJobId());
-//                System.out.println("Added task " + t.getUUID() + ", jobId: " + jobId);
                 AWEJobManager.getInstance().register(t);
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
             }

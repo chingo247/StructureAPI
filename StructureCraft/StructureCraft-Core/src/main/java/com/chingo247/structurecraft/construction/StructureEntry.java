@@ -16,8 +16,6 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.plan.ConstructionPlan;
-import com.chingo247.structurecraft.construction.plan.IConstructionPlan;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -25,29 +23,30 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import com.chingo247.structurecraft.construction.actions.IConstruction;
 
 /**
  *
  * @author Chingo
  */
-public class ConstructionEntry implements IConstructionEntry {
+public class StructureEntry implements IStructureEntry {
 
     private IStructure structure;
-    private IConstructionExecutor constructionExecutor;
-    private ConstructionEntry nextEntry;
-    private ConstructionEntry prevEntry;
+    private IContractor constractor;
+    private StructureEntry nextEntry;
+    private StructureEntry prevEntry;
     private StructureTask currentTask;
     private Queue<StructureTask> tasks;
-    private IConstructionPlan plan;
+    private IConstruction plan;
     private int total = 0, done = 0;
     private List<IConstructionListener> listeners;
     private boolean firstQueue = true, firstStarted = true;
 
-    protected ConstructionEntry(IConstructionExecutor executor, IStructure structure, IConstructionPlan plan) {
+    protected StructureEntry(IContractor constractor, IStructure structure, IConstruction plan) {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
         this.tasks = new LinkedList<>();
         this.structure = structure;
-        this.constructionExecutor = executor;
+        this.constractor = constractor;
         this.plan = plan;
         this.listeners = Lists.newArrayList();
     }
@@ -61,13 +60,13 @@ public class ConstructionEntry implements IConstructionEntry {
     }
     
     @Override
-    public IConstructionPlan getConstructionPlan() {
+    public IConstruction getConstructionDescription() {
         return plan;
     }
 
     @Override
-    public IConstructionExecutor getConstructionExecutor() {
-        return constructionExecutor;
+    public IContractor getConstructionExecutor() {
+        return constractor;
     }
 
     @Override
@@ -76,11 +75,11 @@ public class ConstructionEntry implements IConstructionEntry {
         total++;
     }
 
-    void setPrevEntry(ConstructionEntry entry) {
+    void setPrevEntry(StructureEntry entry) {
         this.prevEntry = entry;
     }
 
-    void setNextEntry(ConstructionEntry nextEntry) {
+    void setNextEntry(StructureEntry nextEntry) {
         Preconditions.checkArgument(!nextEntry.equals(this), "Next entry may not be equal the current entry");
         Preconditions.checkArgument(!matchesAncestor(nextEntry), "Entry may not be equal to any previous entries");
         this.nextEntry = nextEntry;
@@ -96,7 +95,7 @@ public class ConstructionEntry implements IConstructionEntry {
         return (double) ((done / total) * 100);
     }
 
-    private boolean matchesAncestor(ConstructionEntry entry) {
+    private boolean matchesAncestor(StructureEntry entry) {
         if (prevEntry == null) {
             return false;
         } else if (prevEntry.equals(entry)) {
@@ -167,13 +166,11 @@ public class ConstructionEntry implements IConstructionEntry {
                     next.onComplete(this);
                 }
                 clear();
-                constructionExecutor.remove(this);
+                constractor.remove(this);
                 if (nextEntry != null) {
-//                System.out.println("[ConstructionEntry]: Moving to next entry");
                     nextEntry.proceed();
                 }
             } else {
-//            System.out.println("[ConstructionEntry]: Starting new task!");
                 tasks.poll();
 
                 currentTask.addListener(new ITaskStartedListener() {
@@ -184,7 +181,7 @@ public class ConstructionEntry implements IConstructionEntry {
                             firstStarted = false;
                             for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
                                 IConstructionListener next = iterator.next();
-                                next.onStarted(ConstructionEntry.this);
+                                next.onStarted(StructureEntry.this);
                             }
                         }
                     }
@@ -207,9 +204,7 @@ public class ConstructionEntry implements IConstructionEntry {
      */
     @Override
     public void purge() {
-//        System.out.println("[ConstructionEntry]: PURGE TASK HERE");
         if (currentTask != null && !currentTask.isCancelled()) {
-//            System.out.println("[ConstructionEntry]: Not yet cancelled");
             currentTask.cancel();
 
         }

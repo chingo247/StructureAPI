@@ -17,8 +17,7 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.ConstructionEntry;
-import com.chingo247.structurecraft.construction.IConstructionEntry;
+import com.chingo247.structurecraft.construction.StructureEntry;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.google.common.collect.Maps;
@@ -31,6 +30,7 @@ import org.primesoft.asyncworldedit.AsyncWorldEditMain;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacerListener;
 import org.primesoft.asyncworldedit.blockPlacer.entries.JobEntry;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
  *
@@ -88,7 +88,7 @@ public class AWEJobManager {
         try {
             AWEPlacementTask task = tasks.get(taskUUID);
             if (task != null) {
-                IConstructionEntry entry = task.getConstructionEntry();
+                IStructureEntry entry = task.getConstructionEntry();
                 if(entry != null) {
                     IStructure structure = entry.getStructure();
                     return structure;

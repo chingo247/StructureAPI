@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.plan;
+package com.chingo247.structurecraft.construction.actions;
 
 import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.placement.options.Traversal;
@@ -16,28 +16,28 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  *
  * @author Chingo
  */
-public interface IConstructionPlan {
+public interface IConstruction {
     
     
     
-    IConstructionPlan setForced(boolean forced);
+    IConstruction setForced(boolean forced);
     
-    IConstructionPlan setStructureTraversal(Traversal traversal);
+    IConstruction setStructureTraversal(Traversal traversal);
     
     /**
      * If enabled, will check if the player has the right privileges to execute
      * @param restrictive
      * @return 
      */
-    IConstructionPlan setRestrictive(boolean restrictive);
+    IConstruction setRestrictive(boolean restrictive);
     
-    IConstructionPlan setRecursive(boolean recursive);
+    IConstruction setRecursive(boolean recursive);
     
-    IConstructionPlan setReversedOrder(boolean reversed);
+    IConstruction setReversedOrder(boolean reversed);
     
-    IConstructionPlan setPlayer(UUID player);
+    IConstruction setPlayer(UUID player);
     
-    IConstructionPlan setEditsession(AsyncEditSession aes);
+    IConstruction setEditsession(AsyncEditSession aes);
     
     void execute();
     

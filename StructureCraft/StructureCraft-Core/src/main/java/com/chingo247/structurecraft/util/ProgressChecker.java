@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.plan;
+package com.chingo247.structurecraft.util;
 
 import com.chingo247.structurecraft.util.IProgressable;
 

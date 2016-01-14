@@ -25,6 +25,6 @@ import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
  */
 public interface ITaskAssigner {
     
-    void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws Exception;
+    void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IStructureEntry constructionEntry) throws Exception;
     
 }

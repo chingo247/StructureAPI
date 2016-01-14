@@ -16,13 +16,14 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.plan.IConstructionPlanFactory;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.construction.plan.ConstructionPlan;
-import com.chingo247.structurecraft.construction.plan.ConstructionPlanFactory;
-import com.chingo247.structurecraft.construction.plan.IConstructionPlan;
+import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structurecraft.construction.awe.AWETaskAssigner;
+import com.chingo247.structurecraft.construction.actions.Build;
+import com.chingo247.structurecraft.construction.actions.Construction;
+import com.chingo247.structurecraft.construction.actions.Demolish;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -51,44 +52,81 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
+import com.chingo247.structurecraft.construction.actions.Rollback;
+import com.chingo247.structurecraft.construction.save.schematic.SchematicSavingAssigner;
+import com.chingo247.structurecraft.exeption.StructurePlanException;
+import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.placement.block.IBlockPlacement;
+import com.chingo247.structurecraft.construction.actions.IConstruction;
 
 /**
  *
  * @author Chingo
  */
-public class ConstructionExecutor implements IConstructionExecutor {
+public class Contractor implements IContractor {
 
-    private static final Logger LOG = Logger.getLogger(ConstructionExecutor.class.getName());
+    /**
+     * The Logger.
+     */
+    private static final Logger LOG = Logger.getLogger(Contractor.class.getName());
+    /**
+     * The console UUID, used for non-players
+     */
     private static final UUID CONSOLE = UUID.randomUUID();
-    private final IStructureAPI structureAPI;
+    /**
+     * The singleton instance
+     */
+    private static Contractor instance;
+    /**
+     * The mutex object for synchronisation
+     */
     private final Object entryMutex = new Object();
+    /**
+     * The StructureRepository for database operations
+     */
     private final IStructureRepository structureRepository;
-    private Map<Long, ConstructionEntry> entries;
+    /**
+     * The structure entries
+     */
+    private Map<Long, StructureEntry> entries;
+    /**
+     * The ThreadPool used to queue tasks for structures
+     */
     private KeyPool<Long> structurePool;
+    /**
+     * The ExecutorService
+     */
     private ExecutorService es;
-    private ConstructionPlanFactory planFactory;
 
-    public ConstructionExecutor(IStructureAPI structureAPI, ExecutorService es) {
+    /**
+     * Constructor.
+     */
+    private Contractor() {
+        this.es = StructureAPI.getInstance().getExecutor();
         this.structurePool = new KeyPool<>(es);
-        this.es = es;
-        this.structureAPI = structureAPI;
-        this.planFactory = new ConstructionPlanFactory(this);
         this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
         this.entries = Maps.newHashMap();
     }
 
-    ConstructionEntry getOrCreateEntry(IStructure structure, IConstructionPlan plan) {
+    public static Contractor getInstance() {
+        if (instance == null) {
+            instance = new Contractor();
+        }
+        return instance;
+    }
+
+    StructureEntry getOrCreateEntry(IStructure structure, IConstruction plan) {
         synchronized (entryMutex) {
-            ConstructionEntry entry = entries.get(structure.getId());
+            StructureEntry entry = entries.get(structure.getId());
             if (entry == null) {
-                entry = new ConstructionEntry(this, structure, plan);
+                entry = new StructureEntry(this, structure, plan);
                 entries.put(structure.getId(), entry);
             }
             return entry;
         }
     }
 
-    ConstructionEntry getEntry(IStructure structure) {
+    StructureEntry getEntry(IStructure structure) {
         synchronized (entryMutex) {
             return entries.get(structure.getId());
         }
@@ -109,12 +147,9 @@ public class ConstructionExecutor implements IConstructionExecutor {
     }
 
     @Override
-    public void execute(final ConstructionPlan plan) {
+    public void execute(final Construction plan) {
         final IStructure structure = plan.getStructure();
-//        System.out.println("plan structure: " + plan.getStructure());
-//        System.out.println("plan structure id: " + plan.getStructure().getId());
-
-        final APlatform platform = structureAPI.getPlatform();
+        final APlatform platform = StructureAPI.getInstance().getPlatform();
         final IColors colors = platform.getChatColors();
         final IPlayer player = plan.getPlayer() != null ? platform.getPlayer(plan.getPlayer()) : null;
         final UUID playerOrRandomUUID;
@@ -136,8 +171,8 @@ public class ConstructionExecutor implements IConstructionExecutor {
                 );
         Player ply = SettlerCraft.getInstance().getPlayer(playerOrRandomUUID);
         final AsyncEditSession editSession = plan.getEditSession() != null ? plan.getEditSession()
-                : (AsyncEditSession) (ply != null ? structureAPI.getSessionFactory().getEditSession(world, -1, ply)
-                        : structureAPI.getSessionFactory().getEditSession(world, -1));
+                : (AsyncEditSession) (ply != null ? StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1, ply)
+                        : StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1));
 
         es.execute(new Runnable() {
 
@@ -146,13 +181,12 @@ public class ConstructionExecutor implements IConstructionExecutor {
                 try {
 
                     // Get lock on root node
-                    final GraphDatabaseService graph = structureAPI.getGraphDatabase();
+                    final GraphDatabaseService graph = StructureAPI.getInstance().getGraphDatabase();
                     Transaction tx = null;
                     Long lockId = null;
                     try {
                         tx = graph.beginTx();
                         StructureNode structureNode = new StructureNode(structure.getUnderlyingNode());
-//                        System.out.println("Structure: " + structureNode);
                         StructureNode rootNode = structureNode.getRoot();
                         lockId = rootNode.getId();
                     } catch (Exception ex) {
@@ -200,7 +234,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                         for (Node sn : nodes) {
                                             structures.add(new Structure(sn));
                                         }
-                                        
+
                                         tx.success();
                                     } catch (Exception ex) {
                                         if (tx != null) {
@@ -220,21 +254,21 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                     if (structures != null) {
                                         // STOP ALL
                                         for (Structure s : structures) {
-                                            ConstructionEntry entry = getEntry(s);
+                                            StructureEntry entry = getEntry(s);
                                             if (entry != null) {
                                                 entry.purge();
                                             }
                                         }
 
-                                        IConstructionEntry startEntry = null;
+                                        IStructureEntry startEntry = null;
                                         if (plan.isRecursive()) {
-                                            ConstructionEntry prevEntry = null;
+                                            StructureEntry prevEntry = null;
                                             try {
                                                 for (Structure s : structures) {
-                                                    ConstructionEntry currentEntry = getOrCreateEntry(s, plan);
-                                                    
+                                                    StructureEntry currentEntry = getOrCreateEntry(s, plan);
+
                                                     plan.register(currentEntry);
-                                                    
+
                                                     if (startEntry == null) {
                                                         startEntry = currentEntry;
                                                     }
@@ -254,12 +288,12 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                                     sender.sendMessage("[StructureAPI]: An error occured... See console");
                                                 }
                                                 remove(structures); // Cleanup entries
-                                                Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
+                                                Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, null, ex);
                                             }
                                         } else {
-                                            IConstructionEntry entry = getOrCreateEntry(structure, plan);
+                                            IStructureEntry entry = getOrCreateEntry(structure, plan);
                                             plan.register(entry);
-                                            
+
                                             ITaskAssigner assigner = plan.getAssigner();
                                             try {
                                                 assigner.assignTasks(editSession, playerOrRandomUUID, entry);
@@ -271,7 +305,7 @@ public class ConstructionExecutor implements IConstructionExecutor {
                                             } catch (IOException ex) {
                                                 startEntry = null;
                                                 remove(entry.getStructure().getId());
-                                                Logger.getLogger(ConstructionExecutor.class.getName()).log(Level.SEVERE, null, ex);
+                                                Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, null, ex);
                                             }
                                         }
 
@@ -306,13 +340,64 @@ public class ConstructionExecutor implements IConstructionExecutor {
     }
 
     @Override
-    public void remove(IConstructionEntry entry) {
+    public void remove(IStructureEntry entry) {
         remove(entry.getStructure().getId());
     }
 
+    /**
+     * Checks if a structure supports construction
+     * @param structure The structure
+     * @return True if it supports construction
+     * @throws StructurePlanException May throw exception if the reading of the StructurePlan fails
+     */
     @Override
-    public IConstructionPlanFactory getConstructionPlanFactory() {
-        return planFactory;
+    public boolean supportsConstruction(IStructure structure) throws StructurePlanException  {
+        IPlacement placement = structure.getStructurePlan().getPlacement();
+        return (placement instanceof IBlockPlacement);
+    }
+
+    @Override
+    public IConstruction newRollbackPlan(IStructure structure) throws StructureException, Exception {
+        ITaskAssigner assigner = new AWETaskAssigner();
+        return new Rollback(this, structure, assigner);
+    }
+
+    @Override
+    public IConstruction newBuildPlan(IStructure structure) throws StructureException, StructurePlanException {
+        if (!supportsConstruction(structure)) {
+            throw new StructureException("Structure doesn't support build");
+        }
+
+        ITaskAssigner assigner = new AWETaskAssigner();
+        return new Build(this, structure, assigner);
+    }
+
+    @Override
+    public IConstruction newDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException {
+        if (!supportsConstruction(structure)) {
+            throw new StructureException("Structure doesn't support demolishment");
+        }
+        ITaskAssigner assigner = new AWETaskAssigner();
+        return new Demolish(this, structure, assigner);
+    }
+
+    @Override
+    public IConstruction newSaveBuildPlan(IStructure structure) throws StructureException, StructurePlanException {
+        if (!supportsConstruction(structure)) {
+            throw new StructureException("Structure doesn't support build");
+        }
+
+        ITaskAssigner assigner = new SchematicSavingAssigner();
+        return new Build(this, structure, assigner);
+    }
+
+    @Override
+    public IConstruction newSaveDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException {
+        if (!supportsConstruction(structure)) {
+            throw new StructureException("Structure doesn't support demolishment");
+        }
+        ITaskAssigner assigner = new SchematicSavingAssigner();
+        return new Demolish(this, structure, assigner);
     }
 
 }

@@ -16,7 +16,7 @@ public abstract class StructurePlacingTask extends StructureTask {
 
     private PlaceOptions options;
     
-    public StructurePlacingTask(IConstructionEntry constructionEntry, UUID submitter) {
+    public StructurePlacingTask(IStructureEntry constructionEntry, UUID submitter) {
         super(constructionEntry, submitter);
     }
 

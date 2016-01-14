@@ -20,6 +20,7 @@ import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.model.plot.Plot;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.exeption.StructurePlanException;
 import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.io.StructurePlanReader;
 import com.chingo247.structurecraft.util.WorldUtil;
@@ -241,10 +242,10 @@ public class Structure extends Plot implements IStructure {
     }
 
     @Override
-    public IStructurePlan getStructurePlan() throws StructureException {
+    public IStructurePlan getStructurePlan() throws StructurePlanException {
         File planFile = new File(getDirectory(), "structureplan.xml");
         if(!planFile.exists()) {
-            throw new StructureException("Structure #" + getId() + " doesn't have a plan!");
+            throw new StructurePlanException("Structure #" + getId() + " doesn't have a plan!");
         }
 
         StructurePlanReader reader = new StructurePlanReader();

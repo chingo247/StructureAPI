@@ -5,15 +5,15 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.plan.IConstructionPlan;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.util.IProgressable;
+import com.chingo247.structurecraft.construction.actions.IConstruction;
 
 /**
  *
  * @author Chingo
  */
-public interface IConstructionEntry extends IProgressable {
+public interface IStructureEntry extends IProgressable {
     
     /**
      * Adds a listener for this entry. The listener will be removed once all the tasks are finished
@@ -22,13 +22,13 @@ public interface IConstructionEntry extends IProgressable {
      */
     void addListener(IConstructionListener listener);
     
-    IConstructionPlan getConstructionPlan();
+    IConstruction getConstructionDescription();
     
     /**
      * Gets the construction executor.
      * @return The construction executor
      */
-    IConstructionExecutor getConstructionExecutor();
+    IContractor getConstructionExecutor();
     /**
      * Gets the structure.
      * @return The structure

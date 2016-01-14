@@ -18,12 +18,13 @@ package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
-import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.world.World;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -40,7 +41,9 @@ public class SchematicSavePlacement extends BlockPlacement implements IBlockPlac
     
     @Override
     public BaseBlock getBlock(Vector position) {
-        return schematicSaveData.getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        BaseBlock b =  schematicSaveData.getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        System.out.println("Pos: " + position + " b: " + b);
+        return b;
     }
 
     @Override

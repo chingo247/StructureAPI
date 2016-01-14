@@ -58,8 +58,8 @@ class SchematicSubPlacement extends BlockPlacement {
 
     @Override
     public final int getRotation() {
-        if(placement instanceof RotationalPlacement) {
-            return ((RotationalPlacement) placement).getRotation();
+        if(this.placement instanceof RotationalPlacement) {
+            return ((RotationalPlacement) this.placement).getRotation();
         }
         return 0;
     }

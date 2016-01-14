@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 ching
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,24 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.exeption;
 
 /**
  *
- * @author Chingo
+ * @author ching
  */
-public interface IConstructionListener {
+public class StructurePlanException extends PlayerReadableException {
 
-    void onStarted(IStructureEntry entry);
-
-    void onQueued(IStructureEntry entry);
-
-    void onComplete(IStructureEntry entry);
-
-    void onProgress(IStructureEntry entry);
-
-    void onCancelled(IStructureEntry entry);
+    public StructurePlanException(String playerMessage) {
+        super(playerMessage);
+    }
     
-    void onFailed(IStructureEntry entry);
+    public StructurePlanException(String playerMessage, Throwable throwable) {
+        super(playerMessage, playerMessage, throwable);
+    }
 
+    public StructurePlanException(String consoleMessage, String playerMessage, Throwable throwable) {
+        super(playerMessage, consoleMessage, throwable);
+    }
+
+    
+    
+    
+    
+    
 }

@@ -6,7 +6,6 @@
 package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.StructureTask;
 import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
 import com.chingo247.structurecraft.util.concurrent.AsyncLoad;
@@ -21,6 +20,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
  *
@@ -56,7 +56,7 @@ class SchematicSavingTask extends StructureTask {
      * @param safeBlockData The safe block data that will be used to save
      * @param callback
      */
-    public SchematicSavingTask(IConstructionEntry entry, UUID submitter, CuboidRegion toSave, World world, SchematicSaveData safeBlockData) {
+    public SchematicSavingTask(IStructureEntry entry, UUID submitter, CuboidRegion toSave, World world, SchematicSaveData safeBlockData) {
         super(entry, submitter);
         this.toSave = toSave;
         this.world = world;
@@ -65,7 +65,6 @@ class SchematicSavingTask extends StructureTask {
 
     @Override
     protected void execute() {
-        final ExecutorService executorService = StructureAPI.getInstance().getExecutor();
         final IStructureAPIPlugin plugin = StructureAPI.getInstance().getPlugin();
         final IScheduler scheduler = plugin.getScheduler();
         final Vector pos = getConstructionEntry().getStructure().getMin();
@@ -132,11 +131,13 @@ class SchematicSavingTask extends StructureTask {
             // Cube traverse this clipboard
             Vector min = toSave.getMinimumPoint();
             Vector max = toSave.getMaximumPoint();
+            
+            System.out.println("Min: " + min + " Max: " + max);
 
-            for (int x = min.getBlockX(), relX = 0; x < max.getBlockX(); x++, relX++) {
-                for (int z = min.getBlockZ(), relZ = 0; z < max.getBlockZ(); z++, relZ++) {
-                    for (int y = min.getBlockY(), relY = 0; y < max.getBlockY(); y++, relY++) {
-                        Vector relativePosition = new BlockVector(relX, relY, relZ);
+            for (int x = min.getBlockX(); x < max.getBlockX(); x++) {
+                for (int z = min.getBlockZ(); z < max.getBlockZ(); z++) {
+                    for (int y = min.getBlockY(); y < max.getBlockY(); y++) {
+                        Vector relativePosition = new BlockVector(x, y, z);
                         Vector worldPos = new BlockVector(x + pos.getBlockX(), y + pos.getBlockY(), z + pos.getBlockZ());
                         BaseBlock b = world.getBlock(worldPos);
                         safeBlockData.setBlock(relativePosition, b);

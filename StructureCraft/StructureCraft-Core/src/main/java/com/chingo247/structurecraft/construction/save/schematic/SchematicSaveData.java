@@ -48,7 +48,7 @@ public class SchematicSaveData {
 
     public SchematicSaveData(File file, CuboidRegion cube) {
         this.file = file;
-        Vector size = RegionUtil.getSize(cube);
+        Vector size = RegionUtil.getSize(cube).subtract(Vector.ONE);
         
         this.width = size.getBlockX();
         this.height = size.getBlockY();
@@ -137,6 +137,8 @@ public class SchematicSaveData {
      * @return True if block has been set, false if block was already set
      */
     public boolean setBlock(Vector vector, BaseBlock block) {
+        
+        
         int index = (vector.getBlockY() * width * length)
                 + vector.getBlockZ() * width + vector.getBlockX();
 
@@ -161,7 +163,7 @@ public class SchematicSaveData {
                         : addBlocks[index >> 1] & 0xF | ((block.getType() >> 8) & 0xF) << 4);
             }
 
-            this.done[index] = 1;
+            this.done[index] = (byte) 1;
             return true;
         }
         return false;
@@ -221,6 +223,7 @@ public class SchematicSaveData {
         byte[] addBlocks = schematic.containsKey("AddBlocks") ? getChildTag(schematic, "AddBlocks", ByteArrayTag.class).getValue() : new byte[0];
         return new SchematicSaveData(done, blockIds, data, addBlocks, tileEntities, cube, file);
     }
+    
     
     private static Map<Vector, Map<String, Tag>> getTileEntitiesMap(List<Tag> tileEntities) {
         Map<Vector, Map<String, Tag>> tileEntitiesMap

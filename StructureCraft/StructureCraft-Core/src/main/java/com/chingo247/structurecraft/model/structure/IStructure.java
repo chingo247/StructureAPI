@@ -18,10 +18,12 @@ package com.chingo247.structurecraft.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.exeption.StructurePlanException;
 import com.chingo247.structurecraft.model.plot.IPlot;
 import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.sk89q.worldedit.Vector;
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 /**
@@ -71,7 +73,7 @@ public interface IStructure extends IPlot {
      * @return The structure plan
      * @throws StructureException if structure doesnt have a plan
      */
-    IStructurePlan getStructurePlan() throws StructureException;
+    IStructurePlan getStructurePlan() throws StructurePlanException;
 
     File getDirectory();
     

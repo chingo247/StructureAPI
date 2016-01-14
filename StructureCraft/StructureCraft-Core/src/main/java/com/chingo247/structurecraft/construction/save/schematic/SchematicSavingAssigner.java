@@ -6,7 +6,6 @@
 package com.chingo247.structurecraft.construction.save.schematic;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.IConstructionEntry;
 import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -27,9 +26,12 @@ import java.util.List;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
- *
+ * Uses a schematic to save to save before the blocks are placed. 
+ * The areas are saved and placed in parts with a size of 16x16
+ * 
  * @author Chingo
  */
 public class SchematicSavingAssigner implements ITaskAssigner {
@@ -73,11 +75,11 @@ public class SchematicSavingAssigner implements ITaskAssigner {
     }
 
     @Override
-    public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IConstructionEntry constructionEntry) throws Exception {
+    public void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IStructureEntry constructionEntry) throws Exception {
         IStructure structure = constructionEntry.getStructure();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         
-        IPlacement structurePlacement = constructionEntry.getConstructionPlan().getPlacement(structure);
+        IPlacement structurePlacement = constructionEntry.getConstructionDescription().getPlacement(structure);
         if(!(structurePlacement instanceof IBlockPlacement)) {
             throw new UnsupportedPlacementException(
                     SchematicSavingAssigner.class.getName() 
@@ -86,21 +88,31 @@ public class SchematicSavingAssigner implements ITaskAssigner {
             );
         }
         
-        IBlockPlacement placement = (IBlockPlacement) constructionEntry.getConstructionPlan().getPlacement(structure);
+        IBlockPlacement placement = (IBlockPlacement) structurePlacement;
+        
         CuboidRegion placementArea = placement.getCuboidRegion();
         
         // Get or create rollback data
         File rollbackFile = structure.getRollbackData().getRollbackSchematic();
-        SchematicSaveData safeBlockData = rollbackFile.exists() ? 
-                SchematicSaveData.load(rollbackFile) : new SchematicSaveData(rollbackFile, placementArea);
-
+        SchematicSaveData safeBlockData;
+        if(rollbackFile.exists()) {
+            System.out.println("Using existing Schematic Save Data");
+            safeBlockData = SchematicSaveData.load(rollbackFile);
+        } else {
+            System.out.println("Creating new Schematic Save Data");
+            safeBlockData = new SchematicSaveData(rollbackFile, placementArea);
+        }
+        
+        System.out.println("Area: " + placementArea);
+        
         // Create place areas...
         List<CuboidRegion> chunks = getChunkedAreas(placementArea, CHUNK_SIZE);
 
-        for (CuboidRegion region : chunks) {
-            constructionEntry.addTask(new SchematicSavingTask(constructionEntry, playerOrRandomUUID, region, session.getWorld(), safeBlockData));
+        for (CuboidRegion subarea : chunks) {
+            System.out.println("Subarea: " + subarea);
+            constructionEntry.addTask(new SchematicSavingTask(constructionEntry, playerOrRandomUUID, subarea, session.getWorld(), safeBlockData));
             constructionEntry.addTask(new AWEPlacementTask(
-                    asyncWorldEdit, constructionEntry, new SchematicSubPlacement(placement, region), playerOrRandomUUID, session, structure.getMin())
+                    asyncWorldEdit, constructionEntry, new SchematicSubPlacement(placement, subarea), playerOrRandomUUID, session, structure.getMin())
             );
         }
     }

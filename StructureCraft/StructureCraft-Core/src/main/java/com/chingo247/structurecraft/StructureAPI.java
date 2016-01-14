@@ -35,8 +35,7 @@ import com.chingo247.structurecraft.menu.StructurePlanMenuReader;
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
-import com.chingo247.structurecraft.construction.ConstructionExecutor;
-import com.chingo247.structurecraft.construction.IConstructionExecutor;
+import com.chingo247.structurecraft.construction.Contractor;
 import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.event.structure.plan.StructurePlansLoadedEvent;
@@ -77,6 +76,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
+import com.chingo247.structurecraft.construction.IContractor;
 
 /**
  *
@@ -99,7 +99,7 @@ public class StructureAPI implements IStructureAPI {
     private final Set<StructureRestriction> restrictions;
     private IStructurePlacerFactory structurePlacerFactory;
     private IConstructionZonePlacerFactory constructionZonePlacerFactory;
-    private IConstructionExecutor constructionExecutor;
+    private IContractor constructionExecutor;
    
     private IStructureAPIPlugin plugin;
     private ConfigProvider config;
@@ -261,7 +261,7 @@ public class StructureAPI implements IStructureAPI {
             
             this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
             this.structurePlacerFactory = new StructurePlacerFactory(this);
-            this.constructionExecutor = new ConstructionExecutor(this, executor);
+            this.constructionExecutor = Contractor.getInstance();
             this.initialized = true;
         }
     }
@@ -306,7 +306,7 @@ public class StructureAPI implements IStructureAPI {
     }
 
     @Override
-    public IConstructionExecutor getConstructionExecutor() {
+    public IContractor getConstructionExecutor() {
         return constructionExecutor;
     }
 

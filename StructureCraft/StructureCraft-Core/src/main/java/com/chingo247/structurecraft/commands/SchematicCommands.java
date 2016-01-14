@@ -26,6 +26,7 @@ import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.exeption.StructurePlanException;
 import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.schematic.FastClipboard;
@@ -99,7 +100,7 @@ public class SchematicCommands {
         IStructurePlan plan = null;
         try {
             plan = structure.getStructurePlan();
-        } catch (StructureException ex) {
+        } catch (StructurePlanException ex) {
             throw new CommandException(ex);
         }
         IPlacement placement = plan.getPlacement();

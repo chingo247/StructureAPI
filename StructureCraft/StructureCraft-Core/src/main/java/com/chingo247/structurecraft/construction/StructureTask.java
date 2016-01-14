@@ -31,15 +31,15 @@ import java.util.UUID;
  */
 public abstract class StructureTask {
 
-    private IConstructionEntry constructionEntry;
+    private IStructureEntry structureEntry;
     private final UUID submitter, uuid;
     private boolean cancelled = false, failed = false, finished = false, started = false;
     private List<ITaskStartedListener> listeners;
 
-    public StructureTask(IConstructionEntry constructionEntry, UUID submitter) {
+    public StructureTask(IStructureEntry constructionEntry, UUID submitter) {
         Preconditions.checkNotNull(constructionEntry, "ConstructionEntry may not be null");
         Preconditions.checkNotNull(submitter, "Submitter may not be null");
-        this.constructionEntry = constructionEntry;
+        this.structureEntry = constructionEntry;
         this.uuid = UUID.randomUUID();
 //        this.callback = callback;
         this.submitter = submitter;
@@ -58,8 +58,8 @@ public abstract class StructureTask {
         return submitter;
     }
 
-    public final IConstructionEntry getConstructionEntry() {
-        return constructionEntry;
+    public final IStructureEntry getConstructionEntry() {
+        return structureEntry;
     }
 
     public final UUID getUUID() {
@@ -101,7 +101,7 @@ public abstract class StructureTask {
         if (!cancelled) {
             setCancelled(true);
             onCancel();
-            constructionEntry.getConstructionExecutor().remove(constructionEntry);
+            structureEntry.getConstructionExecutor().remove(structureEntry);
             finish();
         }
     }
@@ -120,7 +120,7 @@ public abstract class StructureTask {
                 StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskCompleteEvent(this));
             }
             listeners.clear();
-            constructionEntry.proceed();
+            structureEntry.proceed();
         }
     }
 

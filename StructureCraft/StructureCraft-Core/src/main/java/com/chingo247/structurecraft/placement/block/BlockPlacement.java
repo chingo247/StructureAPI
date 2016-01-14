@@ -69,6 +69,8 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
     @Override
     public void place(EditSession editSession, Vector pos, PlaceOptions option) {
         
+        System.out.println("Size: " + getSize());
+        
         Iterator<Vector> traversal = new CuboidIterator(
                 option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
                 option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
