@@ -14,18 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.event.task;
+package com.chingo247.structurecraft.construction.listener;
 
-import com.chingo247.structurecraft.construction.task.StructureTask;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
  *
  * @author Chingo
  */
-public class StructureTaskQueuedEvent extends StructureTaskEvent {
+public interface IConstructionListener {
 
-    public StructureTaskQueuedEvent(StructureTask task) {
-        super(task);
-    }
+    void onStarted(IStructureEntry entry);
+
+    void onQueued(IStructureEntry entry);
+
+    void onComplete(IStructureEntry entry);
+
+    void onProgress(IStructureEntry entry);
+
+    void onCancelled(IStructureEntry entry);
     
+    void onFailed(IStructureEntry entry);
+
 }

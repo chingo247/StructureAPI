@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,7 @@ package com.chingo247.structurecraft.construction;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
-import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.awe.AWETaskAssigner;
-import com.chingo247.structurecraft.construction.actions.Build;
-import com.chingo247.structurecraft.construction.actions.Construction;
-import com.chingo247.structurecraft.construction.actions.Demolish;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.RelTypes;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -39,7 +34,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.World;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,12 +46,6 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
-import com.chingo247.structurecraft.construction.actions.Rollback;
-import com.chingo247.structurecraft.construction.save.schematic.SchematicSavingAssigner;
-import com.chingo247.structurecraft.exeption.StructurePlanException;
-import com.chingo247.structurecraft.placement.IPlacement;
-import com.chingo247.structurecraft.placement.block.IBlockPlacement;
-import com.chingo247.structurecraft.construction.actions.IConstruction;
 
 /**
  *
@@ -68,7 +56,7 @@ public class Contractor implements IContractor {
     /**
      * The Logger.
      */
-    private static final Logger LOG = Logger.getLogger(Contractor.class.getName());
+    private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(Contractor.class.getName());
     /**
      * The console UUID, used for non-players
      */
@@ -99,7 +87,7 @@ public class Contractor implements IContractor {
     private ExecutorService es;
 
     /**
-     * Constructor.
+     * Private Constructor.
      */
     private Contractor() {
         this.es = StructureAPI.getInstance().getExecutor();
@@ -115,7 +103,7 @@ public class Contractor implements IContractor {
         return instance;
     }
 
-    StructureEntry getOrCreateEntry(IStructure structure, IConstruction plan) {
+    private StructureEntry getOrCreateEntry(IStructure structure, IContract plan) {
         synchronized (entryMutex) {
             StructureEntry entry = entries.get(structure.getId());
             if (entry == null) {
@@ -126,32 +114,22 @@ public class Contractor implements IContractor {
         }
     }
 
-    StructureEntry getEntry(IStructure structure) {
+    private StructureEntry getEntry(IStructure structure) {
         synchronized (entryMutex) {
             return entries.get(structure.getId());
         }
     }
 
-    void remove(Iterable<? extends IStructure> structures) {
-        synchronized (entryMutex) {
-            for (IStructure structure : structures) {
-                entries.remove(structure.getId());
-            }
-        }
-    }
-
-    void remove(long id) {
-        synchronized (entryMutex) {
-            entries.remove(id);
-        }
-    }
-
+    /**
+     * Submits a contract for execution
+     *
+     * @param contract
+     */
     @Override
-    public void execute(final Construction plan) {
-        final IStructure structure = plan.getStructure();
+    public void submit(final IStructure structure, final IContract constract) {
         final APlatform platform = StructureAPI.getInstance().getPlatform();
         final IColors colors = platform.getChatColors();
-        final IPlayer player = plan.getPlayer() != null ? platform.getPlayer(plan.getPlayer()) : null;
+        final IPlayer player = constract.getPlayer() != null ? platform.getPlayer(constract.getPlayer()) : null;
         final UUID playerOrRandomUUID;
         final ICommandSender sender;
 
@@ -170,7 +148,7 @@ public class Contractor implements IContractor {
                         structure.getWorldName()
                 );
         Player ply = SettlerCraft.getInstance().getPlayer(playerOrRandomUUID);
-        final AsyncEditSession editSession = plan.getEditSession() != null ? plan.getEditSession()
+        final AsyncEditSession editSession = constract.getEditSession() != null ? constract.getEditSession()
                 : (AsyncEditSession) (ply != null ? StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1, ply)
                         : StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1));
 
@@ -222,7 +200,7 @@ public class Contractor implements IContractor {
                                                 .relationships(RelTypes.SUBSTRUCTURE_OF, Direction.INCOMING)
                                                 .breadthFirst();
 
-                                        if (plan.isReversed()) {
+                                        if (constract.isReversed()) {
                                             traversal = traversal.reverse();
                                         }
 
@@ -261,18 +239,21 @@ public class Contractor implements IContractor {
                                         }
 
                                         IStructureEntry startEntry = null;
-                                        if (plan.isRecursive()) {
+                                        if (constract.isRecursive()) {
                                             StructureEntry prevEntry = null;
                                             try {
                                                 for (Structure s : structures) {
-                                                    StructureEntry currentEntry = getOrCreateEntry(s, plan);
+                                                    StructureEntry currentEntry = getOrCreateEntry(s, constract);
 
-                                                    plan.register(currentEntry);
-
+//                                                    constract.registerListeners(currentEntry);
                                                     if (startEntry == null) {
                                                         startEntry = currentEntry;
                                                     }
-                                                    plan.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry);
+//                                                    constract.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry);
+                                                    
+                                                    constract.apply(currentEntry);
+                                                    
+                                                    
                                                     if (prevEntry != null) {
                                                         prevEntry.setNextEntry(currentEntry);
                                                     }
@@ -282,30 +263,30 @@ public class Contractor implements IContractor {
                                                 startEntry = null;
                                                 remove(structures);
                                                 sender.sendMessage(ex.getMessage());
-                                            } catch (IOException ex) {
+                                            } catch (Exception ex) {
                                                 startEntry = null;
                                                 if (player != null) {
                                                     sender.sendMessage("[StructureAPI]: An error occured... See console");
                                                 }
                                                 remove(structures); // Cleanup entries
-                                                Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, null, ex);
+                                                Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                                             }
                                         } else {
-                                            IStructureEntry entry = getOrCreateEntry(structure, plan);
-                                            plan.register(entry);
+                                            IStructureEntry entry = getOrCreateEntry(structure, constract);
+//                                            constract.registerListeners(entry);
 
-                                            ITaskAssigner assigner = plan.getAssigner();
+                                           
                                             try {
-                                                assigner.assignTasks(editSession, playerOrRandomUUID, entry);
+                                                constract.apply(entry);
                                                 startEntry = entry;
                                             } catch (StructureException ex) {
                                                 startEntry = null;
                                                 sender.sendMessage(ex.getMessage());
                                                 remove(entry.getStructure().getId());
-                                            } catch (IOException ex) {
+                                            } catch (Exception ex) {
                                                 startEntry = null;
                                                 remove(entry.getStructure().getId());
-                                                Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, null, ex);
+                                                Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                                             }
                                         }
 
@@ -323,20 +304,28 @@ public class Contractor implements IContractor {
                             }
 
                         });
+
                     }
                 } catch (Exception ex) {
-                    if (player != null) {
-                        player.sendMessage(colors.red() + "[StructureAPI]: An error occured... see console");
-                    }
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }
+
             }
         });
     }
 
-    @Override
-    public void purge(IStructure structure) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void remove(Iterable<? extends IStructure> structures) {
+        synchronized (entryMutex) {
+            for (IStructure structure : structures) {
+                entries.remove(structure.getId());
+            }
+        }
+    }
+
+    private void remove(long id) {
+        synchronized (entryMutex) {
+            entries.remove(id);
+        }
     }
 
     @Override
@@ -344,60 +333,9 @@ public class Contractor implements IContractor {
         remove(entry.getStructure().getId());
     }
 
-    /**
-     * Checks if a structure supports construction
-     * @param structure The structure
-     * @return True if it supports construction
-     * @throws StructurePlanException May throw exception if the reading of the StructurePlan fails
-     */
     @Override
-    public boolean supportsConstruction(IStructure structure) throws StructurePlanException  {
-        IPlacement placement = structure.getStructurePlan().getPlacement();
-        return (placement instanceof IBlockPlacement);
-    }
-
-    @Override
-    public IConstruction newRollbackPlan(IStructure structure) throws StructureException, Exception {
-        ITaskAssigner assigner = new AWETaskAssigner();
-        return new Rollback(this, structure, assigner);
-    }
-
-    @Override
-    public IConstruction newBuildPlan(IStructure structure) throws StructureException, StructurePlanException {
-        if (!supportsConstruction(structure)) {
-            throw new StructureException("Structure doesn't support build");
-        }
-
-        ITaskAssigner assigner = new AWETaskAssigner();
-        return new Build(this, structure, assigner);
-    }
-
-    @Override
-    public IConstruction newDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException {
-        if (!supportsConstruction(structure)) {
-            throw new StructureException("Structure doesn't support demolishment");
-        }
-        ITaskAssigner assigner = new AWETaskAssigner();
-        return new Demolish(this, structure, assigner);
-    }
-
-    @Override
-    public IConstruction newSaveBuildPlan(IStructure structure) throws StructureException, StructurePlanException {
-        if (!supportsConstruction(structure)) {
-            throw new StructureException("Structure doesn't support build");
-        }
-
-        ITaskAssigner assigner = new SchematicSavingAssigner();
-        return new Build(this, structure, assigner);
-    }
-
-    @Override
-    public IConstruction newSaveDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException {
-        if (!supportsConstruction(structure)) {
-            throw new StructureException("Structure doesn't support demolishment");
-        }
-        ITaskAssigner assigner = new SchematicSavingAssigner();
-        return new Demolish(this, structure, assigner);
+    public void purge(IStructure structure) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

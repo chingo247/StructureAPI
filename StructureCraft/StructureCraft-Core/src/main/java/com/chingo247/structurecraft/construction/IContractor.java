@@ -16,40 +16,28 @@
  */
 package com.chingo247.structurecraft.construction;
 
-import com.chingo247.structurecraft.construction.actions.Construction;
-import com.chingo247.structurecraft.construction.actions.IConstruction;
-import com.chingo247.structurecraft.exeption.StructureException;
-import com.chingo247.structurecraft.exeption.StructurePlanException;
 import com.chingo247.structurecraft.model.structure.IStructure;
 
 /**
  *
- * @author ching
+ * @author chingo
  */
 public interface IContractor {
 
-    void execute(final Construction plan);
+    void submit(final IStructure structure, final IContract contract);
 
-    IConstruction newBuildPlan(IStructure structure) throws StructureException, StructurePlanException;
-
-    IConstruction newDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException;
-
-    IConstruction newRollbackPlan(IStructure structure) throws StructureException, Exception;
-
-    IConstruction newSaveBuildPlan(IStructure structure) throws StructureException, StructurePlanException;
-
-    IConstruction newSaveDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException;
+//    IConstruction newBuildPlan(IStructure structure) throws StructureException, StructurePlanException;
+//
+//    IConstruction newDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException;
+//
+//    IConstruction newRollbackPlan(IStructure structure) throws StructureException, Exception;
+//
+//    IConstruction newSaveBuildPlan(IStructure structure) throws StructureException, StructurePlanException;
+//
+//    IConstruction newSaveDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException;
 
     void purge(IStructure structure);
 
     void remove(IStructureEntry entry);
 
-    /**
-     * Checks if a structure supports construction
-     * @param structure The structure
-     * @return True if it supports construction
-     * @throws StructurePlanException May throw exception if the reading of the StructurePlan fails
-     */
-    boolean supportsConstruction(IStructure structure) throws StructurePlanException;
-    
 }

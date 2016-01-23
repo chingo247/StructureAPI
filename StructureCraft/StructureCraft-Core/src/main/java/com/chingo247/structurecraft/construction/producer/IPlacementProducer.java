@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 ching
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,24 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.producer;
+
+import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.placement.IPlacement;
 
 /**
  *
- * @author Chingo
+ * @author ching
  */
-public interface IConstructionListener {
-
-    void onStarted(IStructureEntry entry);
-
-    void onQueued(IStructureEntry entry);
-
-    void onComplete(IStructureEntry entry);
-
-    void onProgress(IStructureEntry entry);
-
-    void onCancelled(IStructureEntry entry);
+public interface IPlacementProducer<T extends IPlacement> {
+     
+    T produce(IStructure structure) throws StructureException;
     
-    void onFailed(IStructureEntry entry);
-
 }

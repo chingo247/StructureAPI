@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.save.schematic;
+package com.chingo247.structurecraft.construction.contract.safe;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.StructureTask;
+import com.chingo247.structurecraft.construction.task.StructureTask;
 import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
 import com.chingo247.structurecraft.util.concurrent.AsyncLoad;
 import com.chingo247.structurecraft.util.concurrent.AsyncTask;
@@ -18,20 +18,17 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import com.chingo247.structurecraft.construction.IStructureEntry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Chingo
  */
 class SchematicSavingTask extends StructureTask {
-
-    /**
-     * Logger.
-     */
-    private static final Logger LOG = Logger.getLogger(SchematicSavingTask.class.getName());
+    
+    private static final Logger LOG = LoggerFactory.getLogger(SchematicSavingTask.class);
 
     /**
      * The region that needs to be saved.
@@ -86,7 +83,7 @@ class SchematicSavingTask extends StructureTask {
                         } catch (Exception e) {
                             setFailed(true);
                             safeBlockData = null;
-                            LOG.log(Level.SEVERE, e.getMessage(), e);
+                            LOG.error(e.getMessage(), e);
                         } finally {
                             finish();
                         }
@@ -140,6 +137,9 @@ class SchematicSavingTask extends StructureTask {
                         Vector relativePosition = new BlockVector(x, y, z);
                         Vector worldPos = new BlockVector(x + pos.getBlockX(), y + pos.getBlockY(), z + pos.getBlockZ());
                         BaseBlock b = world.getBlock(worldPos);
+                        
+                        LOG.info("WorldPos: " + worldPos + ", RelPos: " + relativePosition);
+                        
                         safeBlockData.setBlock(relativePosition, b);
                     }
                 }

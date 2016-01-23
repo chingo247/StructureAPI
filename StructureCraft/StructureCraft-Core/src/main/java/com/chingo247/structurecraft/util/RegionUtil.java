@@ -16,10 +16,16 @@
  */
 package com.chingo247.structurecraft.util;
 
+import com.google.common.collect.Lists;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  *
@@ -27,6 +33,7 @@ import java.util.Comparator;
  */
 public class RegionUtil {
 
+    private static final int CHUNK_SIZE = 16;
     
     public static final Comparator<Vector2D> ORDERED_XZ = new Comparator<Vector2D>() {
 
@@ -81,4 +88,46 @@ public class RegionUtil {
         return region.getMaximumPoint().subtract(region.getMinimumPoint()).add(Vector.ONE);
     }
 
+    public static Collection<CuboidRegion> getChunkCubes(CuboidRegion area, int chunkSize) {
+        return getChunkCubes(area, chunkSize, null);
+    }
+    
+    public static Collection<CuboidRegion> getChunkCubes(CuboidRegion area, int chunkSize, Comparator<Vector2D> sorter) {
+        List<CuboidRegion> subareas = Lists.newArrayList();
+        Vector min = area.getMinimumPoint();
+
+        List<Vector2D> chunks = new ArrayList<>(area.getChunks());
+        if(sorter != null) {
+            Collections.sort(chunks, sorter);
+        }
+
+        Vector areaMin = Vector.ZERO;
+        Vector areaMax = RegionUtil.getSize(area).subtract(Vector.ONE);
+
+        for (Vector2D v : chunks) {
+            Vector minRel = new BlockVector(v.getBlockX() * CHUNK_SIZE, 0, v.getBlockZ() * CHUNK_SIZE).subtract(min).setY(0);
+            Vector maxRel = minRel.add(chunkSize, area.getMaximumY() - area.getMinimumY(), chunkSize);
+
+//            // Fit min positions
+            if (!area.contains(minRel)) {
+                minRel = minRel
+                        .setX(minRel.getBlockX() < areaMin.getBlockX() ? areaMin.getBlockX() : minRel.getBlockX())
+                        .setZ(minRel.getBlockZ() < areaMin.getBlockZ() ? areaMin.getBlockZ() : minRel.getBlockZ());
+            }
+//            
+//            // Fit max positions
+            if (!area.contains(maxRel)) {
+                maxRel = maxRel
+                        .setX(maxRel.getBlockX() > areaMax.getBlockX() ? areaMax.getBlockX() : maxRel.getBlockX())
+                        .setZ(maxRel.getBlockZ() > areaMax.getBlockZ() ? areaMax.getBlockZ() : maxRel.getBlockZ());
+
+            }
+
+            CuboidRegion subarea = new CuboidRegion(minRel, maxRel);
+            subareas.add(subarea);
+        }
+        return subareas;
+    }
+    
+    
 }

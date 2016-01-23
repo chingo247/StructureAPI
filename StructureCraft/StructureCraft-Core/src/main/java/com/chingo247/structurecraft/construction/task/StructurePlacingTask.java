@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.task;
 
+import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import java.util.UUID;
 

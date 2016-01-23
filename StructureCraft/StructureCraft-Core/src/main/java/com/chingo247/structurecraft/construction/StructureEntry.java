@@ -16,41 +16,57 @@
  */
 package com.chingo247.structurecraft.construction;
 
+import com.chingo247.structurecraft.construction.listener.IConstructionListener;
+import com.chingo247.structurecraft.construction.task.ITaskStartedListener;
+import com.chingo247.structurecraft.construction.task.StructureTask;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.util.ProgressChecker;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import com.chingo247.structurecraft.construction.actions.IConstruction;
 
 /**
  *
  * @author Chingo
  */
 public class StructureEntry implements IStructureEntry {
-
+    
     private IStructure structure;
     private IContractor constractor;
     private StructureEntry nextEntry;
     private StructureEntry prevEntry;
     private StructureTask currentTask;
     private Queue<StructureTask> tasks;
-    private IConstruction plan;
+    private IContract contract;
     private int total = 0, done = 0;
     private List<IConstructionListener> listeners;
+    private double reportableProgress;
     private boolean firstQueue = true, firstStarted = true;
+    private ProgressChecker checker;
 
-    protected StructureEntry(IContractor constractor, IStructure structure, IConstruction plan) {
+    protected StructureEntry(IContractor constractor, IStructure structure, IContract contract) {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
         this.tasks = new LinkedList<>();
         this.structure = structure;
         this.constractor = constractor;
-        this.plan = plan;
+        this.contract = contract;
         this.listeners = Lists.newArrayList();
+        this.reportableProgress = 5.0;
     }
 
+    public void setReportableProgress(double reportableProgress) {
+        Preconditions.checkArgument(reportableProgress >= 0, "reportableProgress must be greater or equal to 0");
+        Preconditions.checkArgument(reportableProgress <= 100, "reportableProgress must be smaller or equal to 100");
+        this.reportableProgress = reportableProgress;
+    }
+
+    public double getReportableProgress() {
+        return reportableProgress;
+    }
+    
     @Override
     public void update(IStructure structure) {
         if(!structure.getId().equals(this.structure.getId())) {
@@ -60,8 +76,8 @@ public class StructureEntry implements IStructureEntry {
     }
     
     @Override
-    public IConstruction getConstructionDescription() {
-        return plan;
+    public IContract getContract() {
+        return contract;
     }
 
     @Override
@@ -226,6 +242,11 @@ public class StructureEntry implements IStructureEntry {
     @Override
     public int numTasks() {
         return tasks.size();
+    }
+
+    @Override
+    public boolean hasProgress() {
+        return (checker.checkProgress((done / total) * 100, reportableProgress));
     }
 
 }

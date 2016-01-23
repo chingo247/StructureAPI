@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.structurecraft.construction.save.schematic;
+package com.chingo247.structurecraft.construction.contract.safe;
 
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.google.common.collect.Lists;
@@ -31,12 +31,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Chingo
  */
 public class SchematicSaveData {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(SchematicSaveData.class);
 
     private byte[] done;
     private byte[] blockIds;
@@ -139,10 +143,11 @@ public class SchematicSaveData {
     public boolean setBlock(Vector vector, BaseBlock block) {
         
         
-        int index = (vector.getBlockY() * width * length)
-                + vector.getBlockZ() * width + vector.getBlockX();
+        int index =  vector.getBlockY() * width * length + vector.getBlockZ() * width + vector.getBlockX();
 
         if (this.done[index] == 0) {
+            LOG.info("Saving: " + vector);
+            
             this.data[index] = (byte) block.getData();
             this.blockIds[index] = (byte) block.getType();
 

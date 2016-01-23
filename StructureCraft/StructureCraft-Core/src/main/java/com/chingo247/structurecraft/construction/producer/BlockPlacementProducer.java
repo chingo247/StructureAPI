@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,17 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.producer;
 
-import java.util.UUID;
-import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
+import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 
 /**
  *
  * @author Chingo
  */
-public interface ITaskAssigner {
+public abstract class BlockPlacementProducer implements IPlacementProducer<IBlockPlacement> {
     
-    void assignTasks(AsyncEditSession session, UUID playerOrRandomUUID, IStructureEntry constructionEntry) throws Exception;
+    protected void checkIsBlockPlacement(IPlacement placement) throws StructureException {
+        if( !(placement instanceof IBlockPlacement)) {
+            throw new StructureException("Placement is not a block placement");
+        }
+    }
     
 }

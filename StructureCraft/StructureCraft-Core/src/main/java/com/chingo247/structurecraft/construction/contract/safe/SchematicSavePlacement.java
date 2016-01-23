@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.save.schematic;
+package com.chingo247.structurecraft.construction.contract.safe;
 
 import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
@@ -22,9 +22,8 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.World;
-import org.bukkit.Sound;
-import org.bukkit.entity.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -32,7 +31,9 @@ import org.bukkit.entity.Player;
  */
 public class SchematicSavePlacement extends BlockPlacement implements IBlockPlacement {
     
-    private SchematicSaveData schematicSaveData;
+    private Logger LOG = LoggerFactory.getLogger(SchematicSavePlacement.class);
+    
+    private final SchematicSaveData schematicSaveData;
 
     public SchematicSavePlacement(SchematicSaveData saveData) {
         super(saveData.getWidth(), saveData.getHeight(), saveData.getLength());
@@ -41,8 +42,8 @@ public class SchematicSavePlacement extends BlockPlacement implements IBlockPlac
     
     @Override
     public BaseBlock getBlock(Vector position) {
+        LOG.info("GetBlock: " + position);
         BaseBlock b =  schematicSaveData.getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
-        System.out.println("Pos: " + position + " b: " + b);
         return b;
     }
 

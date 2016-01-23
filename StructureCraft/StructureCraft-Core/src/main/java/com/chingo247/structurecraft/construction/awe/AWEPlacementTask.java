@@ -17,8 +17,8 @@
 package com.chingo247.structurecraft.construction.awe;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.ITaskStartedListener;
-import com.chingo247.structurecraft.construction.StructurePlacingTask;
+import com.chingo247.structurecraft.construction.task.ITaskStartedListener;
+import com.chingo247.structurecraft.construction.task.StructurePlacingTask;
 import com.chingo247.structurecraft.event.task.StructureTaskStartEvent;
 import com.chingo247.structurecraft.event.async.StructureJobAddedEvent;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;

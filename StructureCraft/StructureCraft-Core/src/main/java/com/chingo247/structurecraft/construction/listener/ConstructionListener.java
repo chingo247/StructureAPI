@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,170 +14,40 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.actions;
+package com.chingo247.structurecraft.construction.listener;
 
 import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.ITaskAssigner;
 import com.chingo247.structurecraft.StructureScheduler;
+import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.model.owner.OwnerDomainNode;
 import com.chingo247.structurecraft.model.owner.OwnerType;
 import com.chingo247.structurecraft.model.owner.Ownership;
 import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
-import com.chingo247.structurecraft.placement.options.Traversal;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
-import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.IPlayer;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
-import com.chingo247.structurecraft.construction.IContractor;
-import com.chingo247.structurecraft.construction.IStructureEntry;
 
 /**
  *
  * @author Chingo
  */
-public abstract class Construction implements IConstruction {
-    
-    private static final Logger LOG = Logger.getLogger(Construction.class.getName());
-    private double reportableProgress;
-    private final IContractor executor;
-    private final ITaskAssigner assigner;
-    private boolean recursive, restrictive, reversed;
-    private UUID player;
-    private AsyncEditSession editSession;
-    private Traversal traveral;
-    private boolean useForce;
-    protected final IStructure structure;
-    
-    public Construction(IContractor executor, IStructure structure, ITaskAssigner assigner) {
-        this.structure = structure;
-        this.executor = executor;
-        this.assigner = assigner;
-        this.reportableProgress = 10.0;
-    }
+public abstract class ConstructionListener implements com.chingo247.structurecraft.construction.listener.IConstructionListener {
 
-    /**
-     * Set the progress that will be reported. Value must be greater than 0 and smaller or equal to 100
-     * @param reportableProgress The min progress that has to be made before it gets reported to the player
-     */
-    public void setReportableProgress(double reportableProgress) {
-        Preconditions.checkArgument(reportableProgress > 0, "Reportableprogress must be greater than zero");
-        Preconditions.checkArgument(reportableProgress <= 100, "Reportableprogress must be smaller thatn 100");
-        this.reportableProgress = reportableProgress;
-    }
+    private static final Logger LOG = Logger.getLogger(ConstructionListener.class.getName());
 
-    public double getReportableProgress() {
-        return reportableProgress;
-    }
-    
-    @Override
-    public abstract IPlacement getPlacement(IStructure structure) throws Exception;
-    
-    public abstract void register(IStructureEntry entry) throws Exception;
-
-    @Override
-    public boolean isForced() {
-        return useForce;
-    }
-
-    public Construction setStructureTraversal(Traversal traversal) {
-        this.traveral = traversal;
-        return this;
-    }
-
-    public Construction setForced(boolean useForce) {
-        this.useForce = useForce;
-        return this;
-    }
-    
-    public ITaskAssigner getAssigner() {
-        return assigner;
-    }
-
-    public AsyncEditSession getEditSession() {
-        return editSession;
-    }
-
-    public UUID getPlayer() {
-        return player;
-    }
-
-    public IStructure getStructure() {
-        return structure;
-    }
-    
-    public boolean isRecursive() {
-        return recursive;
-    }
-
-    public boolean isRestrictive() {
-        return restrictive;
-    }
-
-    
-    public boolean isReversed() {
-        return reversed;
-    }
-    
-    
-    public Construction setRestrictive(boolean restrictive) {
-        this.restrictive = restrictive;
-        return this;
-    }
-
-    
-    public Construction setRecursive(boolean recursive) {
-        this.recursive = recursive;
-        return this;
-    }
-
-    
-    public Construction setReversedOrder(boolean reversed) {
-        this.reversed = reversed;
-        return this;
-    }
-
-    
-    public Construction setPlayer(UUID player) {
-        this.player = player;
-        return this;
-    }
-    
-    
-
-    
-    public Construction setEditsession(AsyncEditSession aes) {
-        this.editSession = aes;
-        return this;
-    }
-    
-    
-    public void execute() {
-        executor.execute(this);
-    }
-
-    
-    public Traversal getStructureTraversal() {
-        return traveral;
-    }
-    
-    
     protected void handleEntry(final IStructureEntry entry, final ConstructionStatus newStatus, final boolean isProgressUpdate, final String... messages) {
         StructureScheduler.getInstance().submit(entry.getStructure().getId(), new Runnable() {
             @Override
@@ -197,7 +67,7 @@ public abstract class Construction implements IConstruction {
                         }
                         Structure structure = new Structure(structureNode);
                         entry.update(structure);
-                        
+
                         tx.success();
                     } catch (Exception ex) {
                         if (tx != null) {
@@ -210,7 +80,7 @@ public abstract class Construction implements IConstruction {
                         }
                     }
                     boolean shouldTell = (oldStatus != newStatus) || isProgressUpdate;
-                    
+
                     if (shouldTell) {
                         // Tell the starter
                         for (IPlayer p : owners) {
@@ -267,6 +137,4 @@ public abstract class Construction implements IConstruction {
         return "#" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
     }
 
-    
-    
 }

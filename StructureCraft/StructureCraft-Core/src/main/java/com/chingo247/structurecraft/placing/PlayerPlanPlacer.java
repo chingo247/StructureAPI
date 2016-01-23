@@ -23,6 +23,8 @@ import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.construction.contract.BuildContract;
+import com.chingo247.structurecraft.construction.contract.safe.SafeContract;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.getPlanID;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.getValue;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.isStructurePlan;
@@ -194,11 +196,14 @@ public class PlayerPlanPlacer {
                                 // start construction
                                 IStructure structure = placeResult.getPlacedStructure();
                                 if (!structureAPI.isQueueLocked(player.getUniqueId())) {
-                                    structureAPI.getConstructionExecutor()
-                                            .newSaveBuildPlan(structure)
-                                            .setRecursive(true)
+                                    BuildContract buildContract = new BuildContract();
+                                    SafeContract safeContract = new SafeContract(buildContract);
+                                    safeContract.setRecursive(true)
                                             .setPlayer(playerUUID)
-                                            .execute();
+                                            .setRestrictive(true)
+                                            .setRecursive(true);
+                                    structureAPI.getConstructionExecutor().submit(structure, safeContract);
+                                    
                                 } else {
                                     player.sendMessage(color.red() + "Your AWE queue is locked at the moment, try '/stt:build " + structure.getId() + "' when your queue is unlocked");
                                 }

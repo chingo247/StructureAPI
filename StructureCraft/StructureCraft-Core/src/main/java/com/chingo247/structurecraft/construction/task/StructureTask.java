@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction;
+package com.chingo247.structurecraft.construction.task;
 
+import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.event.task.StructureTaskCancelledEvent;
 import com.chingo247.structurecraft.event.task.StructureTaskCompleteEvent;

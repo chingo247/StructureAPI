@@ -34,6 +34,10 @@ import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.construction.contract.BuildContract;
+import com.chingo247.structurecraft.construction.contract.DemolitionContract;
+import com.chingo247.structurecraft.construction.contract.RollbackContract;
+import com.chingo247.structurecraft.construction.contract.safe.SafeContract;
 import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.platform.permission.Permissions;
 import com.chingo247.xplatform.core.IColors;
@@ -281,13 +285,14 @@ public class StructureCommands {
 
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
-        structureAPI.getConstructionExecutor()
-                .newSaveBuildPlan(structure)
-                .setRecursive(true)
+        
+        BuildContract buildContract = new BuildContract();
+        SafeContract safeContract = new SafeContract(buildContract);
+        safeContract.setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
-                .setPlayer(uuid)
-                .execute();
+                .setPlayer(uuid);
+        structureAPI.getConstructionExecutor().submit(structure, safeContract);
     }
     
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
@@ -328,13 +333,16 @@ public class StructureCommands {
         
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
-        structureAPI.getConstructionExecutor()
-                .newRollbackPlan(structure)
-                .setRecursive(true)
+        
+        DemolitionContract demolitionContract =  new DemolitionContract();
+        SafeContract safeContract = new SafeContract(demolitionContract);
+        safeContract.setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
-                .setPlayer(uuid)
-                .execute();
+                .setReversedOrder(true)
+                .setPlayer(uuid);
+        structureAPI.getConstructionExecutor().submit(structure, safeContract);
+        
     }
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
@@ -378,15 +386,14 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        // Start demolition
-        structureAPI.getConstructionExecutor()
-                .newSaveDemolitionPlan(structure)
-                .setRecursive(true)
+        RollbackContract rollbackContract =  new RollbackContract();
+        SafeContract safeContract = new SafeContract(rollbackContract);
+        safeContract.setRecursive(true)
                 .setRestrictive(true)
-                .setReversedOrder(true)
                 .setForced(useForce)
-                .setPlayer(uuid)
-                .execute();
+                .setReversedOrder(true)
+                .setPlayer(uuid);
+        structureAPI.getConstructionExecutor().submit(structure, safeContract);
 
     }
     
