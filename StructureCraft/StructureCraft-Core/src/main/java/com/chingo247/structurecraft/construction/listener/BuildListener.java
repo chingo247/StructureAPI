@@ -30,8 +30,6 @@ public class BuildListener extends ConstructionListener {
 
     public BuildListener() {
     }
-    
-    
 
     @Override
     public void onComplete(IStructureEntry structureEntry) {

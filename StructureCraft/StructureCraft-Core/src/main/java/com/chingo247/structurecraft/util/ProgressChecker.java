@@ -16,8 +16,6 @@
  */
 package com.chingo247.structurecraft.util;
 
-import com.chingo247.structurecraft.util.IProgressable;
-
 /**
  *
  * @author Chingo

@@ -34,6 +34,7 @@ import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
 import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.construction.IContract;
 import com.chingo247.structurecraft.construction.contract.BuildContract;
 import com.chingo247.structurecraft.construction.contract.DemolitionContract;
 import com.chingo247.structurecraft.construction.contract.RollbackContract;
@@ -334,14 +335,13 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
         
-        DemolitionContract demolitionContract =  new DemolitionContract();
-        SafeContract safeContract = new SafeContract(demolitionContract);
-        safeContract.setRecursive(true)
+        IContract rollbackContract =  new RollbackContract()
+                .setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, safeContract);
+        structureAPI.getConstructionExecutor().submit(structure, rollbackContract);
         
     }
 

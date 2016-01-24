@@ -17,7 +17,6 @@ package com.chingo247.structurecraft.bukkit;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.xplatform.core.IPlugin;
 import com.chingo247.settlercraft.core.exception.SettlerCraftException;
 import com.chingo247.structurecraft.bukkit.listener.PlanListener;
 import com.chingo247.settlercraft.core.platforms.bukkit.BKPermissionRegistry;
@@ -49,7 +48,6 @@ import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import com.sk89q.worldedit.command.SchematicCommands;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
@@ -69,17 +67,12 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
 
     public static final Level LOG_LEVEL = Level.SEVERE;
     public static final String MSG_PREFIX = "[SettlerCraft]: ";
-    private static final String BLOCKS_HUB = "BlocksHub";
-    
-    private static final Logger LOGGER = Logger.getLogger(BKStructureAPIPlugin.class.getName());
     
     private IEconomyProvider economyProvider;
     private ConfigProvider configProvider;
     private static BKStructureAPIPlugin instance;
     private GraphDatabaseService graph;
     private PluginCommandManager commands;
-    private int maxThreadsForLogger = 2;
-    private ExecutorService loggerPool;
 
     @Override
     public void onEnable() {
@@ -224,9 +217,6 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
     @Override
     public void onDisable() {
         super.onDisable(); //To change body of generated methods, choose Tools | Templates.
-        if(loggerPool != null) {
-            loggerPool.shutdown();
-        }
     }
     
     

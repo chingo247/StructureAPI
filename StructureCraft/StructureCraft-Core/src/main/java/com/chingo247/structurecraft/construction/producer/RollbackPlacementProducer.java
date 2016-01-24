@@ -16,8 +16,8 @@
  */
 package com.chingo247.structurecraft.construction.producer;
 
-import com.chingo247.structurecraft.construction.contract.safe.SchematicSaveData;
-import com.chingo247.structurecraft.construction.contract.safe.SchematicSavePlacement;
+import com.chingo247.structurecraft.construction.contract.safe.schematic.IOSchematicSafeData;
+import com.chingo247.structurecraft.construction.contract.safe.schematic.SchematicSafeData;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
@@ -33,16 +33,15 @@ public class RollbackPlacementProducer extends BlockPlacementProducer {
     @Override
     public IBlockPlacement produce(IStructure structure) throws StructureException {
         File rollbackSchematic = structure.getRollbackData().getRollbackSchematic();
-        if(!rollbackSchematic.exists()) {
+        if (!rollbackSchematic.exists()) {
             throw new StructureException("Structure doesn't have a rollback schematic");
         }
-        SchematicSaveData schematicSaveData;
         try {
-            schematicSaveData = SchematicSaveData.load(rollbackSchematic);
+            SchematicSafeData safeData = IOSchematicSafeData.read(rollbackSchematic);
+            return safeData;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-        return new SchematicSavePlacement(schematicSaveData);
     }
-    
+
 }

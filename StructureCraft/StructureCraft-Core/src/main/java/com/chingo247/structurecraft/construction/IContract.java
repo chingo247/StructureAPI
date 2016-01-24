@@ -20,6 +20,7 @@ import com.chingo247.structurecraft.construction.listener.ConstructionListener;
 import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.placement.options.Traversal;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
@@ -55,6 +56,10 @@ public interface IContract {
     boolean isReversed();
 
     boolean isForced();
+    
+    PlaceOptions getPlaceOptions();
+    
+    IContract setPlaceOptions(PlaceOptions options);
 
     Traversal getStructureTraversal();
     

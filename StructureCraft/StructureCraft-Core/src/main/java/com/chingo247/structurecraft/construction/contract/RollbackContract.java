@@ -21,7 +21,6 @@ import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.construction.IStructureEntry;
-import static com.chingo247.structurecraft.construction.contract.BuildContract.BUILD_PRODUCER;
 import com.chingo247.structurecraft.construction.listener.ConstructionListener;
 import com.chingo247.structurecraft.construction.listener.RollbackListener;
 import com.chingo247.structurecraft.construction.producer.BlockPlacementProducer;

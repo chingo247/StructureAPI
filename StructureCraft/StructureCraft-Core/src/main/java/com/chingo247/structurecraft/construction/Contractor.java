@@ -151,6 +151,7 @@ public class Contractor implements IContractor {
         final AsyncEditSession editSession = constract.getEditSession() != null ? constract.getEditSession()
                 : (AsyncEditSession) (ply != null ? StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1, ply)
                         : StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1));
+        constract.setEditsession(editSession);
 
         es.execute(new Runnable() {
 

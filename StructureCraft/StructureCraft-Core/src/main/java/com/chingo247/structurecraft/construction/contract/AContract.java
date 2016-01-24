@@ -53,8 +53,9 @@ public abstract class AContract implements IContract {
         return useForce;
     }
     
-    public void setPlaceOptions(PlaceOptions placeOptions) {
+    public IContract setPlaceOptions(PlaceOptions placeOptions) {
         this.placeOptions = placeOptions;
+        return this;
     }
     
     public PlaceOptions getPlaceOptions() {

@@ -16,13 +16,21 @@
  */
 package com.chingo247.structurecraft.construction.contract;
 
+import com.chingo247.structurecraft.IStructureAPI;
+import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IStructureEntry;
+import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
+import static com.chingo247.structurecraft.construction.contract.BuildContract.BUILD_PRODUCER;
 import com.chingo247.structurecraft.construction.listener.DemolitionListener;
 import com.chingo247.structurecraft.construction.producer.BlockPlacementProducer;
 import com.chingo247.structurecraft.construction.producer.DemolitionPlacementProducer;
 import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
+import com.chingo247.structurecraft.placement.options.PlaceOptions;
+import com.sk89q.worldedit.Vector;
+import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**
  *
@@ -46,7 +54,21 @@ public class DemolitionContract extends AContract {
     
     @Override
     public void apply(IStructureEntry entry) throws StructureException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        IStructureAPI structureAPI = StructureAPI.getInstance();
+        IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
+        Vector position = entry.getStructure().getMin(); // Always place from the min position... 
+        IPlacement placement = DEMOLITION_PRODUCER.produce(entry.getStructure());                
+        AWEPlacementTask task = new AWEPlacementTask(
+                        asyncWorldEdit,
+                        entry,
+                        placement,
+                        getPlayer(),
+                        getEditSession(),
+                        position
+                );
+        task.setOptions(new PlaceOptions());        
+        entry.addListener(DEMOLITION_LISTENER);        
+        entry.addTask(task);
     }
 
 }

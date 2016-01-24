@@ -53,15 +53,15 @@ public class AWEPlacementTask extends StructurePlacingTask {
      * Constructor.
      *
      * @param callback
-     * @param connstructionEntry The constructionEntry
+     * @param structureEntry The constructionEntry
      * @param placement The placement
      * @param playerOrRandomUUID A player or random UUID used to track the process. Jobs will be queued on this specific UUID.
      * @param editSession The editsession
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IStructureEntry connstructionEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
-        super(connstructionEntry, playerOrRandomUUID);
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IStructureEntry structureEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
+        super(structureEntry, playerOrRandomUUID);
         this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;
         this.placement = placement;

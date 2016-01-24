@@ -55,6 +55,7 @@ public class StructureEntry implements IStructureEntry {
         this.contract = contract;
         this.listeners = Lists.newArrayList();
         this.reportableProgress = 5.0;
+        this.checker = new ProgressChecker();
     }
 
     public void setReportableProgress(double reportableProgress) {

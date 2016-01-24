@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,77 +14,78 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.chingo247.structurecraft.construction.contract.safe;
 
-package com.chingo247.structurecraft.placement.block;
-
-import com.chingo247.structurecraft.placement.AbstractPlacement;
+import com.chingo247.settlercraft.core.Direction;
+import com.chingo247.structurecraft.construction.StructureEntry;
+import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.StructureBlock;
-import static com.chingo247.settlercraft.core.Direction.EAST;
-import static com.chingo247.settlercraft.core.Direction.NORTH;
-import static com.chingo247.settlercraft.core.Direction.SOUTH;
-import static com.chingo247.settlercraft.core.Direction.WEST;
-import com.chingo247.structurecraft.util.iterator.CuboidIterator;
+import com.chingo247.structurecraft.placement.block.BlockPlacement;
+import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.BlockMask;
 import com.chingo247.structurecraft.placement.options.BlockPredicate;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.WorldUtil;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  *
  * @author Chingo
  */
-public abstract class BlockPlacement extends AbstractPlacement implements IBlockPlacement {
+class SafePlacement extends BlockPlacement {
 
-    protected static final int PRIORITY_REDSTONE = 5;
-    protected static final int PRIORITY_FIRST = 4;
-    protected static final int PRIORITY_LIQUID = 3;
-    protected static final int PRIORITY_LATER = 2;
-    protected static final int PRIORITY_FINAL = 1;
+    private Iterator<Vector> traversal;
+    private int maxBlocks;
+    private IBlockPlacement placement;
+    private Queue<StructureBlock> placeLater;
+    private final Direction d;
+    private boolean last = false;
+    private StructureEntry entry;
 
-    protected final int BLOCK_BETWEEN;
-    protected final int MAX_PLACE_LATER_TO_PLACE = 10;
+    public SafePlacement( IBlockPlacement blockPlacement, Iterator<Vector> traversal, int maxBlocks, PriorityQueue<StructureBlock> placeLater) {
+        super(blockPlacement.getWidth(), blockPlacement.getHeight(), blockPlacement.getLength());
 
-    public BlockPlacement(int width, int height, int length) {
-        super(width, height, length);
-        this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.001)));
+        this.maxBlocks = maxBlocks;
+        this.traversal = traversal;
+        this.placement = blockPlacement;
+        this.placeLater = placeLater;
+        if (placement instanceof RotationalPlacement) {
+            d = WorldUtil.getDirection(((RotationalPlacement) placement).getRotation());
+        } else {
+            d = Direction.EAST; // Default
+        }
     }
 
-    public BlockPlacement(int rotation, Vector relativePosition, int width, int height, int length) {
-        super(rotation, relativePosition, width, height, length);
-        this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.01)));
+    public boolean isLast() {
+        return last;
+    }
+    
+    public void setLast(boolean last) {
+        this.last = last;
     }
 
-    public final int numBlocks() {
-        return getWidth() * getHeight() * getLength();
+    @Override
+    public BaseBlock getBlock(Vector position) {
+        return placement.getBlock(position);
     }
 
     @Override
     public void place(EditSession editSession, Vector pos, PlaceOptions option) {
-        
-//        System.out.println("Size: " + getSize());
-        
-        Iterator<Vector> traversal = new CuboidIterator(
-                option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
-                option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
-                option.getCubeZ() <= 0 ? getSize().getBlockZ() : option.getCubeZ()
-        ).iterate(getSize());
-        
-        
-        PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
 
         int placeLaterPlaced = 0;
         int placeLaterPause = 0;
+        int count = 0;
 
+//        System.out.println(" ");
+//        System.out.println(" SAFE PLACEMENT");
         // Cube traverse this clipboard
-        while (traversal.hasNext()) {
+        while (traversal.hasNext() && count < maxBlocks) {
             Vector v = traversal.next();
             BaseBlock clipboardBlock = getBlock(v);
 
@@ -112,8 +113,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
                     doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
 
                     placeLaterPlaced++;
-                    
-                    
+
                     if (plb.getPriority() == PRIORITY_LIQUID || BlockType.emitsLight(plb.getBlock().getId())) {
                         placeLaterPlaced++;
                     }
@@ -124,60 +124,25 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
                     }
                 }
             }
-
-        }
-        // Empty the queue
-        while (placeLater.peek() != null) {
-            StructureBlock plb = placeLater.poll();
-            doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
+            count++;
         }
         
-    }
-
-    protected int getPriority(BaseBlock block) {
-        if (isWater(block) || isLava(block)) {
-            return PRIORITY_LIQUID;
-        }
+//        System.out.println(" ");
         
-        if (BlockType.shouldPlaceLast(block.getId()) || BlockType.emitsLight(block.getId())) {
-            return PRIORITY_LATER;
+        if(isLast()) {
+            // Empty the queue
+            while (placeLater.peek() != null) {
+                StructureBlock plb = placeLater.poll();
+                doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
+            }
         }
-
-        if (BlockType.shouldPlaceFinal(block.getId())) {
-            return PRIORITY_FINAL;
-        }
-
-        return PRIORITY_FIRST;
-
-    }
-
-    protected boolean isLava(BaseBlock b) {
-        int bi = b.getType();
-        if (bi == BlockID.LAVA || bi == BlockID.STATIONARY_LAVA) {
-            return true;
-        }
-        return false;
-    }
-
-    protected boolean isWater(BaseBlock b) {
-        int bi = b.getType();
-        if (bi == BlockID.WATER || bi == BlockID.STATIONARY_WATER) {
-            return true;
-        }
-        return false;
     }
 
     @Override
-    public abstract BaseBlock getBlock(Vector position);
-    
-    public BaseBlock getBlock(int x, int y, int z) {
-        return getBlock(new BlockVector(x, y, z));
-    }
-
     protected void doBlock(EditSession editSession, Vector position, Vector blockPosition, BaseBlock block, PlaceOptions option) {
         Vector p;
-        
-        switch (WorldUtil.getDirection(getRotation())) {
+
+        switch (d) {
             case EAST:
                 p = position.add(blockPosition);
                 break;
@@ -197,6 +162,8 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
             default:
                 throw new AssertionError("unreachable");
         }
+        
+//        System.out.println("PlacePos: " + p +  ", rel: " + blockPosition);
 
         for (BlockPredicate bp : option.getIgnore()) {
             if (bp.evaluate(blockPosition, p, block)) {
@@ -210,6 +177,5 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
 
         editSession.rawSetBlock(p, block);
     }
-    
 
 }
