@@ -17,9 +17,7 @@
 package com.chingo247.structurecraft.construction.contract.safe.schematic;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.block.BlockPlacement;
-import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.google.common.collect.Maps;
@@ -42,6 +40,7 @@ public class SchematicSafeData extends BlockPlacement {
 
     private static final Logger LOG = Logger.getLogger(SchematicSafeData.class.getName());
 
+    private byte[] blockLight;
     private byte[] done;
     private byte[] ids;
     private byte[] data;
@@ -54,6 +53,7 @@ public class SchematicSafeData extends BlockPlacement {
         super(width, height, length);
         int blocks = width * height * length;
 
+        this.blockLight = new byte[blocks];
         this.done = new byte[blocks];
         this.ids = new byte[blocks];
         this.data = new byte[blocks];
@@ -150,7 +150,7 @@ public class SchematicSafeData extends BlockPlacement {
      */
     public boolean setBlock(Vector vector, BaseBlock block) {
         int index = (vector.getBlockY() * width * length) + (vector.getBlockZ() * width) + vector.getBlockX();
-
+        
         if (this.done[index] == 0) {
             this.data[index] = (byte) block.getData();
             this.ids[index] = (byte) block.getType();
@@ -162,6 +162,9 @@ public class SchematicSafeData extends BlockPlacement {
                     this.tileEntities.put(vector, map);
                 }
             }
+            
+            
+            
 
             if (block.getType() > 255) {
                 if (addId == null) { // Lazily create section
@@ -183,28 +186,28 @@ public class SchematicSafeData extends BlockPlacement {
         return getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
-    @Override
-    public void place(EditSession session, Vector pos, PlaceOptions option) {
-        try {
-
-            for (int x = 0; x < width; x++) {
-                for (int z = 0; z < length; z++) {
-                    for (int y = 0; y < height; y++) {
-                        BaseBlock b = getBlock(x, y, z);
-
-//                        System.out.println("rollback-block: " + b + ", pos: " + pos.add(x, y, z));
-
-                        if (b != null) {
-                            session.rawSetBlock(pos.add(x, y, z), b);
-                        }
-                    }
-                }
-            }
-//            System.out.println("Width: " + width + ", Height: " + height + ", Length: " + length);
-        } catch (Exception ex) {
-            LOG.log(Level.SEVERE, ex.getMessage(), ex);
-        }
-    }
+//    @Override
+//    public void place(EditSession session, Vector pos, PlaceOptions option) {
+//        try {
+//
+//            for (int x = 0; x < width; x++) {
+//                for (int z = 0; z < length; z++) {
+//                    for (int y = 0; y < height; y++) {
+//                        BaseBlock b = getBlock(x, y, z);
+//
+////                        System.out.println("rollback-block: " + b + ", pos: " + pos.add(x, y, z));
+//
+//                        if (b != null) {
+//                            session.rawSetBlock(pos.add(x, y, z), b);
+//                        }
+//                    }
+//                }
+//            }
+////            System.out.println("Width: " + width + ", Height: " + height + ", Length: " + length);
+//        } catch (Exception ex) {
+//            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+//        }
+//    }
 
     @Override
     public Vector getOffset() {

@@ -23,13 +23,9 @@ import java.io.IOException;
 import com.chingo247.structurecraft.plan.exception.SchematicException;
 import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.google.common.base.Preconditions;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
-import java.io.FileInputStream;
+import com.sk89q.worldedit.world.DataException;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 /**
  *
@@ -42,11 +38,13 @@ public class DefaultSchematic implements Schematic {
     private final int width;
     private final int height;
     private final int length;
+    private int rotation;
 
-    protected DefaultSchematic(File schematicFile, int width, int height, int length) {
+    protected DefaultSchematic(File schematicFile, int width, int height, int length, int rotation) {
         Preconditions.checkNotNull(schematicFile);
         Preconditions.checkArgument(schematicFile.exists());
         this.schematicFile = schematicFile;
+        this.rotation = rotation;
 
         XXHasher hasher = new XXHasher();
 
@@ -104,30 +102,37 @@ public class DefaultSchematic implements Schematic {
     }
 
     @Override
+    public int getRotation() {
+        return rotation;
+    }
+    
+    @Override
     public SchematicPlacement createPlacement() {
-        return new SchematicPlacement(this, 0, Vector.ZERO); // Default settlercraft thinks schematics are stored in natural position
+        SchematicPlacement placement = new SchematicPlacement(this, 0, Vector.ZERO);
+        placement.rotate(rotation);
+        return placement; // Default settlercraft thinks schematics are stored in natural position
     }
 
-    public static SchematicPlacement readPlacement(File f) throws IOException {
-        NamedTag rootTag;
-        try (NBTInputStream nbtStream = new NBTInputStream(
-                new GZIPInputStream(new FileInputStream(f)))) {
-            rootTag = nbtStream.readNamedTag();
-            if (!rootTag.getName().equalsIgnoreCase("Schematic")) {
-                throw new RuntimeException("Tag 'Schematic' does not exist or is not first");
-            }
-
-            Map<String, Tag> schematic = (Map) rootTag.getTag().getValue();
-            if (!schematic.containsKey("Blocks")) {
-                throw new RuntimeException("Schematic file is missing a \"Blocks\" tag");
-            }
-
-            short width = getChildTag(schematic, "Width", ShortTag.class).getValue();
-            short length = getChildTag(schematic, "Length", ShortTag.class).getValue();
-            short height = getChildTag(schematic, "Height", ShortTag.class).getValue();
-            return new DefaultSchematic(f, width, height, length).createPlacement();
-        }
-    }
+//    public static SchematicPlacement readPlacement(File f) throws IOException {
+//        NamedTag rootTag;
+//        try (NBTInputStream nbtStream = new NBTInputStream(
+//                new GZIPInputStream(new FileInputStream(f)))) {
+//            rootTag = nbtStream.readNamedTag();
+//            if (!rootTag.getName().equalsIgnoreCase("Schematic")) {
+//                throw new RuntimeException("Tag 'Schematic' does not exist or is not first");
+//            }
+//
+//            Map<String, Tag> schematic = (Map) rootTag.getTag().getValue();
+//            if (!schematic.containsKey("Blocks")) {
+//                throw new RuntimeException("Schematic file is missing a \"Blocks\" tag");
+//            }
+//
+//            short width = getChildTag(schematic, "Width", ShortTag.class).getValue();
+//            short length = getChildTag(schematic, "Length", ShortTag.class).getValue();
+//            short height = getChildTag(schematic, "Height", ShortTag.class).getValue();
+//            return new DefaultSchematic(f, width, height, length).createPlacement();
+//        }
+//    }
 
     /**
      * Get child tag of a NBT structure.

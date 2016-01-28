@@ -18,7 +18,6 @@ package com.chingo247.structurecraft;
 
 import com.chingo247.structurecraft.exeption.StructureRestrictionException;
 import com.chingo247.menuapi.menu.CategoryMenu;
-import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.placing.constructionzone.IConstructionZonePlacerFactory;
@@ -36,12 +35,15 @@ import java.util.concurrent.ExecutorService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 import com.chingo247.structurecraft.construction.IContractor;
+import com.chingo247.structurecraft.watchers.PhysicsWatch;
 
 /**
  *
  * @author Chingo
  */
 public interface IStructureAPI {
+    
+    PhysicsWatch getPhysicsWatcher();
     
     GraphDatabaseService getGraphDatabase();
     

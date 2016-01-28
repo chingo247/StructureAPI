@@ -24,14 +24,15 @@ import org.neo4j.graphdb.Node;
  */
 public interface ISchematicData {
     
-    public int getWidth();
-    public int getHeight();
-    public int getLength();
-    public long getXXHash64();
-    public String getName();
-    public long getLastImport();
-    public void setLastImport(long date);
-    public void delete();
+    int getWidth();
+    int getHeight();
+    int getLength();
+    int getRotation();
+    long getXXHash64();
+    String getName();
+    long getLastImport();
+    void setLastImport(long date);
+    void delete();
     
     
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 ching
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.schematic;
+package com.chingo247.structurecraft.watchers;
 
-import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.sk89q.worldedit.Vector;
-import java.io.File;
+import com.sk89q.worldedit.blocks.BaseBlock;
 
 /**
  *
- * @author Chingo
+ * @author ching
  */
-public interface Schematic {
+public interface ICancellableBlockEvent extends ICancellable {
     
-    long getHash();
-    FastClipboard getClipboard();
-    SchematicPlacement createPlacement();
-    Vector getSize();
-    int getWidth();
-    int getHeight();
-    int getLength();
-    int getRotation();
-    File getFile();
+    BaseBlock getBlock();
+    
+    Vector getPosition();
+    
+    String getWorld();
+    
+    
     
 }

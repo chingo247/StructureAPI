@@ -81,12 +81,12 @@ public class SchematicManager {
             Schematic schematic = getSchematic(checksum);
             if (schematic == null) {
                 FastClipboard clipboard = FastClipboard.read(schematicFile);
-                schematic = new DefaultSchematic(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength());
+                schematic = new DefaultSchematic(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength(), clipboard.getyAxisOffset());
                 schematics.put(checksum, schematic);
                 clipboard = null;
             }
             return schematic;
-        } catch (IOException  ex) {
+        } catch (IOException ex) {
             throw new SchematicException(ex);
         }
 
@@ -98,104 +98,117 @@ public class SchematicManager {
 
     public synchronized void load(File directory) {
         Preconditions.checkArgument(directory.isDirectory());
-
-        ForkJoinPool pool;
+        
         Iterator<File> fit = FileUtils.iterateFiles(directory, new String[]{"schematic"}, true);
+        
         if (fit.hasNext()) {
-            pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors()); // only create the pool if we have schematics
-        } else {
-            return;
-        }
-        
-        
-        Map<Long, ISchematicData> alreadyHere = Maps.newHashMap();
-        List<SchematicProcessor> tasks =  Lists.newArrayList();
-        List<Schematic> alreadyDone = Lists.newArrayList();
-        XXHasher hasher = new XXHasher();
-        
-        try(Transaction tx = graph.beginTx()) {
-            Collection<SchematicDataNode> schematicNodes = schematicRepository.findAfterDate(System.currentTimeMillis() - TWO_DAYS);
-            for(SchematicDataNode node : schematicNodes) {
-                alreadyHere.put(node.getXXHash64(), node);
-            }
+            ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors()); // only create the pool if we have schematics
+            Map<Long, ISchematicData> alreadyHere = Maps.newHashMap();
+            Map<Long, ISchematicData> needsUpdating = Maps.newHashMap();
             
-            // Process the schematics that need to be loaded
-            while (fit.hasNext()) {
-                File schematicFile = fit.next();
-                try {
-                    long checksum = hasher.hash64(schematicFile);
-                    // Only load schematic data that wasn't yet loaded...
-                    ISchematicData existingData = alreadyHere.get(checksum);
-                    if(existingData != null) {
-                        Schematic s = new DefaultSchematic(schematicFile, existingData.getWidth(), existingData.getHeight(), existingData.getLength());
-                        alreadyDone.add(s);
-                    } else if (getSchematic(checksum) == null) {
-                        SchematicProcessor processor = new SchematicProcessor(schematicFile);
-                        tasks.add(processor);
-                        pool.execute(processor);
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(SchematicManager.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-            tx.success();
-        }
-        
-        
-        
-        // Wait for the processes the finish and queue them for bulk insert
-        List<Schematic> newSchematics = Lists.newArrayList();
-        try {
-            for (SchematicProcessor sp : tasks) {
-                Schematic schematic = sp.get();
-                if (schematic != null) {
-                    newSchematics.add(schematic);
-                }
-            }
-        } catch (Exception ex) {
-            Logger.getLogger(SchematicManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
+            List<SchematicProcessor> tasks = Lists.newArrayList();
+            List<Schematic> alreadyDone = Lists.newArrayList();
+            XXHasher hasher = new XXHasher();
 
-        // Close the pool!
-        pool.shutdown();
-        
-        // Update the database
-        try(Transaction tx = graph.beginTx()) {
-            for(Schematic data : alreadyDone) {
-                SchematicDataNode sdn = schematicRepository.findByHash(data.getHash());
-                sdn.setLastImport(System.currentTimeMillis());
+            try (Transaction tx = graph.beginTx()) {
+                Collection<SchematicDataNode> schematicNodes = schematicRepository.findAfterDate(System.currentTimeMillis() - TWO_DAYS);
+                for (SchematicDataNode node : schematicNodes) {
+                    if(!node.hasRotation()) {
+                        needsUpdating.put(node.getXXHash64(), node);
+                        continue;
+                    }
+                    alreadyHere.put(node.getXXHash64(), node);
+                }
+
+                // Process the schematics that need to be loaded
+                while (fit.hasNext()) {
+                    File schematicFile = fit.next();
+                    try {
+                        long checksum = hasher.hash64(schematicFile);
+                        // Only load schematic data that wasn't yet loaded...
+                        ISchematicData existingData = alreadyHere.get(checksum);
+                        if (existingData != null) {
+                            Schematic s = new DefaultSchematic(schematicFile, existingData.getWidth(), existingData.getHeight(), existingData.getLength(), existingData.getRotation());
+                            alreadyDone.add(s);
+                        } else if (getSchematic(checksum) == null) {
+                            SchematicProcessor processor = new SchematicProcessor(schematicFile);
+                            tasks.add(processor);
+                            pool.execute(processor);
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(SchematicManager.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                tx.success();
             }
-            for(Schematic newData : newSchematics) {
-                String name = newData.getFile().getName();
-                long xxhash = newData.getHash();
-                int width = newData.getWidth();
-                int height = newData.getHeight();
-                int length = newData.getLength();
-                schematicRepository.addSchematic(name, xxhash, width, height, length, System.currentTimeMillis());
+
+            // Wait for the processes the finish and queue them for bulk insert
+            List<Schematic> newSchematics = Lists.newArrayList();
+            try {
+                for (SchematicProcessor sp : tasks) {
+                    Schematic schematic = sp.get();
+                    if (schematic != null) {
+                        newSchematics.add(schematic);
+                    }
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(SchematicManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            // Close the pool!
+            pool.shutdown();
+
+            int updated = 0;
+            // Update the database
+            try (Transaction tx = graph.beginTx()) {
+                for (Schematic data : alreadyDone) {
+                    SchematicDataNode sdn = schematicRepository.findByHash(data.getHash());
+                    sdn.setLastImport(System.currentTimeMillis());
+                }
+                for (Schematic newData : newSchematics) {
+                    if(needsUpdating.get(newData.getHash()) != null) {
+                        SchematicDataNode dataNode = schematicRepository.findByHash(newData.getHash());
+                        dataNode.setRotation(newData.getRotation());
+                        updated++;
+                        continue;
+                    } 
+                    String name = newData.getFile().getName();
+                    long xxhash = newData.getHash();
+                    int width = newData.getWidth();
+                    int height = newData.getHeight();
+                    int length = newData.getLength();
+                    int rotation = newData.getRotation();
+                    schematicRepository.addSchematic(name, xxhash, width, height, length, rotation, System.currentTimeMillis());
+                }
+
+                // Delete unused
+                int removed = 0;
+                for (SchematicDataNode sdn : schematicRepository.findBeforeDate(System.currentTimeMillis() - TWO_DAYS)) {
+                    sdn.delete();
+                    removed++;
+                }
+                if (removed > 0) {
+                    System.out.println("[SettlerCraft]: Deleted " + removed + " schematic(s) from cache");
+                }
+                
+                if (updated > 0) {
+                    System.out.println("[SettlerCraft]: Updated " + updated + " schematic(s) from cache");
+                }
+
+                tx.success();
             }
             
-            // Delete unused
-            int removed = 0;
-            for(SchematicDataNode sdn : schematicRepository.findBeforeDate(System.currentTimeMillis() - TWO_DAYS)) {
-                sdn.delete();
-                removed++;
+
+            synchronized (schematics) {
+                for (Schematic schematic : newSchematics) {
+                    schematics.put(schematic.getHash(), schematic);
+                }
+                for (Schematic schematic : alreadyDone) {
+                    schematics.put(schematic.getHash(), schematic);
+                }
             }
-            if(removed > 0) {
-                System.out.println("[SettlerCraft]: Deleted " + removed + " schematics from cache");
-            }
-            
-            
-            tx.success();
+
         }
-        
-        
-        synchronized(schematics) {
-                for(Schematic schematic : newSchematics) schematics.put(schematic.getHash(), schematic);
-                for(Schematic schematic : alreadyDone) schematics.put(schematic.getHash(), schematic);
-        }
-            
-        
-        
 
     }
 
@@ -213,8 +226,7 @@ public class SchematicManager {
         protected Schematic compute() {
             try {
                 FastClipboard clipboard = FastClipboard.read(schematicFile);
-                DefaultSchematic schematic =  new DefaultSchematic(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength());
-                clipboard = null;
+                DefaultSchematic schematic = new DefaultSchematic(schematicFile, clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength(), clipboard.getyAxisOffset());
                 return schematic;
             } catch (Exception ex) {
                 Logger.getLogger(getClass().getName()).log(Level.SEVERE, ex.getMessage(), ex);

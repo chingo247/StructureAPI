@@ -17,7 +17,6 @@
 package com.chingo247.structurecraft.construction.contract.safe;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.structurecraft.construction.StructureEntry;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.StructureBlock;
 import com.chingo247.structurecraft.placement.block.BlockPlacement;
@@ -46,7 +45,6 @@ class SafePlacement extends BlockPlacement {
     private Queue<StructureBlock> placeLater;
     private final Direction d;
     private boolean last = false;
-    private StructureEntry entry;
 
     public SafePlacement( IBlockPlacement blockPlacement, Iterator<Vector> traversal, int maxBlocks, PriorityQueue<StructureBlock> placeLater) {
         super(blockPlacement.getWidth(), blockPlacement.getHeight(), blockPlacement.getLength());
@@ -74,6 +72,8 @@ class SafePlacement extends BlockPlacement {
     public BaseBlock getBlock(Vector position) {
         return placement.getBlock(position);
     }
+    
+    
 
     @Override
     public void place(EditSession editSession, Vector pos, PlaceOptions option) {
@@ -82,8 +82,6 @@ class SafePlacement extends BlockPlacement {
         int placeLaterPause = 0;
         int count = 0;
 
-//        System.out.println(" ");
-//        System.out.println(" SAFE PLACEMENT");
         // Cube traverse this clipboard
         while (traversal.hasNext() && count < maxBlocks) {
             Vector v = traversal.next();
@@ -93,6 +91,7 @@ class SafePlacement extends BlockPlacement {
                 continue;
             }
 
+            
             int priority = getPriority(clipboardBlock);
 
             if (priority == PRIORITY_FIRST) {
@@ -108,7 +107,10 @@ class SafePlacement extends BlockPlacement {
 
                 // only place these when having a greater xz-cubevalue to avoid placing torches etc in air and break them later
                 while (placeLater.peek() != null
-                        && placeLater.peek().getPosition().getBlockY() < v.getBlockY()) {
+                        && placeLater.peek().getPosition().getBlockY() < v.getBlockY()
+                        && (placeLater.peek().getPosition().getBlockX() % option.getCubeX()) > (v.getBlockX() % option.getCubeX())
+                        && (placeLater.peek().getPosition().getBlockZ() % option.getCubeZ()) > (v.getBlockZ() % option.getCubeZ())
+                        ) {
                     StructureBlock plb = placeLater.poll();
                     doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
 
@@ -163,7 +165,6 @@ class SafePlacement extends BlockPlacement {
                 throw new AssertionError("unreachable");
         }
         
-//        System.out.println("PlacePos: " + p +  ", rel: " + blockPosition);
 
         for (BlockPredicate bp : option.getIgnore()) {
             if (bp.evaluate(blockPosition, p, block)) {
@@ -174,7 +175,7 @@ class SafePlacement extends BlockPlacement {
         for (BlockMask bm : option.getBlockMasks()) {
             bm.apply(blockPosition, p, block);
         }
-
+        
         editSession.rawSetBlock(p, block);
     }
 

@@ -74,6 +74,7 @@ import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 import com.chingo247.structurecraft.construction.IContractor;
+import com.chingo247.structurecraft.watchers.PhysicsWatch;
 
 /**
  *
@@ -112,6 +113,8 @@ public class StructureAPI implements IStructureAPI {
     private IAsyncWorldEditIntegration asyncWorldEditIntegration;
 
     private static StructureAPI instance;
+    
+    private final PhysicsWatch physicsWatch;
 
     private StructureAPI() {
         this.platform = SettlerCraft.getInstance().getPlatform();
@@ -126,6 +129,7 @@ public class StructureAPI implements IStructureAPI {
         this.eventDispatcher.register(eventBus);
         this.eventDispatcher.register(asyncEventBus);
         this.asyncEventBus.register(new StructurePlanManagerHandler());
+        this.physicsWatch = new PhysicsWatch();
         setupSchema();
         applyUpdates();
 
@@ -406,6 +410,11 @@ public class StructureAPI implements IStructureAPI {
     @Override
     public IStructureAPIPlugin getPlugin() {
         return plugin;
+    }
+
+    @Override
+    public PhysicsWatch getPhysicsWatcher() {
+        return physicsWatch;
     }
 
     private class StructurePlanManagerHandler {

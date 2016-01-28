@@ -30,5 +30,5 @@ public interface ISchematicRepository {
 
     public Collection<SchematicDataNode> findAfterDate(long date);
 
-    public void addSchematic(String name, long xxhash64, int width, int height, int length, long importDate);
+    public void addSchematic(String name, long xxhash64, int width, int height, int length, int rotation, long importDate);
 }

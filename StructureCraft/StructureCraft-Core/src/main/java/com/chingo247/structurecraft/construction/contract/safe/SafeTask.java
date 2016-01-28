@@ -9,13 +9,9 @@ import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.task.StructureTask;
 import com.chingo247.structurecraft.platform.IStructureAPIPlugin;
-import com.chingo247.structurecraft.util.concurrent.AsyncLoad;
-import com.chingo247.structurecraft.util.concurrent.AsyncTask;
 import com.chingo247.xplatform.core.IScheduler;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +19,6 @@ import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.construction.contract.safe.schematic.IOSchematicSafeData;
 import com.chingo247.structurecraft.construction.contract.safe.schematic.SchematicSafeData;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
-import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.util.WorldUtil;
 import java.io.File;
@@ -122,6 +117,7 @@ class SafeTask extends StructureTask {
                         }
 
                         BaseBlock b = world.getBlock(p);
+                        
 //                        System.out.println("");
 
                         Vector safePos = p.subtract(structureMin);

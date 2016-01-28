@@ -1,142 +1,225 @@
-/*
- * Copyright (C) 2015 Chingo
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-package com.chingo247.structurecraft.util.traversal;
-
-import com.google.common.base.Preconditions;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.regions.CuboidRegion;
-import java.util.Iterator;
-
-/**
- *
- * @author Chingo
- */
-public class CuboidRegionTraversal implements Iterator<CuboidRegion>, Iterable<CuboidRegion>{
-
-    private final CuboidRegion region;
-    private Vector currentStart, currentEnd;
-    private int minX, minY, minZ;
-    private final int xRange, yRange, zRange;
-
-    public CuboidRegionTraversal(CuboidRegion region, int xRange, int yRange, int zRange) {
-        Preconditions.checkNotNull(region);
-        this.region = region;
-        this.minX = this.region.getMinimumPoint().getBlockX();
-        this.minY = this.region.getMinimumPoint().getBlockY();
-        this.minZ = this.region.getMinimumPoint().getBlockZ();
-        this.xRange = xRange;
-        this.yRange = yRange;
-        this.zRange = zRange;
-    }
-    
-    /**
-     * Copy constructor
-     * @param dimension
-     * @param currentStart
-     * @param currentEnd
-     * @param xRange
-     * @param yRange
-     * @param zRange 
-     */
-    private CuboidRegionTraversal(CuboidRegion dimension, Vector currentStart, Vector currentEnd, int xRange, int yRange, int zRange, int minX, int minY, int minZ) {
-        this.region = dimension;
-        this.currentStart = currentStart;
-        this.currentEnd = currentEnd;
-        this.xRange = xRange;
-        this.yRange = yRange;
-        this.zRange = zRange;
-        this.minX = minX;
-        this.minY = minY;
-        this.minZ = minZ;
-    }
-
-    public CuboidRegion getDimension() {
-        return region;
-    }
-    
-    @Override
-    public CuboidRegion next() {
-        currentStart = new Vector(minX, minY, minZ);
-        currentEnd = new Vector(minX + xRange, minY + yRange, minZ + zRange);
-        
-        if(minY > region.getMaximumY()) {
-            return null;
-        }
-
-        fitEnd();
-        minX += xRange + 1;
-        
-        if(minX > region.getMaximumY()) {
-            minX = region.getMinimumPoint().getBlockX();
-            minZ+= zRange + 1;
-            
-            if(minZ > region.getMaximumPoint().getBlockZ()) {
-                minZ = region.getMinimumPoint().getBlockZ();
-                minY += yRange + 1;
-            }
-        }
-        return new CuboidRegion(currentStart, currentEnd);
-    }
-
-    /**
-     * Makes the end fit
-     */
-    private void fitEnd() {
-        if(isInside(currentEnd)) return;
-        int x = currentEnd.getBlockX(), y = currentEnd.getBlockY(), z = currentEnd.getBlockZ();
-        if (currentEnd.getBlockX() > region.getMaximumPoint().getBlockX()) {
-            x = region.getMaximumPoint().getBlockX();
-        }
-        if (currentEnd.getBlockY() > region.getMaximumPoint().getBlockY()) {
-            y = region.getMaximumPoint().getBlockY();
-        }
-        if (currentEnd.getBlockZ() > region.getMaximumPoint().getBlockZ()) {
-            z = region.getMaximumPoint().getBlockZ();
-        }
-        currentEnd = new Vector(x, y, z);
-    }
-
-    private boolean isInside(Vector v) {
-        return region.contains(v);
-//        return v.getBlockX() < region.getMaxX() && v.getBlockX() > region.getMinX()
-//                && v.getBlockY() < region.getMaxY() && v.getBlockY() > region.getMinY()
-//                && region.getMaxZ() < region.getMaxZ() && v.getBlockZ() > region.getMinZ();
-    }
-    
-    public CuboidRegionTraversal copy() {
-        return new CuboidRegionTraversal(region, currentStart, currentEnd, xRange, yRange, zRange, minX, minY, minZ);
-    }
-    
-    @Override
-    public boolean hasNext() {
-        return this.copy().next() != null;
-    }
-
-    @Override
-    public Iterator<CuboidRegion> iterator() {
-        return this;
-    }
-
-    /**
-     * Does nothing at the moment
-     */
-    @Override
-    public void remove() {
-        
-    }
-
-}
+///*
+// * Copyright (C) 2016 Chingo
+// *
+// * This program is free software: you can redistribute it and/or modify
+// * it under the terms of the GNU General Public License as published by
+// * the Free Software Foundation, either version 3 of the License, or
+// * (at your option) any later version.
+// *
+// * This program is distributed in the hope that it will be useful,
+// * but WITHOUT ANY WARRANTY; without even the implied warranty of
+// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// * GNU General Public License for more details.
+// *
+// * You should have received a copy of the GNU General Public License
+// * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// */
+//package com.chingo247.structurecraft.util.traversal;
+//
+//import com.chingo247.structurecraft.util.RegionUtil;
+//import com.google.common.collect.Lists;
+//import com.sk89q.worldedit.BlockVector;
+//import com.sk89q.worldedit.Vector;
+//import com.sk89q.worldedit.Vector2D;
+//import com.sk89q.worldedit.regions.CuboidRegion;
+//import java.util.ArrayList;
+//import java.util.Collection;
+//import java.util.Collections;
+//import java.util.Comparator;
+//import java.util.HashSet;
+//import java.util.Iterator;
+//import java.util.List;
+//import java.util.NoSuchElementException;
+//
+///**
+// *
+// * @author Chingo
+// */
+//public class CuboidRegionTraversal implements Iterator<Vector> {
+//
+//    private static final int CHUNK_SIZE = 16;
+//
+//    private Collection<CuboidRegion> regions;
+//    private Iterator<CuboidRegion> regionIt;
+//    private CuboidRegion currentRegion;
+//    private RegionTraverser regionTraverser;
+//    private Vector size;
+//    private boolean reversed;
+//    private boolean regionsTraversalDone = false;
+//
+//    private CuboidRegionTraversal(Collection<CuboidRegion> regions, Iterator<CuboidRegion> regionIt, CuboidRegion currentRegion, RegionTraverser regionTraverser, boolean reversed) {
+//        this.regions = regions;
+//        this.regionIt = regionIt;
+//        this.currentRegion = currentRegion;
+//        this.regionTraverser = regionTraverser;
+//        this.reversed = reversed;
+//    }
+//
+//    public CuboidRegionTraversal(Vector size) {
+//        this(size, false);
+//    }
+//
+//    public CuboidRegionTraversal(Vector size, boolean reversed) {
+////        this.regions = getChunkCubes(new CuboidRegion(Vector.ZERO, size), CHUNK_SIZE, RegionUtil.ORDERED_XZ);
+//        this.regionIt = regions.iterator();
+//        this.reversed = reversed;
+//    }
+//
+////    private static int fitsNeeded(int number, int roundTo) {
+////        double needed = Math.ceil((double) number / roundTo);
+////        return (int) needed;
+////    }
+////
+////    private Collection<CuboidRegion> getChunkCubes(CuboidRegion area, int chunkSize, Comparator<Vector2D> sorter) {
+////        List<CuboidRegion> subareas = Lists.newArrayList();
+////
+////        Vector size = RegionUtil.getSize(area);
+////        Vector min = area.getMinimumPoint();
+////
+////        Vector max = area.getMinimumPoint()
+////                .add(
+////                        fitsNeeded(size.getBlockX(), chunkSize) * chunkSize,
+////                        fitsNeeded(size.getBlockY(), chunkSize) * chunkSize,
+////                        fitsNeeded(size.getBlockZ(), chunkSize) * chunkSize
+////                );
+////        
+////        for(in)
+////
+////        for (Vector2D v : chunks) {
+////            Vector minRel = new BlockVector(v.getBlockX() * CHUNK_SIZE, 0, v.getBlockZ() * CHUNK_SIZE).subtract(min).setY(0);
+////            Vector maxRel = minRel.add(chunkSize, area.getMaximumY() - area.getMinimumY(), chunkSize);
+////
+//////            // Fit min positions
+////            if (!area.contains(minRel)) {
+////                minRel = minRel
+////                        .setX(minRel.getBlockX() < areaMin.getBlockX() ? areaMin.getBlockX() : minRel.getBlockX())
+////                        .setZ(minRel.getBlockZ() < areaMin.getBlockZ() ? areaMin.getBlockZ() : minRel.getBlockZ());
+////            }
+//////            
+//////            // Fit max positions
+////            if (!area.contains(maxRel)) {
+////                maxRel = maxRel
+////                        .setX(maxRel.getBlockX() > areaMax.getBlockX() ? areaMax.getBlockX() : maxRel.getBlockX())
+////                        .setZ(maxRel.getBlockZ() > areaMax.getBlockZ() ? areaMax.getBlockZ() : maxRel.getBlockZ());
+////
+////            }
+////
+////            CuboidRegion subarea = new CuboidRegion(minRel, maxRel);
+////            subareas.add(subarea);
+////        }
+////        return subareas;
+////    }
+//
+//    @Override
+//    public boolean hasNext() {
+//        return !regionsTraversalDone;
+//    }
+//
+//    @Override
+//    public Vector next() {
+//        Vector nextPos = null;
+//
+//        if ((regionTraverser == null || (regionTraverser != null && !regionTraverser.hasNext())) && regionIt.hasNext()) {
+//            currentRegion = regionIt.next();
+//            regionTraverser = new RegionTraverser();
+//        }
+//
+//        if (regionTraverser != null && regionTraverser.hasNext()) {
+//            nextPos = regionTraverser.next();
+//        }
+//
+//        if (nextPos == null) {
+//            throw new NoSuchElementException("No next element!");
+//        }
+//
+//        if (regionTraverser == null || (regionTraverser != null && !regionTraverser.hasNext() && !regionIt.hasNext())) {
+//            regionsTraversalDone = true;
+//        }
+//
+//        return nextPos;
+//    }
+//
+//    public CuboidRegionTraversal copy() {
+//        Collection<CuboidRegion> copy = new HashSet<>();
+//        CuboidRegion cloneCurrent = null;
+//        for (Iterator<CuboidRegion> iterator = regions.iterator(); iterator.hasNext();) {
+//
+//            CuboidRegion next = iterator.next();
+//            CuboidRegion clone = next.clone();
+//            copy.add(clone);
+//            if (clone.equals(currentRegion)) {
+//                cloneCurrent = clone;
+//            }
+//        }
+//
+//        CuboidRegionTraversal cloneTraversal = new CuboidRegionTraversal(copy, copy.iterator(), cloneCurrent, regionTraverser.copy(), reversed);
+//        return cloneTraversal;
+//    }
+//
+//    private class RegionTraverser {
+//
+//        int x, y, z;
+//        Vector min;
+//        Vector max;
+//        boolean done = false;
+//
+//        public RegionTraverser(int x, int y, int z, Vector min, Vector max, boolean done) {
+//            this.x = x;
+//            this.y = y;
+//            this.z = z;
+//            this.min = min;
+//            this.max = max;
+//            this.done = done;
+//        }
+//
+//        public RegionTraverser() {
+//            this.min = currentRegion.getMinimumPoint();
+//            this.max = currentRegion.getMaximumPoint();
+//            this.x = min.getBlockX();
+//            this.y = min.getBlockY();
+//            this.z = min.getBlockZ();
+//        }
+//
+//        private RegionTraverser copy() {
+//            return new RegionTraverser(x, y, z, min, max, done);
+//        }
+//
+//        private boolean hasNext() {
+//            return !done;
+//        }
+//
+//        private Vector next() {
+//            if (done != true) {
+//                int currentX = x;
+//                int currentY = y;
+//                int currentZ = z;
+//
+//                x++;
+//                if (x > max.getBlockX()) {
+//                    x = 0;
+//                    z++;
+//
+//                    if (z > max.getBlockZ()) {
+//                        z = 0;
+//
+//                        if (!reversed) {
+//                            y++;
+//                        } else {
+//                            y--;
+//                        }
+//
+//                    }
+//                }
+//
+//                if (!currentRegion.contains(new BlockVector(x, y, z))) {
+//                    done = true;
+//                }
+//
+//                return new BlockVector(currentX, currentY, currentZ);
+//            } else {
+//                throw new NoSuchElementException("No next element!");
+//            }
+//        }
+//    }
+//
+//}

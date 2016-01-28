@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.chingo247.structurecraft.placement.block;
 
 import com.chingo247.structurecraft.placement.AbstractPlacement;
@@ -23,17 +22,19 @@ import static com.chingo247.settlercraft.core.Direction.EAST;
 import static com.chingo247.settlercraft.core.Direction.NORTH;
 import static com.chingo247.settlercraft.core.Direction.SOUTH;
 import static com.chingo247.settlercraft.core.Direction.WEST;
-import com.chingo247.structurecraft.util.iterator.CuboidIterator;
 import com.chingo247.structurecraft.placement.options.BlockMask;
 import com.chingo247.structurecraft.placement.options.BlockPredicate;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.WorldUtil;
+import com.chingo247.structurecraft.util.iterator.CuboidIterator;
+import com.chingo247.structurecraft.util.traversal.CuboidTraversal;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
@@ -63,21 +64,16 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
     }
 
     public final int numBlocks() {
-        return getWidth() * getHeight() * getLength();
+        return width * height * length;
     }
 
     @Override
     public void place(EditSession editSession, Vector pos, PlaceOptions option) {
-        
-//        System.out.println("Size: " + getSize());
-        
         Iterator<Vector> traversal = new CuboidIterator(
                 option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
                 option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
                 option.getCubeZ() <= 0 ? getSize().getBlockZ() : option.getCubeZ()
         ).iterate(getSize());
-        
-        
         PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
 
         int placeLaterPlaced = 0;
@@ -107,13 +103,14 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
 
                 // only place these when having a greater xz-cubevalue to avoid placing torches etc in air and break them later
                 while (placeLater.peek() != null
-                        && placeLater.peek().getPosition().getBlockY() < v.getBlockY()) {
+                        && placeLater.peek().getPosition().getBlockY() < v.getBlockY()
+                        && (placeLater.peek().getPosition().getBlockX() % option.getCubeX()) > (v.getBlockX() % option.getCubeX())
+                        && (placeLater.peek().getPosition().getBlockZ() % option.getCubeZ()) > (v.getBlockZ() % option.getCubeZ())) {
                     StructureBlock plb = placeLater.poll();
                     doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
 
                     placeLaterPlaced++;
-                    
-                    
+
                     if (plb.getPriority() == PRIORITY_LIQUID || BlockType.emitsLight(plb.getBlock().getId())) {
                         placeLaterPlaced++;
                     }
@@ -131,14 +128,14 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
             StructureBlock plb = placeLater.poll();
             doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
         }
-        
+
     }
 
     protected int getPriority(BaseBlock block) {
         if (isWater(block) || isLava(block)) {
             return PRIORITY_LIQUID;
         }
-        
+
         if (BlockType.shouldPlaceLast(block.getId()) || BlockType.emitsLight(block.getId())) {
             return PRIORITY_LATER;
         }
@@ -169,14 +166,14 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
 
     @Override
     public abstract BaseBlock getBlock(Vector position);
-    
+
     public BaseBlock getBlock(int x, int y, int z) {
         return getBlock(new BlockVector(x, y, z));
     }
 
     protected void doBlock(EditSession editSession, Vector position, Vector blockPosition, BaseBlock block, PlaceOptions option) {
         Vector p;
-        
+
         switch (WorldUtil.getDirection(getRotation())) {
             case EAST:
                 p = position.add(blockPosition);
@@ -210,6 +207,5 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
 
         editSession.rawSetBlock(p, block);
     }
-    
 
 }

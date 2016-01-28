@@ -24,6 +24,7 @@ import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.StructureInvalidator;
+import com.chingo247.structurecraft.bukkit.listener.PhysicsListener;
 import com.chingo247.structurecraft.commands.SettlerCommands;
 import com.chingo247.structurecraft.commands.StructureCommands;
 import com.chingo247.structurecraft.commands.StructurePlanCommands;
@@ -153,6 +154,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
         
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new PlanListener(structureAPI, economyProvider), this);
+//        Bukkit.getPluginManager().registerEvents(new PhysicsListener(StructureAPI.getInstance().getPhysicsWatcher()), this);
         
         // Generate Plans 
         File generationDirectory = StructureAPI.getInstance().getGenerationDirectory();

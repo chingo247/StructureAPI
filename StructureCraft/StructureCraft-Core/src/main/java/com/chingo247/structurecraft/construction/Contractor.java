@@ -26,6 +26,7 @@ import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
 import com.chingo247.structurecraft.model.structure.StructureRepository;
+import com.chingo247.structurecraft.watchers.PhysicsWatch;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
@@ -239,12 +240,16 @@ public class Contractor implements IContractor {
                                             }
                                         }
 
+                                        PhysicsWatch watcher = StructureAPI.getInstance().getPhysicsWatcher();
                                         IStructureEntry startEntry = null;
                                         if (constract.isRecursive()) {
                                             StructureEntry prevEntry = null;
                                             try {
+                                                
+                                                
                                                 for (Structure s : structures) {
                                                     StructureEntry currentEntry = getOrCreateEntry(s, constract);
+                                                    watcher.register(structure);
 
 //                                                    constract.registerListeners(currentEntry);
                                                     if (startEntry == null) {
@@ -275,7 +280,8 @@ public class Contractor implements IContractor {
                                         } else {
                                             IStructureEntry entry = getOrCreateEntry(structure, constract);
 //                                            constract.registerListeners(entry);
-
+                                            watcher.register(structure);
+                                            
                                            
                                             try {
                                                 constract.apply(entry);
@@ -325,6 +331,9 @@ public class Contractor implements IContractor {
 
     private void remove(long id) {
         synchronized (entryMutex) {
+            PhysicsWatch watch = StructureAPI.getInstance().getPhysicsWatcher();
+            StructureEntry entry = entries.get(id);
+            watch.unregister(entry.getStructure());
             entries.remove(id);
         }
     }
@@ -335,8 +344,18 @@ public class Contractor implements IContractor {
     }
 
     @Override
-    public void purge(IStructure structure) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void purge(final IStructure structure) {
+        structurePool.execute(structure.getId(), new Runnable() {
+
+            @Override
+            public void run() {
+                StructureEntry entry = getEntry(structure);
+                entry.stop();
+            }
+        });
+        
     }
+    
+    
 
 }

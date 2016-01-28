@@ -17,9 +17,8 @@
 
 package com.chingo247.structurecraft.placement.block;
 
-import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.util.iterator.TopDownCuboidIterator;
+import com.chingo247.structurecraft.util.iterator.CuboidIterator;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -41,11 +40,11 @@ public class RestoringPlacement extends DemolishingPlacement {
     
     @Override
     public void place(EditSession editSession, Vector pos, PlaceOptions option) {
-        
-        
-        
-        
-        Iterator<Vector> traversal = new TopDownCuboidIterator(option.getCubeX(), option.getCubeY(), option.getCubeZ()).iterate(parent.getSize());
+         Iterator<Vector> traversal = new CuboidIterator(
+                option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
+                option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
+                option.getCubeZ() <= 0 ? getSize().getBlockZ() : option.getCubeZ()
+        ).iterate(getSize(), true);
         
         while(traversal.hasNext()) {
             Vector blockPosition = traversal.next();

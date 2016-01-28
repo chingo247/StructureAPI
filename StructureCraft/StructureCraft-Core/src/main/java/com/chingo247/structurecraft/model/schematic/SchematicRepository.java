@@ -96,7 +96,7 @@ public class SchematicRepository implements ISchematicRepository {
     }
     
     @Override
-    public void addSchematic(String name, long xxhash64, int width, int height, int length, long importDate) {
+    public void addSchematic(String name, long xxhash64, int width, int height, int length, int rotation, long importDate) {
         Node n = graph.createNode(SchematicDataNode.LABEL);
         n.setProperty(SchematicDataNode.NAME_PROPERTY, name);
         n.setProperty(SchematicDataNode.WIDTH_PROPERTY, width);
@@ -104,6 +104,7 @@ public class SchematicRepository implements ISchematicRepository {
         n.setProperty(SchematicDataNode.LENGTH_PROPERTY, length);
         n.setProperty(SchematicDataNode.XXHASH_PROPERTY, xxhash64);
         n.setProperty(SchematicDataNode.LAST_IMPORT, importDate);
+        n.setProperty(SchematicDataNode.ROTATION_PROPERTY, rotation);
     } 
      
     

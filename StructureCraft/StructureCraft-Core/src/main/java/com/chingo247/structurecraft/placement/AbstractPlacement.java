@@ -29,8 +29,8 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
     protected final Vector position;
     private int rotation;
     protected final int width;
-    protected final  int height;
-    protected final  int length;
+    protected final int height;
+    protected final int length;
 
     public AbstractPlacement(int width, int height, int length) {
         this(0, Vector.ZERO, width, height, length);
@@ -87,17 +87,17 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
     }
 
     @Override
-    public final int getHeight() {
+    public int getHeight() {
         return height;
     }
 
     @Override
-    public final int getLength() {
+    public int getLength() {
         return length;
     }
 
     @Override
-    public final int getWidth() {
+    public int getWidth() {
         return width;
     }
     

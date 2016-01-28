@@ -17,9 +17,9 @@
 package com.chingo247.structurecraft.construction.contract.safe;
 
 import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.construction.IContract;
 import com.chingo247.structurecraft.construction.IStructureEntry;
+import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.construction.contract.AContract;
 import com.chingo247.structurecraft.construction.contract.safe.schematic.IOSchematicSafeData;
 import com.chingo247.structurecraft.construction.contract.safe.schematic.SchematicSafeData;
@@ -31,20 +31,19 @@ import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.StructureBlock;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.util.RegionUtil;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.UUID;
+import static org.neo4j.kernel.Traversal.traversal;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
+
 
 /**
  *
@@ -53,6 +52,8 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 public class SafeContract extends AContract {
 
     private static final int CHUNK_SIZE = 16;
+    private static final int CHUNK_HEIGHT = 256;
+    private static final int MAX_BLOCKS_PER_TASK = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
 
     private IContract contract;
 
@@ -76,24 +77,20 @@ public class SafeContract extends AContract {
         IStructure structure = entry.getStructure();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         IBlockPlacement placement = getPlacementProducer().produce(structure);
-        CuboidRegion placementArea = placement.getCuboidRegion();
 
         // Get or create rollback data
         File rollbackFile = structure.getRollbackData().getRollbackSchematic();
         SchematicSafeData safeBlockData;
         if (rollbackFile.exists()) {
             try {
-                System.out.println("Using existing Schematic Save Data");
                 safeBlockData = IOSchematicSafeData.read(rollbackFile);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
-            System.out.println("Creating new Schematic Save Data");
             safeBlockData = new SchematicSafeData(placement.getWidth(), placement.getHeight(), placement.getLength());
         }
 
-        System.out.println("Area: " + placementArea);
 
         // Create place areas...
         IContract entryContract = entry.getContract();
@@ -103,33 +100,31 @@ public class SafeContract extends AContract {
 
         PlaceOptions option = contract.getPlaceOptions() != null ? contract.getPlaceOptions() : new PlaceOptions();
 
-        Iterator<Vector> traversalSafe = makeTraversal(placement, option);
-        Iterator<Vector> traversalPlace = makeTraversal(placement, option);
+        Iterator<Vector> traversalSafe = makeTraversal(placement);
+        Iterator<Vector> traversalPlace = makeTraversal(placement);
         PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
 
-        Vector size = placement.getSize();
-        int cubeX = option.getCubeX() <= 0 ? size.getBlockX() : option.getCubeX();
-        int cubeY = option.getCubeY() <= 0 ? size.getBlockY() : option.getCubeY();
-        int cubeZ = option.getCubeZ() <= 0 ? size.getBlockZ() : option.getCubeZ();
-        int cubeblocks = cubeX * cubeY * cubeZ;
         
-        System.out.println("CUBE BLOCKS: " + cubeblocks);
+        
 
         int totalBlocks = placement.getWidth() * placement.getHeight() * placement.getLength();
-        System.out.println("TOTAL BLOCKS: " + totalBlocks);
+        
+        Vector size = placement.getSize();
         int countBlock = 0;
 
         while (countBlock < totalBlocks) {
-            entry.addTask(new SafeTask(entry, player, placement, world, safeBlockData, rollbackFile, traversalSafe, cubeblocks));
-            SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, cubeblocks, placeLater);
+            entry.addTask(new SafeTask(entry, player, placement, world, safeBlockData, rollbackFile, traversalSafe, MAX_BLOCKS_PER_TASK));
+            SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
             entry.addTask(new AWEPlacementTask(
                     asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())
             );
-            countBlock += cubeblocks;
+            countBlock += MAX_BLOCKS_PER_TASK;
         }
+        
+        entry.addListener(getConstructionListener());
 
         // Empties the last blocks in placelater-queue
-        SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, cubeblocks, placeLater);
+        SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
         safePlacement.setLast(true);
         entry.addTask(new AWEPlacementTask(
                 asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())
@@ -137,15 +132,12 @@ public class SafeContract extends AContract {
 
     }
 
-    private Iterator<Vector> makeTraversal(IPlacement placement, PlaceOptions option) {
-
-        Vector size = placement.getSize();
-
+    private Iterator<Vector> makeTraversal(IPlacement placement) {
         return new CuboidIterator(
-                option.getCubeX() <= 0 ? size.getBlockX() : option.getCubeX(),
-                option.getCubeY() <= 0 ? size.getBlockY() : option.getCubeY(),
-                option.getCubeY() <= 0 ? size.getBlockY() : option.getCubeY()
-        ).iterate(size);
+                CHUNK_SIZE,
+                CHUNK_SIZE,
+                CHUNK_SIZE 
+        ).iterate(placement.getSize());
     }
 
 }

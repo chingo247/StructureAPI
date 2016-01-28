@@ -234,6 +234,17 @@ public class StructureEntry implements IStructureEntry {
         prevEntry = null;
         
     }
+    
+    /**
+     * Stops all tasks and will tell all listeners
+     */
+    public void stop() {
+        purge();
+        for (Iterator<IConstructionListener> iterator = listeners.iterator(); iterator.hasNext();) {
+            IConstructionListener next = iterator.next();
+            next.onCancelled(this);
+        }
+    }
 
     @Override
     public boolean hasNextTask() {

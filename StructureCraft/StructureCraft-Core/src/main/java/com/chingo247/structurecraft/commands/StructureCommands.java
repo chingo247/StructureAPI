@@ -36,7 +36,6 @@ import com.chingo247.structurecraft.model.structure.StructureRepository;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.IContract;
 import com.chingo247.structurecraft.construction.contract.BuildContract;
-import com.chingo247.structurecraft.construction.contract.DemolitionContract;
 import com.chingo247.structurecraft.construction.contract.RollbackContract;
 import com.chingo247.structurecraft.construction.contract.safe.SafeContract;
 import com.chingo247.structurecraft.model.settler.SettlerNode;
