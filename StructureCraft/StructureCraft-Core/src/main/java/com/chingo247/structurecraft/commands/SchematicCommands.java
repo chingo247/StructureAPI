@@ -18,6 +18,7 @@ package com.chingo247.structurecraft.commands;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
+import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.structurecraft.model.structure.IStructureRepository;
 import com.chingo247.structurecraft.model.structure.Structure;
 import com.chingo247.structurecraft.model.structure.StructureNode;
@@ -43,10 +44,13 @@ import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldedit.entity.Player;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -55,6 +59,8 @@ import org.neo4j.graphdb.Transaction;
  * @author Chingo
  */
 public class SchematicCommands {
+    
+    public static final String SCHEMATICS_UPDATE_DIR = "update/schematics";
     
     @CommandPermissions({Permissions.CONTENT_ROTATE_PLACEMENT})
     @CommandExtras(async = true)
@@ -155,6 +161,41 @@ public class SchematicCommands {
             sender.sendMessage(rotatedPlans);
         }
         
+    }
+    
+    @CommandPermissions({Permissions.CONTENT_ROTATE_PLACEMENT})
+    @CommandExtras(async = true, senderType = CommandSenderType.CONSOLE)
+    @Command(aliases = {"schematic:rotatedir"}, usage = "/schematic:rotatedir [degrees]", desc = "Rotates schematics in update/schematics directory with given degrees", max = 1, min = 1)
+    public static void schematicRotateDir(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
+        File pluginDir = structureAPI.getPlugin().getDataFolder();
+        File updateDir = new File(pluginDir, SCHEMATICS_UPDATE_DIR);
+        System.out.println("update dir: " + updateDir.getAbsolutePath());
+        
+        String number = args.getString(0);
+        
+        
+        int degrees;
+        try {         
+            degrees  = Integer.parseInt(number);
+        } catch (NumberFormatException nfe) {
+            throw new CommandException("Expected a number value... but got '" + number + "'");
+        }
+        
+        if(degrees % 90 != 0) {
+            throw new CommandException("Value 'degrees' must be a multiple of 90");
+        }
+        
+        Iterator<File> schematicIt = FileUtils.iterateFiles(updateDir, new String[]{"schematic"}, true);
+        while(schematicIt.hasNext()) {
+            File next = schematicIt.next();
+            try {
+                FastClipboard.rotateAndWrite(next, degrees);
+                System.out.println("[SettlerCraft]: Rotated schematic '" + next.getName() + "' with "+String.valueOf(degrees)+" degrees");
+            } catch (IOException ex) {
+                Logger.getLogger(SchematicCommands.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        System.out.println("[SettlerCraft]: Done");
     }
     
 }

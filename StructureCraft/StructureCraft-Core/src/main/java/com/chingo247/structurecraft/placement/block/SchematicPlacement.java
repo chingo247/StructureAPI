@@ -39,23 +39,10 @@ public class SchematicPlacement extends BlockPlacement implements FilePlacement,
         this(schematic, 0, Vector.ZERO);
     }
 
-    public SchematicPlacement(Schematic schematic, int rotation, Vector position) {
-        super(rotation, position, schematic.getWidth(), schematic.getHeight(), schematic.getLength());
+    public SchematicPlacement(Schematic schematic, int axisOffset, Vector position) {
+        super(axisOffset, position, schematic.getWidth(), schematic.getHeight(), schematic.getLength());
         this.schematic = schematic;
         this.clipboard = schematic.getClipboard();
-//        Direction newDirection = WorldUtil.getDirection(getRotation());
-        
-//        int width = schematic.getWidth();
-//        int length = schematic.getLength();
-//        int height = schematic.getHeight();
-        
-//        if(((currentDirection == Direction.EAST || currentDirection == Direction.WEST) && (newDirection == Direction.NORTH || newDirection == Direction.SOUTH))
-//                || ((currentDirection == Direction.NORTH || currentDirection == Direction.SOUTH) && (newDirection == Direction.WEST || newDirection == Direction.EAST))) {
-//            int temp = schematic.getWidth();
-//            width = schematic.getLength();
-//            length = temp;
-//        }
-        
     }
     
     public Schematic getSchematic() {

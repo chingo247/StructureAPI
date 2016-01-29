@@ -27,7 +27,7 @@ public interface ISchematicData {
     int getWidth();
     int getHeight();
     int getLength();
-    int getRotation();
+    int getAxisOffset();
     long getXXHash64();
     String getName();
     long getLastImport();

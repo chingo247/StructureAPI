@@ -38,13 +38,13 @@ public class DefaultSchematic implements Schematic {
     private final int width;
     private final int height;
     private final int length;
-    private int rotation;
+    private int yAxisOffset;
 
-    protected DefaultSchematic(File schematicFile, int width, int height, int length, int rotation) {
+    protected DefaultSchematic(File schematicFile, int width, int height, int length, int axisOffset) {
         Preconditions.checkNotNull(schematicFile);
         Preconditions.checkArgument(schematicFile.exists());
         this.schematicFile = schematicFile;
-        this.rotation = rotation;
+        this.yAxisOffset = axisOffset;
 
         XXHasher hasher = new XXHasher();
 
@@ -102,14 +102,13 @@ public class DefaultSchematic implements Schematic {
     }
 
     @Override
-    public int getRotation() {
-        return rotation;
+    public int getAxisOffset() {
+        return yAxisOffset;
     }
     
     @Override
     public SchematicPlacement createPlacement() {
-        SchematicPlacement placement = new SchematicPlacement(this, 0, Vector.ZERO);
-        placement.rotate(rotation);
+        SchematicPlacement placement = new SchematicPlacement(this,yAxisOffset, Vector.ZERO);
         return placement; // Default settlercraft thinks schematics are stored in natural position
     }
 

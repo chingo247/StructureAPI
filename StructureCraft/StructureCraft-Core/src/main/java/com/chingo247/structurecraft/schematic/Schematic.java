@@ -33,7 +33,7 @@ public interface Schematic {
     int getWidth();
     int getHeight();
     int getLength();
-    int getRotation();
+    int getAxisOffset();
     File getFile();
     
 }

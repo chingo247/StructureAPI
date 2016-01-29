@@ -20,6 +20,7 @@ import com.chingo247.structurecraft.placement.block.SchematicPlacement;
 import com.chingo247.structurecraft.plan.io.document.PlacementElement;
 import com.chingo247.structurecraft.plan.io.exception.PlanException;
 import com.chingo247.structurecraft.placement.PlacementTypes;
+import com.chingo247.structurecraft.schematic.Schematic;
 import com.chingo247.structurecraft.schematic.SchematicManager;
 import com.sk89q.worldedit.Vector;
 import java.io.File;
@@ -44,11 +45,14 @@ public class SchematicPlacementParser implements PlacementParser<SchematicPlacem
 
         Vector pos = placementElement.getPosition();
         
-        int direction = placementElement.getRotation();
+        int direction = placementElement.getAxisOffset();
+        
         
         
         SchematicManager sdm = SchematicManager.getInstance();
-        return new SchematicPlacement(sdm.getOrLoadSchematic(schematicFile), direction, pos);
+        Schematic schematic = sdm.getOrLoadSchematic(schematicFile);
+        direction += schematic.getAxisOffset();
+        return new SchematicPlacement(schematic, direction, pos);
     }
 
     @Override

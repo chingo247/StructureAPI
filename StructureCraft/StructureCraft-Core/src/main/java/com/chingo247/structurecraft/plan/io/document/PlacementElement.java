@@ -60,7 +60,7 @@ public class PlacementElement extends LineElement {
         return simpleElement.getTextValue().trim();
     }
 
-    public int getRotation() {
+    public int getAxisOffset() {
         Node dirNode = le.selectSingleNode(PlacementXMLConstants.ROTATION_ELEMENT);
         if (dirNode != null) {
             LineElement dirElement = new LineElement(getFile(), (Element) dirNode);

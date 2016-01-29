@@ -35,7 +35,7 @@ public class SchematicDataNode implements ISchematicData {
     public static final String XXHASH_PROPERTY = "xxhash";
     public static final String NAME_PROPERTY = "name";
     public static final String LAST_IMPORT = "lastImport";
-    public static final String ROTATION_PROPERTY = "rotation";
+    public static final String AXIS_OFFSET_PROPERTY = "axisOffset";
     
     private final Node underlyingNode;
 
@@ -48,17 +48,17 @@ public class SchematicDataNode implements ISchematicData {
     }
     
     public boolean hasRotation() {
-        return underlyingNode.hasProperty(ROTATION_PROPERTY);
+        return underlyingNode.hasProperty(AXIS_OFFSET_PROPERTY);
     }
 
     @Override
-    public int getRotation() {
-        Integer rotation = underlyingNode.hasProperty(ROTATION_PROPERTY) ? (Integer)underlyingNode.getProperty(ROTATION_PROPERTY) : Integer.MIN_VALUE;
+    public int getAxisOffset() {
+        Integer rotation = underlyingNode.hasProperty(AXIS_OFFSET_PROPERTY) ? (Integer)underlyingNode.getProperty(AXIS_OFFSET_PROPERTY) : Integer.MIN_VALUE;
         return rotation;
     }
     
     public void setRotation(int rotation) {
-        underlyingNode.setProperty(ROTATION_PROPERTY, rotation);
+        underlyingNode.setProperty(AXIS_OFFSET_PROPERTY, rotation);
     }
     
     @Override

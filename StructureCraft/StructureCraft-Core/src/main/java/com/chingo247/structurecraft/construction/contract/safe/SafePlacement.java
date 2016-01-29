@@ -54,10 +54,11 @@ class SafePlacement extends BlockPlacement {
         this.placement = blockPlacement;
         this.placeLater = placeLater;
         if (placement instanceof RotationalPlacement) {
-            d = WorldUtil.getDirection(((RotationalPlacement) placement).getRotation());
+            d = WorldUtil.getDirection(((RotationalPlacement) blockPlacement).getRotation());
         } else {
             d = Direction.EAST; // Default
         }
+        System.out.println("SafePlacement: Direction " + d.name());
     }
 
     public boolean isLast() {
@@ -72,7 +73,6 @@ class SafePlacement extends BlockPlacement {
     public BaseBlock getBlock(Vector position) {
         return placement.getBlock(position);
     }
-    
     
 
     @Override

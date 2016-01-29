@@ -128,7 +128,7 @@ public class SchematicManager {
                         // Only load schematic data that wasn't yet loaded...
                         ISchematicData existingData = alreadyHere.get(checksum);
                         if (existingData != null) {
-                            Schematic s = new DefaultSchematic(schematicFile, existingData.getWidth(), existingData.getHeight(), existingData.getLength(), existingData.getRotation());
+                            Schematic s = new DefaultSchematic(schematicFile, existingData.getWidth(), existingData.getHeight(), existingData.getLength(), existingData.getAxisOffset());
                             alreadyDone.add(s);
                         } else if (getSchematic(checksum) == null) {
                             SchematicProcessor processor = new SchematicProcessor(schematicFile);
@@ -168,7 +168,7 @@ public class SchematicManager {
                 for (Schematic newData : newSchematics) {
                     if(needsUpdating.get(newData.getHash()) != null) {
                         SchematicDataNode dataNode = schematicRepository.findByHash(newData.getHash());
-                        dataNode.setRotation(newData.getRotation());
+                        dataNode.setRotation(newData.getAxisOffset());
                         updated++;
                         continue;
                     } 
@@ -177,8 +177,8 @@ public class SchematicManager {
                     int width = newData.getWidth();
                     int height = newData.getHeight();
                     int length = newData.getLength();
-                    int rotation = newData.getRotation();
-                    schematicRepository.addSchematic(name, xxhash, width, height, length, rotation, System.currentTimeMillis());
+                    int axisOffset = newData.getAxisOffset();
+                    schematicRepository.addSchematic(name, xxhash, width, height, length, axisOffset, System.currentTimeMillis());
                 }
 
                 // Delete unused

@@ -75,8 +75,8 @@ class SafeTask extends StructureTask {
         final IScheduler scheduler = plugin.getScheduler();
         final Vector structureMin = getConstructionEntry().getStructure().getMin();
 
-        final int length = placement.getLength();
-        final int width = placement.getWidth();
+        final int length = safeBlockData.getLength();
+        final int width = safeBlockData.getWidth();
 
         scheduler.run(new Runnable() {
 
@@ -98,33 +98,32 @@ class SafeTask extends StructureTask {
                     while (count < maxBlocks && traversal.hasNext()) {
                         Vector v = traversal.next();
 
-                        Vector p;
-                        switch (d) {
-                            case EAST:
-                                p = structureMin.add(v);
-                                break;
-                            case WEST:
-                                p = structureMin.add((-v.getBlockX()) + (width - 1), v.getBlockY(), (-v.getBlockZ()) + (length - 1));
-                                break;
-                            case NORTH:
-                                p = structureMin.add(v.getBlockZ(), v.getBlockY(), (-v.getBlockX()) + (width - 1));
-                                break;
-                            case SOUTH:
-                                p = structureMin.add((-v.getBlockZ()) + (length - 1), v.getBlockY(), v.getBlockX());
-                                break;
-                            default:
-                                throw new AssertionError("unreachable");
-                        }
+//                        Vector p;
+//                        switch (d) {
+//                            
+//                            case EAST:
+//                                p = structureMin.add(v);
+//                                break;
+//                            case WEST:
+//                                p = structureMin.add((-v.getBlockX()) + (width - 1), v.getBlockY(), (-v.getBlockZ()) + (length - 1));
+//                                break;
+//                            case NORTH:
+//                                p = structureMin.add(v.getBlockZ(), v.getBlockY(), (-v.getBlockX()) + (width - 1));
+//                                break;
+//                            case SOUTH:
+//                                p = structureMin.add((-v.getBlockZ()) + (length - 1), v.getBlockY(), v.getBlockX());
+//                                break;
+//                            default:
+//                                throw new AssertionError("unreachable");
+//                        }
 
-                        BaseBlock b = world.getBlock(p);
+                        BaseBlock b = world.getBlock(structureMin.add(v));
                         
 //                        System.out.println("");
 
-                        Vector safePos = p.subtract(structureMin);
-
 //                        System.out.println("Saving: " + b + p + ", rel: " + safePos);
 
-                        safeBlockData.setBlock(safePos, b);
+                        safeBlockData.setBlock(v, b);
                         count++;
                     }
 //                    System.out.println(" ");

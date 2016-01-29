@@ -16,6 +16,8 @@
  */
 package com.chingo247.structurecraft.placement;
 
+import com.chingo247.settlercraft.core.Direction;
+import com.chingo247.structurecraft.util.WorldUtil;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
@@ -26,23 +28,26 @@ import com.sk89q.worldedit.regions.CuboidRegion;
  */
 public abstract class AbstractPlacement implements IPlacement, RotationalPlacement {
     
+    protected static final int DEFAULT_ROTATION = -90;
+    
     protected final Vector position;
-    private int rotation;
-    protected final int width;
-    protected final int height;
-    protected final int length;
+    private int rotation = DEFAULT_ROTATION;
+    protected int width;
+    protected int height;
+    protected int length;
+    private final int axisOffset;
 
     public AbstractPlacement(int width, int height, int length) {
         this(0, Vector.ZERO, width, height, length);
     }
 
     
-    public AbstractPlacement(int rotation, Vector relativePosition, int width, int height, int length) {
-        this.rotation = rotation;
+    public AbstractPlacement(int axisOffset, Vector relativePosition, int width, int height, int length) {
         this.position = relativePosition;
         this.length = length;
         this.height = height;
         this.width = width;
+        this.axisOffset = axisOffset;
     }
 
     @Override
@@ -54,14 +59,34 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
     public Vector getOffset() {
         return position;
     }
+    
 
     @Override
     public final void rotate(int rotation) {
+        Direction currentDirection = WorldUtil.getDirection(getRotation());
+        System.out.println("CURRENT_DIRECTION: " + currentDirection + ", CURRENT_ROTATION: " + getRotation());
+        
         this.rotation += rotation;
+        this.rotation = (int) (normalizeYaw(this.rotation));
+        
+        Direction newDirection = WorldUtil.getDirection(getRotation());
+        System.out.println("NEW_DIRECTION: " + newDirection + ", NEW_ROTATION: " + getRotation());
+        
+        if (((currentDirection == Direction.EAST || currentDirection == Direction.WEST) && (newDirection == Direction.NORTH || newDirection == Direction.SOUTH))
+                || ((currentDirection == Direction.NORTH || currentDirection == Direction.SOUTH) && (newDirection == Direction.WEST || newDirection == Direction.EAST))) {
+            int temp = width;
+            width = length;
+            length = temp;
+            System.out.println("SWITCH!");
+        } else {
+             System.out.println("NO SWITCH!");
+        }
+        
+        
         this.rotation = (int) (normalizeYaw(this.rotation));
     }
     
-     private static float normalizeYaw(float yaw) {
+     private float normalizeYaw(float yaw) {
         float ya = yaw;
         if(yaw > 360) {
             int times = (int)((ya - (ya % 360)) / 360);
@@ -83,7 +108,7 @@ public abstract class AbstractPlacement implements IPlacement, RotationalPlaceme
     
     @Override
     public int getRotation() {
-        return rotation;
+        return rotation + axisOffset;
     }
 
     @Override

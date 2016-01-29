@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.UUID;
-import static org.neo4j.kernel.Traversal.traversal;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 
@@ -88,7 +87,11 @@ public class SafeContract extends AContract {
                 throw new RuntimeException(ex);
             }
         } else {
-            safeBlockData = new SchematicSafeData(placement.getWidth(), placement.getHeight(), placement.getLength());
+//            if (structure.getDirection() == Direction.NORTH || structure.getDirection() == Direction.SOUTH) {
+//                safeBlockData = new SchematicSafeData(placement.getLength(), placement.getHeight(), placement.getWidth());
+//            } else {
+                safeBlockData = new SchematicSafeData(placement.getWidth(), placement.getHeight(), placement.getLength());
+//            }
         }
 
 
@@ -101,15 +104,11 @@ public class SafeContract extends AContract {
         PlaceOptions option = contract.getPlaceOptions() != null ? contract.getPlaceOptions() : new PlaceOptions();
 
         Iterator<Vector> traversalSafe = makeTraversal(placement);
-        Iterator<Vector> traversalPlace = makeTraversal(placement);
+        Iterator<Vector> traversalPlace = makeTraversal(safeBlockData);
         PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
-
-        
-        
 
         int totalBlocks = placement.getWidth() * placement.getHeight() * placement.getLength();
         
-        Vector size = placement.getSize();
         int countBlock = 0;
 
         while (countBlock < totalBlocks) {

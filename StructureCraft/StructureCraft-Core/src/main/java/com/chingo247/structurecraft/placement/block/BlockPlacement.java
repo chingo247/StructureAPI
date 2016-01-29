@@ -58,8 +58,8 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
         this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.001)));
     }
 
-    public BlockPlacement(int rotation, Vector relativePosition, int width, int height, int length) {
-        super(rotation, relativePosition, width, height, length);
+    public BlockPlacement(int axistOffset, Vector relativePosition, int width, int height, int length) {
+        super(axistOffset, relativePosition, width, height, length);
         this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.01)));
     }
 

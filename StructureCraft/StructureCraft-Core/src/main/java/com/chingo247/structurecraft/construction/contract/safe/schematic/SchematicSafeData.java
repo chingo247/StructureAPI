@@ -40,27 +40,21 @@ public class SchematicSafeData extends BlockPlacement {
 
     private static final Logger LOG = Logger.getLogger(SchematicSafeData.class.getName());
 
-    private byte[] blockLight;
     private byte[] done;
     private byte[] ids;
     private byte[] data;
     private byte[] addId;
     private Map<Vector, Map<String, Tag>> tileEntities;
-    private int width, height, length;
     private Direction direction = Direction.EAST;
 
     public SchematicSafeData(int width, int height, int length) {
-        super(width, height, length);
+        super(DEFAULT_ROTATION, Vector.ZERO, width, height, length);
         int blocks = width * height * length;
 
-        this.blockLight = new byte[blocks];
         this.done = new byte[blocks];
         this.ids = new byte[blocks];
         this.data = new byte[blocks];
         this.tileEntities = Maps.newHashMap();
-        this.width = width;
-        this.height = height;
-        this.length = length;
     }
 
     void setBlockIds(byte[] blockIds) {
