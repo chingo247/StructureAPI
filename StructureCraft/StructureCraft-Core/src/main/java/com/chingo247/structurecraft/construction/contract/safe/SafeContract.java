@@ -90,7 +90,8 @@ public class SafeContract extends AContract {
 //            if (structure.getDirection() == Direction.NORTH || structure.getDirection() == Direction.SOUTH) {
 //                safeBlockData = new SchematicSafeData(placement.getLength(), placement.getHeight(), placement.getWidth());
 //            } else {
-                safeBlockData = new SchematicSafeData(placement.getWidth(), placement.getHeight(), placement.getLength());
+                
+                safeBlockData = new SchematicSafeData(placement.getSize());
 //            }
         }
 

@@ -69,7 +69,7 @@ public class IOSchematicSafeData {
         int height = getChildTag(schematic, "Height", ShortTag.class).getValue();
         int length = getChildTag(schematic, "Length", ShortTag.class).getValue();
 
-        SchematicSafeData schematicSafeData = new SchematicSafeData(width, height, length);
+        SchematicSafeData schematicSafeData = new SchematicSafeData(new BlockVector(width, height, length));
 
         byte[] blockIds = getChildTag(schematic, "Blocks", ByteArrayTag.class).getValue();
         schematicSafeData.setBlockIds(blockIds);

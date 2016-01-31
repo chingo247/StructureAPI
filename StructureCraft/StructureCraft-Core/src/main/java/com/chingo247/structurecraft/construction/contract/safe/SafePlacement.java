@@ -149,7 +149,7 @@ class SafePlacement extends BlockPlacement {
                 p = position.add(blockPosition);
                 break;
             case WEST:
-                p = position.add((-blockPosition.getBlockX()) + (getWidth() - 1), blockPosition.getBlockY(), (-blockPosition.getBlockZ()) + (getLength() - 1));
+                p = position.add((-blockPosition.getBlockX()) + (placement.getLength() - 1), blockPosition.getBlockY(), (-blockPosition.getBlockZ()) + (placement.getWidth() - 1));
                 block.rotate90();
                 block.rotate90();
                 break;
@@ -158,7 +158,7 @@ class SafePlacement extends BlockPlacement {
                 block.rotate90Reverse();
                 break;
             case SOUTH:
-                p = position.add((-blockPosition.getBlockZ()) + (getLength() - 1), blockPosition.getBlockY(), blockPosition.getBlockX());
+                p = position.add((-blockPosition.getBlockZ()) + (placement.getLength() - 1), blockPosition.getBlockY(), blockPosition.getBlockX());
                 block.rotate90();
                 break;
             default:

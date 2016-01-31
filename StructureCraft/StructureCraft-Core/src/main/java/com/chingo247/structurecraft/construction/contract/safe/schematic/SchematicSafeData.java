@@ -47,8 +47,8 @@ public class SchematicSafeData extends BlockPlacement {
     private Map<Vector, Map<String, Tag>> tileEntities;
     private Direction direction = Direction.EAST;
 
-    public SchematicSafeData(int width, int height, int length) {
-        super(DEFAULT_ROTATION, Vector.ZERO, width, height, length);
+    public SchematicSafeData(Vector size) {
+        super(DEFAULT_ROTATION, Vector.ZERO, size.getBlockX(), size.getBlockY(), size.getBlockZ());
         int blocks = width * height * length;
 
         this.done = new byte[blocks];

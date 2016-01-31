@@ -179,7 +179,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
                 p = position.add(blockPosition);
                 break;
             case WEST:
-                p = position.add((-blockPosition.getBlockX()) + (getWidth() - 1), blockPosition.getBlockY(), (-blockPosition.getBlockZ()) + (getLength() - 1));
+                p = position.add((-blockPosition.getBlockX()) + (getLength() - 1), blockPosition.getBlockY(), (-blockPosition.getBlockZ()) + (getWidth() - 1));
                 block.rotate90();
                 block.rotate90();
                 break;
