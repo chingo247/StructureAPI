@@ -31,7 +31,7 @@ public class RollbackPlacementProducer extends BlockPlacementProducer {
 
     @Override
     public IBlockPlacement produce(IStructure structure) throws StructureException {
-        File rollbackSchematic = structure.getRollbackData().getRollbackSchematic();
+        File rollbackSchematic = structure.getRollbackData().getBlockStoreFile();
         if (!rollbackSchematic.exists()) {
             throw new StructureException("Structure doesn't have a rollback schematic");
         }

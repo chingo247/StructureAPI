@@ -24,10 +24,8 @@ import java.io.File;
  */
 public interface IRollbackData {
 
-    File getRollbackSchematic();
+    File getBlockStoreFile();
 
-    boolean hasRollbackSchematic();
-    
-    boolean hasRollbackFiles();
+    boolean hasBlockStore();
     
 }

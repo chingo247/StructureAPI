@@ -17,12 +17,21 @@
 package com.chingo247.structurecraft.store.safe;
 
 import com.chingo247.structurecraft.store.BlockStore;
+import static com.chingo247.structurecraft.store.BlockStore.ROOT_NODE;
 import com.chingo247.structurecraft.store.IBlockStoreChunkFactory;
+import com.chingo247.structurecraft.store.NBTUtils;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 /**
  *
@@ -31,6 +40,8 @@ import java.util.Map;
 public class SafeBlockStore extends BlockStore {
     
     private final SafeBlockStoreChunkFactory chunkFactory;
+    
+    
 
     public SafeBlockStore(File file, Map<String, Tag> root, Vector size) {
         super(file, root, size);
@@ -55,7 +66,25 @@ public class SafeBlockStore extends BlockStore {
         return chunkFactory;
     }
     
-    
+    public static SafeBlockStore load(File f) throws IOException {
+        try (NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(new FileInputStream(f)))) {
+            NamedTag root = nbtStream.readNamedTag();
+            if (!root.getName().equals(ROOT_NODE)) {
+                throw new RuntimeException("File not of type '" + ROOT_NODE + "'");
+            }
+
+            Map<String, Tag> rootMap = (Map) root.getTag().getValue();
+
+            int width = NBTUtils.getChildTag(rootMap, "Width", IntTag.class).getValue();
+            int height = NBTUtils.getChildTag(rootMap, "Height", IntTag.class).getValue();
+            int length = NBTUtils.getChildTag(rootMap, "Length", IntTag.class).getValue();
+
+            BlockVector size = new BlockVector(width, height, length);
+            SafeBlockStore blockStore = new SafeBlockStore(f, rootMap, size);
+            return blockStore;
+        }
+
+    }
     
     
 }

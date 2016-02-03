@@ -17,6 +17,7 @@
 package com.chingo247.structurecraft.store;
 
 import com.sk89q.worldedit.Vector;
+import java.io.IOException;
 
 /**
  *
@@ -31,5 +32,7 @@ public interface IBlockStore extends IBlockContainer {
     int getWidth();
     
     Vector getSize();
+    
+    void save() throws IOException;
     
 }

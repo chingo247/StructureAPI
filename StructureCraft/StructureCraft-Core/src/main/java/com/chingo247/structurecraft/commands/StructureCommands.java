@@ -327,7 +327,7 @@ public class StructureCommands {
         }
         LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
 
-        if(!structure.getRollbackData().hasRollbackFiles()) {
+        if(!structure.getRollbackData().hasBlockStore()) {
             throw new CommandException("Rollback not available for this structure");
         }
         

@@ -33,21 +33,18 @@ public class RollbackData implements IRollbackData {
     }
 
     @Override
-    public File getRollbackSchematic() {
+    public File getBlockStoreFile() {
         File rollbackDirectory = new File(structure.getDirectory(), ROLLBACK_DIRECTORY);
         rollbackDirectory.mkdirs();
         
-        return new File(rollbackDirectory, "rollback.schematic");
+        return new File(rollbackDirectory, "rollback.blockstore");
     }
     
     @Override
-    public boolean hasRollbackSchematic() {
-        return getRollbackSchematic().exists();
+    public boolean hasBlockStore() {
+        return getBlockStoreFile().exists();
     }
 
-    @Override
-    public boolean hasRollbackFiles() {
-        return hasRollbackSchematic(); // Future may add region backups too
-    }
+   
     
 }

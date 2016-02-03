@@ -16,6 +16,9 @@
  */
 package com.chingo247.structurecraft.store;
 
+import com.sk89q.jnbt.Tag;
+import java.util.Map;
+
 /**
  *
  * @author Chingo
@@ -29,4 +32,6 @@ public interface IBlockStoreSection extends IBlockContainer {
     int getY();
     
     int numBlocks();
+    
+    Map<String, Tag> serialize();
 }

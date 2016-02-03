@@ -25,12 +25,16 @@ import com.chingo247.structurecraft.construction.contract.AContract;
 import com.chingo247.structurecraft.construction.listener.ConstructionListener;
 import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
+import com.chingo247.structurecraft.model.structure.IRollbackData;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.model.structure.RollbackData;
 import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.StructureBlock;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
+import com.chingo247.structurecraft.store.BlockStore;
+import com.chingo247.structurecraft.store.safe.SafeBlockStore;
 import com.chingo247.structurecraft.util.RegionUtil;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
@@ -45,6 +49,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**
@@ -83,30 +89,18 @@ public class SafeContract extends AContract {
         CuboidRegion region = structure.getCuboidRegion();
 
         // Get or create rollback data
-        File rollbackFile = structure.getRollbackData().getRollbackSchematic();
-        SchematicSafeData safeBlockData;
-        if (rollbackFile.exists()) {
+        IRollbackData data = structure.getRollbackData();
+        SafeBlockStore blockStore;
+        if(data.hasBlockStore()) {
             try {
-                safeBlockData = IOSchematicSafeData.read(rollbackFile);
+                blockStore = SafeBlockStore.load(data.getBlockStoreFile());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
-            Vector size = placement.getSize();
-            System.out.println("SAFECONTRACT-SIZE: " + size);
-            System.out.println("SAFECONTRACT: width: " + region.getWidth() + ", height: " + region.getHeight() + ", length: " + region.getLength());
-
-            Direction d;
-            if (placement instanceof RotationalPlacement) {
-                d = WorldUtil.getDirection(((RotationalPlacement) placement).getRotation());
-            } else {
-                d = Direction.EAST; // Default
-            }
-
-            safeBlockData = new SchematicSafeData(size, d);
-
-//            safeBlockData = new SchematicSafeData(new BlockVector(region.getWidth(), region.getHeight(), region.getLength()));
+            blockStore = new SafeBlockStore(data.getBlockStoreFile(), region);
         }
+        
 
         // Create place areas...
         IContract entryContract = entry.getContract();
@@ -136,7 +130,7 @@ public class SafeContract extends AContract {
         int countBlock = 0;
 
         while (countBlock < totalBlocks) {
-            entry.addTask(new SafeTask(entry, player, placement, world, safeBlockData, rollbackFile, traversalSafe, MAX_BLOCKS_PER_TASK));
+            entry.addTask(new SafeTask(entry, player, placement, world, blockStore, traversalSafe, MAX_BLOCKS_PER_TASK));
             SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
             entry.addTask(new AWEPlacementTask(
                     asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())

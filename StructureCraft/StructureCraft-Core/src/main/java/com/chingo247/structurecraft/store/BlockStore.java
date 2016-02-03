@@ -18,9 +18,12 @@ package com.chingo247.structurecraft.store;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
@@ -29,11 +32,16 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  *
@@ -48,7 +56,7 @@ public class BlockStore implements IBlockStore {
 
     private final Vector size;
     protected Map<String, Tag> chunkTags;
-    protected Map<String, BlockStoreChunk> chunks;
+    protected Map<String, IBlockStoreChunk> chunks;
     protected File file;
 
     private BlockStoreChunkFactory chunkFactory;
@@ -129,18 +137,22 @@ public class BlockStore implements IBlockStore {
         }
     }
 
+    @Override
     public int getWidth() {
         return size.getBlockX();
     }
 
+    @Override
     public int getLength() {
         return size.getBlockZ();
     }
 
+    @Override
     public int getHeight() {
         return size.getBlockY();
     }
 
+    @Override
     public Vector getSize() {
         return size;
     }
@@ -153,22 +165,67 @@ public class BlockStore implements IBlockStore {
 
     public IBlockStoreChunk getChunk(int x, int z) {
         String key = getChunkKey(x, z);
-        BlockStoreChunk bsc = chunks.get(key);
+        IBlockStoreChunk bsc = chunks.get(key);
         if (bsc == null) {
             Tag chunkTag = chunkTags.get(key);
             
             int chunkX = (x << 4) * 16;
             int chunkZ = (z << 4) * 16;
             
-            int width = chunkX + 16 > getWidth() ? (getWidth() - chunkX) : DEFAULT_SIZE;
-            int length = chunkZ + 16 > getLength()? (getLength() - chunkZ) : DEFAULT_SIZE;
+            int width; 
+            if(chunkTag == null) {
+                width = chunkX + 16 > getWidth() ? (getWidth() - chunkX) : DEFAULT_SIZE;
+            } else {
+                Map<String,Tag> map = (Map)chunkTag.getValue();
+                if(map.containsKey("Width")) {
+                    Tag widthTag = map.get("Width");
+                    width = (short) widthTag.getValue();
+                } else {
+                    width = DEFAULT_SIZE;
+                }
+            }
+            
+            if(width <= 0) {
+                throw new RuntimeException("Width was <= 0");
+            }
+            
+            int length; 
+            if(chunkTag == null) {
+                length = chunkZ + 16 > getLength()? (getLength() - chunkZ) : DEFAULT_SIZE;
+            } else {
+                Map<String,Tag> map = (Map)chunkTag.getValue();
+                if(map.containsKey("Length")) {
+                    Tag lengthTag = map.get("Length");
+                    length = (short) lengthTag.getValue();
+                } else {
+                    length = DEFAULT_SIZE;
+                }
+            }
+            
+            if(length <= 0) {
+                throw new RuntimeException("Length was <= 0");
+            }
             
             this.getChunkFactory().newChunk(chunkTag, chunkX, chunkZ, new Vector2D(width, length));
             this.chunks.put(key, bsc);
         }
         return bsc;
     }
-
+    
+    @Override
+    public void save() throws IOException  {
+        Map<String, Tag> rootMap = Maps.newHashMap();
+        Set<Entry<String,IBlockStoreChunk>> chunkSet = chunks.entrySet();
+        for (Iterator<Entry<String, IBlockStoreChunk>> iterator = chunkSet.iterator(); iterator.hasNext();) {
+            Entry<String, IBlockStoreChunk> next = iterator.next();
+            rootMap.put(next.getKey(), new CompoundTag(next.getValue().serialize()));
+        }
+        
+        try(NBTOutputStream outputStream = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
+            outputStream.writeNamedTag("BlockStore", new CompoundTag(rootMap));
+        }
+    }
+    
     public static BlockStore load(File f) throws IOException {
         try (NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(new FileInputStream(f)))) {
             NamedTag root = nbtStream.readNamedTag();

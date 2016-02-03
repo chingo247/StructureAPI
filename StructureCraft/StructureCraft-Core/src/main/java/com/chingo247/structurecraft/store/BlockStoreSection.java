@@ -17,8 +17,11 @@
 package com.chingo247.structurecraft.store;
 
 import static com.chingo247.structurecraft.store.NBTUtils.getChildTag;
+import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
@@ -171,6 +174,25 @@ public class BlockStoreSection implements IBlockStoreSection {
     @Override
     public void setBlockAt(Vector position, BaseBlock block) {
         this.setBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ(), block);
+    }
+
+    @Override
+    public Map<String, Tag> serialize() {
+        Map<String, Tag> rootMap = Maps.newHashMap();
+        
+        if(!isEmpty()) {
+            if(sectionHeight != BlockStore.DEFAULT_SIZE) {
+                rootMap.put("Height", new ShortTag((short)sectionHeight));
+            }
+        
+            rootMap.put("Blocks", new ByteArrayTag(ids));
+            rootMap.put("Data", new ByteArrayTag(data));
+            
+            if(addId != null) {
+                rootMap.put("AddId", new ByteArrayTag(addId));
+            }
+        }
+        return rootMap;
     }
 
 }

@@ -18,6 +18,7 @@ import java.util.concurrent.ExecutorService;
 import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
+import com.chingo247.structurecraft.store.safe.SafeBlockStore;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.sk89q.worldedit.BlockVector;
 import java.io.File;
@@ -40,7 +41,7 @@ class SafeTask extends StructureTask {
     /**
      * The schematicSaveData object.
      */
-    private SchematicSafeData safeBlockData;
+    private SafeBlockStore safeBlockStore;
 
     private File safeDataFile;
 
@@ -58,14 +59,13 @@ class SafeTask extends StructureTask {
      * @param safeBlockData The safe block data that will be used to save
      * @param callback
      */
-    public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SchematicSafeData safeBlockData, File safeDataFile, Iterator<Vector> traversal, int maxBlocks) {
+    public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStore safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
         super(entry, submitter);
         this.world = world;
-        this.safeBlockData = safeBlockData;
-        this.safeDataFile = safeDataFile;
         this.traversal = traversal;
         this.maxBlocks = maxBlocks;
         this.placement = placement;
+        this.safeBlockStore = safeBlockStore;
     }
 
     @Override
@@ -74,8 +74,7 @@ class SafeTask extends StructureTask {
         final IScheduler scheduler = plugin.getScheduler();
         final Vector position = getConstructionEntry().getStructure().getMin();
 
-        final int length = safeBlockData.getLength();
-        final int width = safeBlockData.getWidth();
+        
 
         scheduler.run(new Runnable() {
 
@@ -95,7 +94,8 @@ class SafeTask extends StructureTask {
 //                    System.out.println("SAFE TASK ");
                     
                     
-                    
+                    int width = placement.getWidth();
+                    int length = placement.getLength();
                     
                     while (count < maxBlocks && traversal.hasNext()) {
                         Vector v = traversal.next();
@@ -126,9 +126,10 @@ class SafeTask extends StructureTask {
 
                         BaseBlock block = world.getBlock(p);
 
-                        System.out.println("Saving: " + b);
+                        System.out.println("Saving: " + position.subtract(p));
+                        
+                        safeBlockStore.setBlockAt(position.subtract(p), block);
 
-                        safeBlockData.setBlock(b, block);
                         count++;
                     }
 //                    System.out.println(" ");
@@ -139,10 +140,9 @@ class SafeTask extends StructureTask {
                         @Override
                         public void run() {
                             try {
-                                IOSchematicSafeData.write(safeDataFile, safeBlockData);
+                                safeBlockStore.save();
                             } catch (Exception e) {
                                 setFailed(true);
-                                safeBlockData = null;
                                 LOG.error(e.getMessage(), e);
                             } finally {
                                 finish();

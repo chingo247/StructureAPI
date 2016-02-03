@@ -17,9 +17,11 @@
 package com.chingo247.structurecraft.store;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.blocks.BaseBlock;
+import java.util.Map;
 
 /**
  *
@@ -42,5 +44,7 @@ public interface IBlockStoreChunk extends IBlockContainer {
     int getChunkZ();
     
     Vector2D getSize();
+    
+    Map<String, Tag> serialize();
     
 }
