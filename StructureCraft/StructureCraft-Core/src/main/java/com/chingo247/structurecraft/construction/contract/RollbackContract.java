@@ -25,7 +25,7 @@ import com.chingo247.structurecraft.construction.listener.ConstructionListener;
 import com.chingo247.structurecraft.construction.listener.RollbackListener;
 import com.chingo247.structurecraft.construction.producer.BlockPlacementProducer;
 import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
-import com.chingo247.structurecraft.construction.producer.RollbackPlacementProducer;
+import com.chingo247.structurecraft.construction.contract.safe.RollbackPlacementProducer;
 import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;

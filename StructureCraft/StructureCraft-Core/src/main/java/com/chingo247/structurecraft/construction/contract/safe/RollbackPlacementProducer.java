@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.producer;
+package com.chingo247.structurecraft.construction.contract.safe;
 
-import com.chingo247.structurecraft.construction.contract.safe.schematic.IOSchematicSafeData;
-import com.chingo247.structurecraft.construction.contract.safe.schematic.SchematicSafeData;
+import com.chingo247.structurecraft.construction.producer.BlockPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;

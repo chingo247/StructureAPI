@@ -53,6 +53,7 @@ class SafePlacement extends BlockPlacement {
         this.traversal = traversal;
         this.placement = blockPlacement;
         this.placeLater = placeLater;
+        
         if (placement instanceof RotationalPlacement) {
             d = WorldUtil.getDirection(((RotationalPlacement) blockPlacement).getRotation());
         } else {

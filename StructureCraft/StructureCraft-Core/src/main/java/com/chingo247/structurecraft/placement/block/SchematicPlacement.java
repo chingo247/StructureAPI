@@ -17,6 +17,7 @@
 
 package com.chingo247.structurecraft.placement.block;
 
+import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.placement.FilePlacement;
 import com.chingo247.structurecraft.placement.IExportablePlacement;
 import com.chingo247.structurecraft.placement.PlacementTypes;
@@ -56,8 +57,6 @@ public class SchematicPlacement extends BlockPlacement implements FilePlacement,
     public Vector getSize() {
         return new BlockVector(clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength()); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
     
     public Schematic getSchematic() {
         return schematic;

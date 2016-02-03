@@ -16,11 +16,10 @@ import com.sk89q.worldedit.world.World;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import com.chingo247.structurecraft.construction.IStructureEntry;
-import com.chingo247.structurecraft.construction.contract.safe.schematic.IOSchematicSafeData;
-import com.chingo247.structurecraft.construction.contract.safe.schematic.SchematicSafeData;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.util.WorldUtil;
+import com.sk89q.worldedit.BlockVector;
 import java.io.File;
 import java.util.Iterator;
 import org.slf4j.Logger;
@@ -73,7 +72,7 @@ class SafeTask extends StructureTask {
     protected void execute() {
         final IStructureAPIPlugin plugin = StructureAPI.getInstance().getPlugin();
         final IScheduler scheduler = plugin.getScheduler();
-        final Vector structureMin = getConstructionEntry().getStructure().getMin();
+        final Vector position = getConstructionEntry().getStructure().getMin();
 
         final int length = safeBlockData.getLength();
         final int width = safeBlockData.getWidth();
@@ -94,36 +93,42 @@ class SafeTask extends StructureTask {
 
 //                    System.out.println(" ");
 //                    System.out.println("SAFE TASK ");
-
+                    
+                    
+                    
+                    
                     while (count < maxBlocks && traversal.hasNext()) {
                         Vector v = traversal.next();
 
-//                        Vector p;
-//                        switch (d) {
-//                            
-//                            case EAST:
-//                                p = structureMin.add(v);
-//                                break;
-//                            case WEST:
-//                                p = structureMin.add((-v.getBlockX()) + (width - 1), v.getBlockY(), (-v.getBlockZ()) + (length - 1));
-//                                break;
-//                            case NORTH:
-//                                p = structureMin.add(v.getBlockZ(), v.getBlockY(), (-v.getBlockX()) + (width - 1));
-//                                break;
-//                            case SOUTH:
-//                                p = structureMin.add((-v.getBlockZ()) + (length - 1), v.getBlockY(), v.getBlockX());
-//                                break;
-//                            default:
-//                                throw new AssertionError("unreachable");
-//                        }
+                        Vector b;
+                        Vector p;
+                        switch (d) {
+                            case EAST:
+                                b = v;
+                                p = position.add(b);
+                                break;
+                            case WEST:
+                                b = new BlockVector((-v.getBlockX()) + (width - 1), v.getBlockY(), (-v.getBlockZ()) + (length - 1));
+                                p = position.add(b);
+                                break;
+                            case NORTH:
+                                b = new BlockVector(v.getBlockZ(), v.getBlockY(), (-v.getBlockX()) + (width - 1));
+                                p = position.add(b);
+                                break;
+                            case SOUTH:
+                                b = new BlockVector((-v.getBlockZ()) + (length - 1), v.getBlockY(), v.getBlockX());
+                                p = position.add(b);
+                                break;
+                            default:
+                                throw new AssertionError("unreachable");
+                        }
+                        System.out.println("SafeTask: " + d);
 
-                        BaseBlock b = world.getBlock(structureMin.add(v));
-                        
-//                        System.out.println("");
+                        BaseBlock block = world.getBlock(p);
 
-//                        System.out.println("Saving: " + b + p + ", rel: " + safePos);
+                        System.out.println("Saving: " + b);
 
-                        safeBlockData.setBlock(v, b);
+                        safeBlockData.setBlock(b, block);
                         count++;
                     }
 //                    System.out.println(" ");

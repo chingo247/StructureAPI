@@ -16,25 +16,29 @@
  */
 package com.chingo247.structurecraft.construction.contract.safe;
 
+import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IContract;
 import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.construction.contract.AContract;
-import com.chingo247.structurecraft.construction.contract.safe.schematic.IOSchematicSafeData;
-import com.chingo247.structurecraft.construction.contract.safe.schematic.SchematicSafeData;
 import com.chingo247.structurecraft.construction.listener.ConstructionListener;
 import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.StructureBlock;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
+import com.chingo247.structurecraft.util.RegionUtil;
+import com.chingo247.structurecraft.util.WorldUtil;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
 import com.google.common.base.Preconditions;
+import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +46,6 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.UUID;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
-
 
 /**
  *
@@ -77,6 +80,8 @@ public class SafeContract extends AContract {
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         IBlockPlacement placement = getPlacementProducer().produce(structure);
 
+        CuboidRegion region = structure.getCuboidRegion();
+
         // Get or create rollback data
         File rollbackFile = structure.getRollbackData().getRollbackSchematic();
         SchematicSafeData safeBlockData;
@@ -87,14 +92,21 @@ public class SafeContract extends AContract {
                 throw new RuntimeException(ex);
             }
         } else {
-//            if (structure.getDirection() == Direction.NORTH || structure.getDirection() == Direction.SOUTH) {
-//                safeBlockData = new SchematicSafeData(placement.getLength(), placement.getHeight(), placement.getWidth());
-//            } else {
-                
-                safeBlockData = new SchematicSafeData(placement.getSize());
-//            }
-        }
+            Vector size = placement.getSize();
+            System.out.println("SAFECONTRACT-SIZE: " + size);
+            System.out.println("SAFECONTRACT: width: " + region.getWidth() + ", height: " + region.getHeight() + ", length: " + region.getLength());
 
+            Direction d;
+            if (placement instanceof RotationalPlacement) {
+                d = WorldUtil.getDirection(((RotationalPlacement) placement).getRotation());
+            } else {
+                d = Direction.EAST; // Default
+            }
+
+            safeBlockData = new SchematicSafeData(size, d);
+
+//            safeBlockData = new SchematicSafeData(new BlockVector(region.getWidth(), region.getHeight(), region.getLength()));
+        }
 
         // Create place areas...
         IContract entryContract = entry.getContract();
@@ -104,12 +116,23 @@ public class SafeContract extends AContract {
 
         PlaceOptions option = contract.getPlaceOptions() != null ? contract.getPlaceOptions() : new PlaceOptions();
 
-        Iterator<Vector> traversalSafe = makeTraversal(placement);
-        Iterator<Vector> traversalPlace = makeTraversal(safeBlockData);
+        System.out.println("RegionTraversal: " + placement.getSize());
+        Iterator<Vector> traversalSafe = new CuboidIterator(
+                CHUNK_SIZE,
+                CHUNK_SIZE,
+                CHUNK_SIZE
+        ).iterate(placement.getSize());
+
+        Iterator<Vector> traversalPlace = new CuboidIterator(
+                CHUNK_SIZE,
+                CHUNK_SIZE,
+                CHUNK_SIZE
+        ).iterate(placement.getSize());
+
         PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
 
         int totalBlocks = placement.getWidth() * placement.getHeight() * placement.getLength();
-        
+
         int countBlock = 0;
 
         while (countBlock < totalBlocks) {
@@ -120,7 +143,7 @@ public class SafeContract extends AContract {
             );
             countBlock += MAX_BLOCKS_PER_TASK;
         }
-        
+
         entry.addListener(getConstructionListener());
 
         // Empties the last blocks in placelater-queue
@@ -130,14 +153,6 @@ public class SafeContract extends AContract {
                 asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())
         );
 
-    }
-
-    private Iterator<Vector> makeTraversal(IPlacement placement) {
-        return new CuboidIterator(
-                CHUNK_SIZE,
-                CHUNK_SIZE,
-                CHUNK_SIZE 
-        ).iterate(placement.getSize());
     }
 
 }

@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.contract.safe.schematic;
+package com.chingo247.structurecraft.construction.contract.safe;
 
+import com.chingo247.settlercraft.core.Direction;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
@@ -43,7 +44,7 @@ import java.util.zip.GZIPOutputStream;
  *
  * @author Chingo
  */
-public class IOSchematicSafeData {
+class IOSchematicSafeData {
 
     private IOSchematicSafeData() {
     }
@@ -68,8 +69,9 @@ public class IOSchematicSafeData {
         int width = getChildTag(schematic, "Width", ShortTag.class).getValue();
         int height = getChildTag(schematic, "Height", ShortTag.class).getValue();
         int length = getChildTag(schematic, "Length", ShortTag.class).getValue();
+        int direction = getChildTag(schematic, "Direction", ShortTag.class).getValue();
 
-        SchematicSafeData schematicSafeData = new SchematicSafeData(new BlockVector(width, height, length));
+        SchematicSafeData schematicSafeData = new SchematicSafeData(new BlockVector(width, height, length), Direction.match(direction));
 
         byte[] blockIds = getChildTag(schematic, "Blocks", ByteArrayTag.class).getValue();
         schematicSafeData.setBlockIds(blockIds);
@@ -100,6 +102,7 @@ public class IOSchematicSafeData {
             schematic.put("Blocks", new ByteArrayTag(safeData.getBlockIds()));
             schematic.put("Data", new ByteArrayTag(safeData.getData()));
             schematic.put("Done", new ByteArrayTag(safeData.getDone()));
+            schematic.put("Direction", new ShortTag((short) safeData.getDirection().getDirectionId()));
 
             List<Tag> tileEntitiesList = Lists.newArrayList();
             for (Map<String, Tag> t : safeData.getTileEntities().values()) {

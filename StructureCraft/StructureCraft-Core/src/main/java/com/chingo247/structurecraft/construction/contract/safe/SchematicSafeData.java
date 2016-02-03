@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.contract.safe.schematic;
+package com.chingo247.structurecraft.construction.contract.safe;
 
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.placement.block.BlockPlacement;
@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  *
  * @author Chingo
  */
-public class SchematicSafeData extends BlockPlacement {
+class SchematicSafeData extends BlockPlacement {
 
     private static final Logger LOG = Logger.getLogger(SchematicSafeData.class.getName());
 
@@ -45,12 +45,14 @@ public class SchematicSafeData extends BlockPlacement {
     private byte[] data;
     private byte[] addId;
     private Map<Vector, Map<String, Tag>> tileEntities;
-    private Direction direction = Direction.EAST;
+    private Direction direction;
 
-    public SchematicSafeData(Vector size) {
+    public SchematicSafeData(Vector size, Direction direction) {
         super(DEFAULT_ROTATION, Vector.ZERO, size.getBlockX(), size.getBlockY(), size.getBlockZ());
         int blocks = width * height * length;
-
+        
+        System.out.println("Blocks: " + blocks);
+        this.direction = direction;
         this.done = new byte[blocks];
         this.ids = new byte[blocks];
         this.data = new byte[blocks];
@@ -93,10 +95,14 @@ public class SchematicSafeData extends BlockPlacement {
         return done;
     }
 
-    @Override
-    public int getRotation() {
-        return WorldUtil.getYaw(direction);
+    public Direction getDirection() {
+        return direction;
     }
+    
+//    @Override
+//    public int getRotation() {
+//        return WorldUtil.getYaw(direction);
+//    }
 
     Map<Vector, Map<String, Tag>> getTileEntities() {
         return tileEntities;
@@ -104,8 +110,15 @@ public class SchematicSafeData extends BlockPlacement {
 
     @Override
     public BaseBlock getBlock(int x, int y, int z) {
-        int index = (y * width * length) + (z * width) + x;
+        int index;
+//        if (direction == Direction.EAST || direction == Direction.WEST) {
+            index = (y * width * length) + (z * width) + x;
+//        } else {
+//            index = (y * width * length) + (x * length) + z;
+//        }
 
+    
+        
         if (done[index] == 0) {
             return null;
         }
@@ -143,7 +156,15 @@ public class SchematicSafeData extends BlockPlacement {
      * @return True if block has been set, false if block was already set
      */
     public boolean setBlock(Vector vector, BaseBlock block) {
-        int index = (vector.getBlockY() * width * length) + (vector.getBlockZ() * width) + vector.getBlockX();
+        int index;
+        if (direction == Direction.EAST || direction == Direction.WEST) {
+            index = (vector.getBlockY() * width * length) + (vector.getBlockZ() * width) + vector.getBlockX();
+        } else {
+            index = (vector.getBlockY() * width * length) + (vector.getBlockX() * length) + vector.getBlockZ();
+        }
+        
+        System.out.println("Used index: " + ((vector.getBlockY() * width * length) + (vector.getBlockZ() * width) + vector.getBlockX()));
+        System.out.println("Other index: " + ((vector.getBlockY() * width * length) + (vector.getBlockX() * length) + vector.getBlockZ()));
         
         if (this.done[index] == 0) {
             this.data[index] = (byte) block.getData();
@@ -180,28 +201,28 @@ public class SchematicSafeData extends BlockPlacement {
         return getBlock(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
-//    @Override
-//    public void place(EditSession session, Vector pos, PlaceOptions option) {
-//        try {
-//
-//            for (int x = 0; x < width; x++) {
-//                for (int z = 0; z < length; z++) {
-//                    for (int y = 0; y < height; y++) {
-//                        BaseBlock b = getBlock(x, y, z);
-//
-////                        System.out.println("rollback-block: " + b + ", pos: " + pos.add(x, y, z));
-//
-//                        if (b != null) {
-//                            session.rawSetBlock(pos.add(x, y, z), b);
-//                        }
-//                    }
-//                }
-//            }
-////            System.out.println("Width: " + width + ", Height: " + height + ", Length: " + length);
-//        } catch (Exception ex) {
-//            LOG.log(Level.SEVERE, ex.getMessage(), ex);
-//        }
-//    }
+    @Override
+    public void place(EditSession session, Vector pos, PlaceOptions option) {
+        try {
+
+            for (int x = 0; x < width; x++) {
+                for (int z = 0; z < length; z++) {
+                    for (int y = 0; y < height; y++) {
+                        BaseBlock b = getBlock(x, y, z);
+
+//                        System.out.println("rollback-block: " + b + ", pos: " + pos.add(x, y, z));
+
+                        if (b != null) {
+                            session.rawSetBlock(pos.add(x, y, z), b);
+                        }
+                    }
+                }
+            }
+//            System.out.println("Width: " + width + ", Height: " + height + ", Length: " + length);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+        }
+    }
 
     @Override
     public Vector getOffset() {
