@@ -52,6 +52,7 @@ import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.util.Comparator;
 import java.util.List;
@@ -141,6 +142,12 @@ public class StructureCommands {
         line += colors.reset() + "Location: " + colors.yellow() + "X: " + colors.reset() + position.getX()
                 + " " + colors.yellow() + "Y: " + colors.reset() + position.getY()
                 + " " + colors.yellow() + "Z: " + colors.reset() + position.getZ() + "\n";
+        
+        CuboidRegion region = structure.getCuboidRegion();
+        
+        line += colors.reset() + "Width: " + colors.yellow() + region.getWidth() + colors.reset() 
+                + " Height: " + colors.yellow() + region.getHeight() + colors.reset()
+                + " Length: " + colors.yellow() + region.getLength() + colors.reset() + "\n";
 
         line += colors.reset() + "Status: " + colors.reset() + getStatusString(structure, colors) + "\n";
 

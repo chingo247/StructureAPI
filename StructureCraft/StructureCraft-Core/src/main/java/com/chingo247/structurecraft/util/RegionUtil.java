@@ -85,7 +85,7 @@ public class RegionUtil {
     }
 
     public static Vector getSize(CuboidRegion region) {
-        return region.getMaximumPoint().subtract(region.getMinimumPoint()).add(Vector.ONE);
+        return region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
     }
 
     public static Collection<CuboidRegion> getChunkCubes(CuboidRegion area, int chunkSize) {

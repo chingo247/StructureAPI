@@ -16,7 +16,7 @@
  */
 package com.chingo247.structurecraft.placement;
 
-import com.chingo247.structurecraft.placement.options.PlaceOptions;
+import com.chingo247.settlercraft.core.Direction;
 
 
 
@@ -27,8 +27,8 @@ import com.chingo247.structurecraft.placement.options.PlaceOptions;
  */
 public interface RotationalPlacement extends IPlacement {
     
-    public int getRotation();
+    int getRotation();
     
-    public void rotate(int rotation);
+    void rotate(int rotation);
     
 }

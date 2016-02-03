@@ -126,9 +126,9 @@ class SafeTask extends StructureTask {
 
                         BaseBlock block = world.getBlock(p);
 
-                        System.out.println("Saving: " + position.subtract(p));
+                        System.out.println("Saving: " + p.subtract(position));
                         
-                        safeBlockStore.setBlockAt(position.subtract(p), block);
+                        safeBlockStore.setBlockAt(p.subtract(position), block);
 
                         count++;
                     }

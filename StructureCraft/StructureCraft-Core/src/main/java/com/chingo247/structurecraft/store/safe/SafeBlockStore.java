@@ -38,26 +38,24 @@ import java.util.zip.GZIPInputStream;
  * @author Chingo
  */
 public class SafeBlockStore extends BlockStore {
-    
-    private final SafeBlockStoreChunkFactory chunkFactory;
-    
-    
 
-    public SafeBlockStore(File file, Map<String, Tag> root, Vector size) {
-        super(file, root, size);
-        
+    private final SafeBlockStoreChunkFactory chunkFactory;
+
+    public SafeBlockStore(File file, Map<String, Tag> root, int width, int height, int length) {
+        super(file, root, width, height, length);
+
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
     public SafeBlockStore(File file, CuboidRegion region) {
         super(file, region);
-        
+
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
-    public SafeBlockStore(File file, Vector size) {
-        super(file, size);
-        
+    public SafeBlockStore(File file, int width, int height, int length) {
+        super(file, width, height, length);
+
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
@@ -65,7 +63,7 @@ public class SafeBlockStore extends BlockStore {
     public IBlockStoreChunkFactory getChunkFactory() {
         return chunkFactory;
     }
-    
+
     public static SafeBlockStore load(File f) throws IOException {
         try (NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(new FileInputStream(f)))) {
             NamedTag root = nbtStream.readNamedTag();
@@ -79,12 +77,10 @@ public class SafeBlockStore extends BlockStore {
             int height = NBTUtils.getChildTag(rootMap, "Height", IntTag.class).getValue();
             int length = NBTUtils.getChildTag(rootMap, "Length", IntTag.class).getValue();
 
-            BlockVector size = new BlockVector(width, height, length);
-            SafeBlockStore blockStore = new SafeBlockStore(f, rootMap, size);
+            SafeBlockStore blockStore = new SafeBlockStore(f, rootMap, width, height, length);
             return blockStore;
         }
 
     }
-    
-    
+
 }

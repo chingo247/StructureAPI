@@ -48,7 +48,7 @@ class SchematicSafeData extends BlockPlacement {
     private Direction direction;
 
     public SchematicSafeData(Vector size, Direction direction) {
-        super(DEFAULT_ROTATION, Vector.ZERO, size.getBlockX(), size.getBlockY(), size.getBlockZ());
+        super(Vector.ZERO, size.getBlockX(), size.getBlockY(), size.getBlockZ());
         int blocks = width * height * length;
         
         System.out.println("Blocks: " + blocks);

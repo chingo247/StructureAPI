@@ -59,7 +59,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         this.z = z;
         this.dimension = dimension;
         this.sectionFactory = new BlockStoreSectionFactory(this);
-
+        this.sections = Maps.newHashMap();
         this.tileEntitiesMap = Maps.newHashMap();
 
         if (chunkTagMap.containsKey("TileEntities")) {
@@ -133,7 +133,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     }
 
     protected final String getSectionKey(int y) {
-        int sectionY = y << 4;
+        int sectionY = y >> 4;
         return "Section-[" + sectionY + "]";
     }
 
@@ -211,6 +211,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
 
     @Override
     public void setBlockAt(int x, int y, int z, BaseBlock block) {
+        System.out.println("[BlockStoreChunk]: setBlock x: " + x + " y: " + y + " z: " + z);
         int sectionY = (y >> 4) * 16;
         IBlockStoreSection section = getSection(y);
         section.setBlockAt(x, y - sectionY, z, block);

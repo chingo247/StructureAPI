@@ -23,6 +23,7 @@ import com.chingo247.structurecraft.placement.IExportablePlacement;
 import com.chingo247.structurecraft.placement.PlacementTypes;
 import com.chingo247.structurecraft.schematic.Schematic;
 import com.chingo247.structurecraft.schematic.FastClipboard;
+import com.chingo247.structurecraft.util.WorldUtil;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -34,12 +35,6 @@ import java.io.File;
  */
 public class SchematicPlacement extends BlockPlacement implements FilePlacement, IBlockPlacement, IExportablePlacement {
 
-    /**
-     * Earlier since SettlerCraft 2.1 there is an option to give an extra offset. Unfortunately the offset was always wrong...
-     * as it was meant for schematics that have an orientation of 0 degrees, while in reality schematics have an orientation of -90 degrees by default.
-     * To not screw up structures, this fix has been implemented...
-     */
-    private static final int DEFAULT_FIXED_OFFSET = 90;
     private final Schematic schematic;
     private FastClipboard clipboard;
 
@@ -48,8 +43,32 @@ public class SchematicPlacement extends BlockPlacement implements FilePlacement,
     }
 
     public SchematicPlacement(Schematic schematic, int axisOffset, Vector position) {
-        super(DEFAULT_FIXED_OFFSET + axisOffset, position, schematic.getWidth(), schematic.getHeight(), schematic.getLength());
+        super(position, schematic.getWidth(), schematic.getHeight(), schematic.getLength());
         this.schematic = schematic;
+        
+        
+        
+        Direction currentDirection = WorldUtil.getDirection(getRotation());
+        System.out.println("Current direction: " + currentDirection);
+        
+        this.rotate(axisOffset);
+        
+        Direction newDirection = WorldUtil.getDirection(getRotation());
+        System.out.println("New direction: " + newDirection);
+        
+        this.width = schematic.getWidth();
+        this.length = schematic.getLength();
+        this.height = schematic.getHeight();
+        
+        if(((currentDirection == Direction.EAST || currentDirection == Direction.WEST) && (newDirection == Direction.NORTH || newDirection == Direction.SOUTH))
+                || ((currentDirection == Direction.NORTH || currentDirection == Direction.SOUTH) && (newDirection == Direction.WEST || newDirection == Direction.EAST))) {
+            int temp = schematic.getWidth();
+            width = schematic.getLength();
+            length = temp;
+        }
+        
+        System.out.println("[SchematicPlacement]: Width: " + width + " Height: " + height + " Length: " + length);
+        
         this.clipboard = schematic.getClipboard();
     }
     
@@ -57,7 +76,7 @@ public class SchematicPlacement extends BlockPlacement implements FilePlacement,
     public Vector getSize() {
         return new BlockVector(clipboard.getWidth(), clipboard.getHeight(), clipboard.getLength()); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     public Schematic getSchematic() {
         return schematic;
     }

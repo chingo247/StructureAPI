@@ -47,6 +47,7 @@ public class BlockStoreSection implements IBlockStoreSection {
 
     protected BlockStoreSection(IBlockStoreChunk bsc, Map<String, Tag> sectionTagMap, int y, int sectionHeight) {
         this.y = y;
+        this.bsc = bsc;
         this.sectionHeight = sectionHeight;
         if (sectionTagMap.isEmpty()) {
             this.empty = true;
@@ -95,6 +96,10 @@ public class BlockStoreSection implements IBlockStoreSection {
 
     protected final int getArrayIndex(int x, int y, int z) {
         Vector2D size = bsc.getSize();
+        System.out.println("[BlockStoreSection]: x: " + x + ", y: " + y + ", z: " + z);
+        System.out.println("[BlockStoreSection]: width: " + size.getBlockX() + ", length: " + size.getBlockZ());
+        System.out.println("[BlockStoreSection]: i1: " + (y * size.getBlockX() * size.getBlockZ()) + " + i2: " + (z * size.getBlockX()) + " + x: " + x);
+        System.out.println("[BlockStoreSection]: index: " + ((y * size.getBlockX() * size.getBlockZ()) + (z * size.getBlockX()) + x));
         return (y * size.getBlockX() * size.getBlockZ()) + (z * size.getBlockX()) + x;
     }
 
@@ -105,7 +110,7 @@ public class BlockStoreSection implements IBlockStoreSection {
 
     @Override
     public int getSectionY() {
-        return y << 4;
+        return y >> 4;
     }
 
     @Override
@@ -152,6 +157,8 @@ public class BlockStoreSection implements IBlockStoreSection {
         }
 
         int index = getArrayIndex(x, y, z);
+        
+        
 
         this.ids[index] = (byte) block.getType();
         this.data[index] = (byte) block.getData();

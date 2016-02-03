@@ -27,14 +27,12 @@ import com.chingo247.structurecraft.placement.options.BlockPredicate;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
-import com.chingo247.structurecraft.util.traversal.CuboidTraversal;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
@@ -58,8 +56,8 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
         this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.001)));
     }
 
-    public BlockPlacement(int axistOffset, Vector relativePosition, int width, int height, int length) {
-        super(axistOffset, relativePosition, width, height, length);
+    public BlockPlacement(Vector relativePosition, int width, int height, int length) {
+        super(relativePosition, width, height, length);
         this.BLOCK_BETWEEN = Math.round((float) ((numBlocks() * 0.01)));
     }
 

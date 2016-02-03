@@ -29,6 +29,7 @@ import static com.chingo247.structurecraft.menu.StructurePlanItem.getPlanID;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.getValue;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.isStructurePlan;
 import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.placement.IPlacement;
 import com.chingo247.structurecraft.selection.CUISelectionManager;
 import com.chingo247.structurecraft.selection.ISelectionManager;
 import com.chingo247.structurecraft.selection.NoneSelectionManager;
@@ -47,6 +48,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -157,10 +159,21 @@ public class PlayerPlanPlacer {
                         Vector pos2;
                         boolean toLeft = player.isSneaking();
 
+                        CuboidRegion selection = plan.getPlacement().getCuboidRegion();
+                        
+                        
+                        IPlacement p = plan.getPlacement();
+                        
+                        System.out.println("[PlayerPlanPlacer]: Selection-Max: " + selection.getMaximumPoint());
+                        System.out.println("[PlayerPlanPlacer]: Selection: " + selection);
+                        System.out.println("[PlayerPlanPlacer]: Width: " + selection.getWidth() + " Height: " + selection.getHeight() + " Length: " + selection.getLength());
+                        System.out.println("[PlayerPlanPlacer]: PlacementWidth: " + p.getWidth() + " PlacementHeight: " + p.getHeight() + " PlacementLength: " + p.getLength());
+                        
+                        
                         if (toLeft) {
-                            pos2 = PlacementUtil.getPoint2Left(pos1, direction, plan.getPlacement().getCuboidRegion().getMaximumPoint());
+                            pos2 = PlacementUtil.getPoint2Left(pos1, direction, selection.getMaximumPoint());
                         } else {
-                            pos2 = PlacementUtil.getPoint2Right(pos1, direction, plan.getPlacement().getCuboidRegion().getMaximumPoint());
+                            pos2 = PlacementUtil.getPoint2Right(pos1, direction, selection.getMaximumPoint());
                         }
 
                         if (!selectionManager.hasSelection(player.getUniqueId())) {
@@ -175,7 +188,7 @@ public class PlayerPlanPlacer {
                             // This is a shortcut for placing the structure at the left of him
                             if (toLeft) {
                                 // Fix WTF HOW?!!1?
-                                pos1 = WorldUtil.translateLocation(pos1, direction, (-(plan.getPlacement().getCuboidRegion().getMaximumPoint().getBlockZ() - 1)), 0, 0);
+                                pos1 = WorldUtil.translateLocation(pos1, direction, (-(selection.getMaximumPoint().getBlockZ() - 1)), 0, 0);
                             }
 
                             IStructurePlacerFactory placerFactory = structureAPI.getStructurePlacerFactory();

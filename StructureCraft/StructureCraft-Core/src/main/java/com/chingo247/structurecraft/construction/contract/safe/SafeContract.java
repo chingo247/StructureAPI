@@ -16,7 +16,6 @@
  */
 package com.chingo247.structurecraft.construction.contract.safe;
 
-import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IContract;
 import com.chingo247.structurecraft.construction.IStructureEntry;
@@ -27,30 +26,20 @@ import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.IRollbackData;
 import com.chingo247.structurecraft.model.structure.IStructure;
-import com.chingo247.structurecraft.model.structure.RollbackData;
-import com.chingo247.structurecraft.placement.IPlacement;
-import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.StructureBlock;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.store.BlockStore;
 import com.chingo247.structurecraft.store.safe.SafeBlockStore;
-import com.chingo247.structurecraft.util.RegionUtil;
-import com.chingo247.structurecraft.util.WorldUtil;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
 import com.google.common.base.Preconditions;
-import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**
@@ -98,7 +87,8 @@ public class SafeContract extends AContract {
                 throw new RuntimeException(ex);
             }
         } else {
-            blockStore = new SafeBlockStore(data.getBlockStoreFile(), region);
+            System.out.println("[SafeContract]: Width: "+ region.getWidth() + " Height: " + region.getHeight() + " Length: " + region.getLength());
+            blockStore = new SafeBlockStore(data.getBlockStoreFile(), region.getWidth(), region.getHeight(), region.getLength());
         }
         
 

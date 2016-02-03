@@ -54,27 +54,31 @@ public class BlockStore implements IBlockStore {
     public static final String ROOT_NODE = "BlockStore";
     public static final int DEFAULT_SIZE = 16;
 
-    private final Vector size;
     protected Map<String, Tag> chunkTags;
     protected Map<String, IBlockStoreChunk> chunks;
     protected File file;
-
+    
+    private  int width, height, length;
+    
     private BlockStoreChunkFactory chunkFactory;
     
     public BlockStore(File file, CuboidRegion region) {
-        this(file, region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1));
+        this(file, region.getWidth(), region.getHeight(), region.getLength());
     }
 
-    public BlockStore(File file, Vector size) {
-        this(file, new HashMap<String, Tag>(), size);
+    public BlockStore(File file, int width, int height, int length) {
+        this(file, new HashMap<String, Tag>(), width, height, length);
     }
 
-    protected BlockStore(File file, Map<String, Tag> root, Vector size) {
-        Preconditions.checkArgument(size.getBlockX() > 0, "Vector x has to be > 0");
-        Preconditions.checkArgument(size.getBlockY() > 0, "Vector y has to be > 0");
-        Preconditions.checkArgument(size.getBlockZ() > 0, "Vector z has to be > 0");
+    protected BlockStore(File file, Map<String, Tag> root, int width, int height, int length) {
+        Preconditions.checkArgument(width > 0, "width has to be > 0");
+        Preconditions.checkArgument(height> 0, "height has to be > 0");
+        Preconditions.checkArgument(length > 0, "length has to be > 0");
 
-        this.size = size;
+        System.out.println("[BlockStore]: Width: " + width + ", Height: " + height + ", Length: " + length);
+        this.width = width;
+        this.height = height;
+        this.length = length;
         this.chunks = Maps.newHashMap();
         this.chunkTags = root;
         this.file = file;
@@ -90,8 +94,8 @@ public class BlockStore implements IBlockStore {
         IBlockStoreChunk chunk = getChunk(x, z);
         BaseBlock b = null;
         if (chunk != null) {
-            int chunkX = (x << 4) * 16;
-            int chunkZ = (z << 4) * 16;
+            int chunkX = (x >> 4) * 16;
+            int chunkZ = (z >> 4) * 16;
             b = chunk.getBlockAt(x - chunkX, y, z - chunkZ);
         }
         return b;
@@ -106,8 +110,12 @@ public class BlockStore implements IBlockStore {
     public void setBlockAt(int x, int y, int z, BaseBlock b) {
         checkPosition(x, y, z);
         IBlockStoreChunk chunk = getChunk(x, z);
-        int chunkX = (x << 4) * 16;
-        int chunkZ = (z << 4) * 16;
+        int chunkX = (x >> 4) * 16;
+        int chunkZ = (z >> 4) * 16;
+        
+        System.out.println("[BlockStore]: x: " + x + ", y: " + y + ", z: " + z);
+        System.out.println("[BlockStore]: chunkX: " + chunkX + ", chunkZ: " + chunkZ);
+        
         chunk.setBlockAt(x - chunkX, y, z - chunkZ, b);
     }
 
@@ -126,35 +134,35 @@ public class BlockStore implements IBlockStore {
         if (z < 0) {
             throw new IndexOutOfBoundsException("z < 0: z was " + z);
         }
-        if (x > 0) {
-            throw new IndexOutOfBoundsException("x > " + size.getBlockX() + ": x was " + x);
+        if (x > getWidth()) {
+            throw new IndexOutOfBoundsException("x > " + getWidth() + ": x was " + x);
         }
-        if (y > 0) {
-            throw new IndexOutOfBoundsException("y > " + size.getBlockY() + ": y was " + y);
+        if (y > getHeight()) {
+            throw new IndexOutOfBoundsException("y > " + getHeight() + ": y was " + y);
         }
-        if (z > 0) {
-            throw new IndexOutOfBoundsException("z > " + size.getBlockZ() + ": z was " + z);
+        if (z > getLength()) {
+            throw new IndexOutOfBoundsException("z > " + getLength() + ": z was " + z);
         }
     }
 
     @Override
     public int getWidth() {
-        return size.getBlockX();
+        return width;
     }
 
     @Override
     public int getLength() {
-        return size.getBlockZ();
+        return length;
     }
 
     @Override
     public int getHeight() {
-        return size.getBlockY();
+        return height;
     }
 
     @Override
     public Vector getSize() {
-        return size;
+        return new BlockVector(width, height, length);
     }
 
     protected final String getChunkKey(int x, int z) {
@@ -169,44 +177,49 @@ public class BlockStore implements IBlockStore {
         if (bsc == null) {
             Tag chunkTag = chunkTags.get(key);
             
-            int chunkX = (x << 4) * 16;
-            int chunkZ = (z << 4) * 16;
+            int chunkX = (x >> 4) * 16;
+            int chunkZ = (z >> 4) * 16;
             
-            int width; 
+            int chunkWidth; 
             if(chunkTag == null) {
-                width = chunkX + 16 > getWidth() ? (getWidth() - chunkX) : DEFAULT_SIZE;
+                chunkWidth = chunkX + 16 > getWidth() ? (getWidth() - chunkX) : DEFAULT_SIZE;
             } else {
                 Map<String,Tag> map = (Map)chunkTag.getValue();
                 if(map.containsKey("Width")) {
                     Tag widthTag = map.get("Width");
-                    width = (short) widthTag.getValue();
+                    chunkWidth = (short) widthTag.getValue();
                 } else {
-                    width = DEFAULT_SIZE;
+                    chunkWidth = DEFAULT_SIZE;
                 }
             }
             
-            if(width <= 0) {
+            System.out.println("[BlockStore]: Width: " + getWidth());
+            System.out.println("[BlockStore]: ChunkWidth: " + chunkWidth);
+            
+            if(chunkWidth <= 0) {
                 throw new RuntimeException("Width was <= 0");
             }
             
-            int length; 
+            int chunkLength; 
             if(chunkTag == null) {
-                length = chunkZ + 16 > getLength()? (getLength() - chunkZ) : DEFAULT_SIZE;
+                chunkLength = chunkZ + 16 > getLength() ? (getLength() - chunkZ) : DEFAULT_SIZE;
             } else {
                 Map<String,Tag> map = (Map)chunkTag.getValue();
                 if(map.containsKey("Length")) {
                     Tag lengthTag = map.get("Length");
-                    length = (short) lengthTag.getValue();
+                    chunkLength = (short) lengthTag.getValue();
                 } else {
-                    length = DEFAULT_SIZE;
+                    chunkLength = DEFAULT_SIZE;
                 }
             }
             
-            if(length <= 0) {
+            System.out.println("[BlockStore]: Length: " + getLength());
+            System.out.println("[BlockStore]: ChunkLength: " + chunkLength);
+            
+            if(chunkLength <= 0) {
                 throw new RuntimeException("Length was <= 0");
             }
-            
-            this.getChunkFactory().newChunk(chunkTag, chunkX, chunkZ, new Vector2D(width, length));
+            bsc = getChunkFactory().newChunk(chunkTag, chunkX, chunkZ, new Vector2D(chunkWidth, chunkLength));
             this.chunks.put(key, bsc);
         }
         return bsc;
@@ -239,8 +252,7 @@ public class BlockStore implements IBlockStore {
             int height = NBTUtils.getChildTag(rootMap, "Height", IntTag.class).getValue();
             int length = NBTUtils.getChildTag(rootMap, "Length", IntTag.class).getValue();
 
-            BlockVector size = new BlockVector(width, height, length);
-            BlockStore blockStore = new BlockStore(f, rootMap, size);
+            BlockStore blockStore = new BlockStore(f, rootMap, width, height, length);
             return blockStore;
         }
 
