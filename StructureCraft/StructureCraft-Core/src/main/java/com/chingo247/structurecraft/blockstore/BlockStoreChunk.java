@@ -238,7 +238,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     @Override
     public Map<String, Tag> serialize() {
         Map<String, Tag> rootMap = Maps.newHashMap();
-        Map<String, Tag> sectionsMap = sectionsTagMap;
+        Map<String, Tag> sectionsMap = new HashMap<>(sectionsTagMap);
 
         // Add Sections
         Set<Entry<String,IBlockStoreSection>> sectionsSet = sections.entrySet();

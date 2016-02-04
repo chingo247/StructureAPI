@@ -234,7 +234,7 @@ public class BlockStore implements IBlockStore {
     }
 
     public Map<String, Tag> serialize() {
-        Map<String, Tag> rootMap = chunkTags;
+        Map<String, Tag> rootMap = new HashMap<>(chunkTags);
         Set<Entry<String, IBlockStoreChunk>> chunkSet = chunks.entrySet();
         for (Iterator<Entry<String, IBlockStoreChunk>> iterator = chunkSet.iterator(); iterator.hasNext();) {
             Entry<String, IBlockStoreChunk> next = iterator.next();
