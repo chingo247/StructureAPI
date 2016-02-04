@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public interface IBlockStoreChunk extends IBlockContainer {
     
+    IBlockStore getBlockStore();
+    
     CompoundTag getTileEntityData(int x, int y, int z);
     
     void setTileEntityData(int x, int y, int z, CompoundTag tag);
@@ -45,7 +47,11 @@ public interface IBlockStoreChunk extends IBlockContainer {
     
     int getChunkZ();
     
-    Vector2D getSize();
+    Vector2D getDimension();
+    
+    int getWidth();
+    
+    int getLength();
     
     Map<String, Tag> serialize();
     

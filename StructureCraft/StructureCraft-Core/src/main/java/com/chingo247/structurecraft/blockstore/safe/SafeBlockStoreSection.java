@@ -17,6 +17,8 @@
 package com.chingo247.structurecraft.blockstore.safe;
 
 import com.chingo247.structurecraft.blockstore.BlockStoreSection;
+import com.chingo247.structurecraft.blockstore.NBTUtils;
+import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import java.util.Map;
@@ -32,7 +34,12 @@ public class SafeBlockStoreSection extends BlockStoreSection implements ISafeBlo
     
     public SafeBlockStoreSection(ISafeBlockStoreChunk bsc, Map<String, Tag> sectionTagMap, int y, int sectionHeight) {
         super(bsc, sectionTagMap, y, sectionHeight);
-        this.written = new byte[numBlocks()];
+        
+        if(sectionTagMap.containsKey("Written")) {
+            this.written = NBTUtils.getChildTag(sectionTagMap, "Written", ByteArrayTag.class).getValue();
+        } else {
+            this.written = new byte[numBlocks()];
+        }
     }
 
     @Override
@@ -65,6 +72,12 @@ public class SafeBlockStoreSection extends BlockStoreSection implements ISafeBlo
         return null;
     }
     
+    @Override
+    public Map<String, Tag> serialize() {
+        Map<String, Tag> rootMap = super.serialize();
+        rootMap.put("Written", new ByteArrayTag(written));
+        return rootMap;
+    }
     
 
     @Override

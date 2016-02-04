@@ -148,6 +148,11 @@ public class CuboidTraversal implements Iterator<Vector>, Iterable<Vector> {
         return this;
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("Not supported."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     
 
 }

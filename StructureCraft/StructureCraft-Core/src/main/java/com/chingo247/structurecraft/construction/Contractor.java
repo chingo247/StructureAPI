@@ -272,7 +272,7 @@ public class Contractor implements IContractor {
                                             } catch (Exception ex) {
                                                 startEntry = null;
                                                 if (player != null) {
-                                                    sender.sendMessage("[StructureAPI]: An error occured... See console");
+                                                    sender.sendMessage(colors.red() + "[StructureAPI]: An error occured... See console");
                                                 }
                                                 remove(structures); // Cleanup entries
                                                 Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);

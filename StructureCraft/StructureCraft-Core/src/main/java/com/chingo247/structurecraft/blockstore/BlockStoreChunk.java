@@ -44,6 +44,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
 
     protected IBlockStore blockStore;
     protected Map<String, Tag> chunkTagMap;
+    protected Map<String, Tag> sectionsTagMap;
     protected Map<String, IBlockStoreSection> sections;
     protected IBlockStoreSectionFactory<IBlockStoreSection> sectionFactory;
     protected Map<Vector, Map<String, Tag>> tileEntitiesMap;
@@ -60,6 +61,14 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         this.dimension = dimension;
         this.sectionFactory = new BlockStoreSectionFactory(this);
         this.sections = Maps.newHashMap();
+        
+        if(chunkTagMap.get("Sections") == null) {
+            this.sectionsTagMap = Maps.newHashMap();
+        } else {
+            this.sectionsTagMap = (Map) chunkTagMap.get("Sections").getValue();
+        }
+        
+        
         this.tileEntitiesMap = Maps.newHashMap();
 
         if (chunkTagMap.containsKey("TileEntities")) {
@@ -102,13 +111,19 @@ public class BlockStoreChunk implements IBlockStoreChunk {
 
     }
 
-    public IBlockStoreSectionFactory<IBlockStoreSection> getSectionFactory() {
+    @Override
+    public IBlockStore getBlockStore() {
+        return blockStore;
+    }
+    
+    public IBlockStoreSectionFactory<? extends IBlockStoreSection> getSectionFactory() {
         return sectionFactory;
     }
 
+    @Override
     public boolean hasSectionAt(int y) {
         String key = getSectionKey(y);
-        return sections.get(key) != null || chunkTagMap.get(key) != null;
+        return sections.get(key) != null || sectionsTagMap.get(key) != null;
     }
 
     @Override
@@ -126,9 +141,19 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         int sectionY = y >> 4;
         return "Section-[" + sectionY + "]";
     }
+    
+    @Override
+    public int getWidth() {
+        return dimension.getBlockX();
+    }
+    
+    @Override
+    public int getLength() {
+        return dimension.getBlockZ();
+    }
 
     @Override
-    public Vector2D getSize() {
+    public Vector2D getDimension() {
         return dimension;
     }
 
@@ -157,7 +182,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         IBlockStoreSection section = sections.get(key);
         int sectionY = (y >> 4) * 16;
         if (section == null) {
-            Tag sectionTag = chunkTagMap.get(key);
+            Tag sectionTag = sectionsTagMap.get(key);
             int sectionHeight = sectionY + 16 > blockStore.getHeight() ? (blockStore.getHeight() - sectionY) : DEFAULT_SIZE;
             
             int height; 
@@ -176,7 +201,6 @@ public class BlockStoreChunk implements IBlockStoreChunk {
             if(height <= 0) {
                 throw new RuntimeException("Height was <= 0");
             }
-            
             
             section = this.getSectionFactory().newSection(sectionTag, sectionY, sectionHeight);
             if (section == null) {
@@ -214,7 +238,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     @Override
     public Map<String, Tag> serialize() {
         Map<String, Tag> rootMap = Maps.newHashMap();
-        Map<String, Tag> sectionsMap = Maps.newHashMap();
+        Map<String, Tag> sectionsMap = sectionsTagMap;
 
         // Add Sections
         Set<Entry<String,IBlockStoreSection>> sectionsSet = sections.entrySet();
@@ -222,6 +246,8 @@ public class BlockStoreChunk implements IBlockStoreChunk {
             Entry<String, IBlockStoreSection> next = iterator.next();
             sectionsMap.put(next.getKey(), new CompoundTag(next.getValue().serialize()));
         }
+        
+        
         
         rootMap.put("Sections", new CompoundTag(sectionsMap));
         
@@ -250,4 +276,10 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         return chunkTagMap.isEmpty() && sections.isEmpty();
     }
 
+    @Override
+    public String toString() {
+        return "[ x: " + x + ", z: " + z + ", width: " + getWidth() + ", length: " + getLength() + " ]";
+    }
+
+    
 }

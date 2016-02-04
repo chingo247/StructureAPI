@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.construction.contract.safe;
+package com.chingo247.structurecraft.construction.producer;
 
+import com.chingo247.structurecraft.placement.BlockStorePlacement;
+import com.chingo247.structurecraft.blockstore.IBlockStore;
+import com.chingo247.structurecraft.blockstore.safe.SafeBlockStore;
 import com.chingo247.structurecraft.construction.producer.BlockPlacementProducer;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.model.structure.IStructure;
@@ -31,13 +34,15 @@ public class RollbackPlacementProducer extends BlockPlacementProducer {
 
     @Override
     public IBlockPlacement produce(IStructure structure) throws StructureException {
-        File rollbackSchematic = structure.getRollbackData().getBlockStoreFile();
-        if (!rollbackSchematic.exists()) {
-            throw new StructureException("Structure doesn't have a rollback schematic");
+        File blockStoreFile = structure.getRollbackData().getBlockStoreFile();
+        if (!blockStoreFile.exists()) {
+            throw new StructureException("Structure doesn't have a rollback file");
         }
         try {
-            SchematicSafeData safeData = IOSchematicSafeData.read(rollbackSchematic);
-            return safeData;
+            IBlockStore blockStore = SafeBlockStore.load(blockStoreFile);
+            BlockStorePlacement placement =  new BlockStorePlacement(blockStore);
+            placement.setReversed(true);
+            return placement;
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }

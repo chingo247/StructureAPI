@@ -37,7 +37,7 @@ import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.IContract;
 import com.chingo247.structurecraft.construction.contract.BuildContract;
 import com.chingo247.structurecraft.construction.contract.RollbackContract;
-import com.chingo247.structurecraft.construction.contract.safe.SafeContract;
+import com.chingo247.structurecraft.construction.contract.SafeContract;
 import com.chingo247.structurecraft.model.settler.SettlerNode;
 import com.chingo247.structurecraft.platform.permission.Permissions;
 import com.chingo247.xplatform.core.IColors;

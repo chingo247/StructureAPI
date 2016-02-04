@@ -18,6 +18,8 @@ package com.chingo247.structurecraft.construction.contract;
 
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structurecraft.blockstore.IBlockStoreChunk;
+import com.chingo247.structurecraft.blockstore.safe.SafeBlockStore;
 import com.chingo247.structurecraft.construction.awe.AWEPlacementTask;
 import com.chingo247.structurecraft.exeption.StructureException;
 import com.chingo247.structurecraft.construction.IStructureEntry;
@@ -25,11 +27,21 @@ import com.chingo247.structurecraft.construction.listener.ConstructionListener;
 import com.chingo247.structurecraft.construction.listener.RollbackListener;
 import com.chingo247.structurecraft.construction.producer.BlockPlacementProducer;
 import com.chingo247.structurecraft.construction.producer.IPlacementProducer;
-import com.chingo247.structurecraft.construction.contract.safe.RollbackPlacementProducer;
+import com.chingo247.structurecraft.construction.producer.RollbackPlacementProducer;
+import com.chingo247.structurecraft.model.structure.IStructure;
+import com.chingo247.structurecraft.model.structure.Structure;
+import com.chingo247.structurecraft.placement.BlockStoreChunkPlacement;
 import com.chingo247.structurecraft.placement.IPlacement;
+import com.chingo247.structurecraft.placement.block.BlockPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
 import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**
@@ -58,20 +70,60 @@ public class RollbackContract extends AContract {
     public void apply(IStructureEntry entry) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
-        Vector position = entry.getStructure().getMin(); // Always place from the min position... 
-        IPlacement placement = ROLLBACK_PRODUCER.produce(entry.getStructure());                
-        AWEPlacementTask task = new AWEPlacementTask(
+        Vector structureMin = entry.getStructure().getMin(); // Always place from the min position... 
+        entry.addListener(ROLLBACK__LISTENER);   
+        
+        /**
+         * Perform memory saving operation... by not loading all as blocks at once!
+         */
+        IStructure structure = entry.getStructure();
+        File blockStoreFile = structure.getRollbackData().getBlockStoreFile();
+        
+        if(!blockStoreFile.exists()) {
+            throw new StructureException("No rollback data available");
+        }
+        
+        try {
+            SafeBlockStore safeBlockStore = SafeBlockStore.load(blockStoreFile);
+            Iterator<IBlockStoreChunk> chunkIt = safeBlockStore.iterator();
+            while(chunkIt.hasNext()) {
+                
+                IBlockStoreChunk chunk = chunkIt.next();
+                System.out.println("NEXT: " + chunk);
+                BlockStoreChunkPlacement placement = new BlockStoreChunkPlacement(chunk);
+                placement.rotate(structure.getDirection().getRotation());
+                
+                placement.setReversed(true);
+                        AWEPlacementTask task = new AWEPlacementTask(
                         asyncWorldEdit,
                         entry,
                         placement,
                         getPlayer(),
                         getEditSession(),
-                        position
+                        structureMin.add(chunk.getX(), 0, chunk.getZ())
                 );
-        task.setOptions(new PlaceOptions());        
-        entry.addListener(ROLLBACK__LISTENER);        
-        entry.addTask(task);
+                task.setOptions(new PlaceOptions());
+                entry.addTask(task);
+            }
+            
+//        IPlacement placement = ROLLBACK_PRODUCER.produce(entry.getStructure());
+//        AWEPlacementTask task = new AWEPlacementTask(
+//                        asyncWorldEdit,
+//                        entry,
+//                        placement,
+//                        getPlayer(),
+//                        getEditSession(),
+//                        position
+//                );
+//        task.setOptions(new PlaceOptions());
+             
+//        entry.addTask(task);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
+    
+    
 
     
 

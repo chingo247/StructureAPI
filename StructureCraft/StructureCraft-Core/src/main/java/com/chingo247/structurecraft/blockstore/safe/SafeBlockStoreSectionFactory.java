@@ -16,6 +16,7 @@
  */
 package com.chingo247.structurecraft.blockstore.safe;
 
+import com.chingo247.structurecraft.blockstore.IBlockStoreSection;
 import com.chingo247.structurecraft.blockstore.IBlockStoreSectionFactory;
 import com.sk89q.jnbt.Tag;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.Map;
  *
  * @author Chingo
  */
-public class SafeBlockStoreSectionFactory implements IBlockStoreSectionFactory<ISafeBlockStoreSection> {
+public class SafeBlockStoreSectionFactory implements IBlockStoreSectionFactory<IBlockStoreSection> {
 
     private ISafeBlockStoreChunk safeChunk;
     

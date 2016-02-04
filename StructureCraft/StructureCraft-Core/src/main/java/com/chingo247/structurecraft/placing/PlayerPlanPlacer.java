@@ -24,7 +24,7 @@ import com.chingo247.structurecraft.plan.IStructurePlan;
 import com.chingo247.structurecraft.plan.StructurePlanManager;
 import com.chingo247.structurecraft.IStructureAPI;
 import com.chingo247.structurecraft.construction.contract.BuildContract;
-import com.chingo247.structurecraft.construction.contract.safe.SafeContract;
+import com.chingo247.structurecraft.construction.contract.SafeContract;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.getPlanID;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.getValue;
 import static com.chingo247.structurecraft.menu.StructurePlanItem.isStructurePlan;

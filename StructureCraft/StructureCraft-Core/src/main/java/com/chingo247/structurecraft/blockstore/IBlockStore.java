@@ -23,7 +23,7 @@ import java.io.IOException;
  *
  * @author Chingo
  */
-public interface IBlockStore extends IBlockContainer {
+public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreChunk> {
     
     int getHeight();
     

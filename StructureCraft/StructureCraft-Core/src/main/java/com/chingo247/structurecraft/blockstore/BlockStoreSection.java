@@ -20,7 +20,6 @@ import static com.chingo247.structurecraft.blockstore.NBTUtils.getChildTag;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
@@ -49,11 +48,12 @@ public class BlockStoreSection implements IBlockStoreSection {
         this.y = y;
         this.bsc = bsc;
         this.sectionHeight = sectionHeight;
+        this.sectionMap = sectionTagMap;
         if (sectionTagMap.isEmpty()) {
             this.empty = true;
         } else {
-            this.addId = sectionMap.containsKey("Add")
-                    ? getChildTag(sectionMap, "Add", ByteArrayTag.class).getValue() : new byte[0];
+            this.addId = sectionMap.containsKey("AddId")
+                    ? getChildTag(sectionMap, "AddId", ByteArrayTag.class).getValue() : new byte[0];
             this.ids = getChildTag(sectionMap, "Blocks", ByteArrayTag.class).getValue();
             this.data = getChildTag(sectionMap, "Data", ByteArrayTag.class).getValue();
             this.empty = false;
@@ -95,7 +95,7 @@ public class BlockStoreSection implements IBlockStoreSection {
     }
 
     protected final int getArrayIndex(int x, int y, int z) {
-        Vector2D size = bsc.getSize();
+        Vector2D size = bsc.getDimension();
         return (y * size.getBlockX() * size.getBlockZ()) + (z * size.getBlockX()) + x;
     }
 
@@ -138,7 +138,7 @@ public class BlockStoreSection implements IBlockStoreSection {
     }
 
     public int numBlocks() {
-        Vector2D size = bsc.getSize();
+        Vector2D size = bsc.getDimension();
         return size.getBlockX() * sectionHeight * size.getBlockZ();
     }
     

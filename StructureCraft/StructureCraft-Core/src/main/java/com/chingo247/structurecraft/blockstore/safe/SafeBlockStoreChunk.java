@@ -17,6 +17,8 @@
 package com.chingo247.structurecraft.blockstore.safe;
 
 import com.chingo247.structurecraft.blockstore.BlockStoreChunk;
+import com.chingo247.structurecraft.blockstore.IBlockStoreSection;
+import com.chingo247.structurecraft.blockstore.IBlockStoreSectionFactory;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -29,14 +31,23 @@ import java.util.Map;
 public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockStoreChunk {
     
     private boolean dirty;
+    private SafeBlockStoreSectionFactory factory;
     
     public SafeBlockStoreChunk(SafeBlockStore blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
         super(blockStore, chunkTagMap, x, z, dimension);
+        
+        this.factory = new SafeBlockStoreSectionFactory(this);
+    }
+
+    @Override
+    public IBlockStoreSectionFactory<IBlockStoreSection> getSectionFactory() {
+        return factory;
     }
     
     @Override
     public boolean isWritten(int x, int y, int z) {
         if(!hasSectionAt(y)) {
+            
             return false;
         }
         
@@ -56,6 +67,7 @@ public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockSt
         if(!isWritten(x, y, z)) {
             return null;
         }
+        
         return super.getBlockAt(x, y, z); //To change body of generated methods, choose Tools | Templates.
     }
     

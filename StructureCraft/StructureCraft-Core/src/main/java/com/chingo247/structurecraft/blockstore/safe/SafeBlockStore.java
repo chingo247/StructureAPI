@@ -23,6 +23,7 @@ import com.chingo247.structurecraft.blockstore.NBTUtils;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
@@ -71,9 +72,9 @@ public class SafeBlockStore extends BlockStore {
 
             Map<String, Tag> rootMap = (Map) root.getTag().getValue();
 
-            int width = NBTUtils.getChildTag(rootMap, "Width", IntTag.class).getValue();
-            int height = NBTUtils.getChildTag(rootMap, "Height", IntTag.class).getValue();
-            int length = NBTUtils.getChildTag(rootMap, "Length", IntTag.class).getValue();
+            int width = NBTUtils.getChildTag(rootMap, "Width", ShortTag.class).getValue();
+            int height = NBTUtils.getChildTag(rootMap, "Height", ShortTag.class).getValue();
+            int length = NBTUtils.getChildTag(rootMap, "Length", ShortTag.class).getValue();
 
             SafeBlockStore blockStore = new SafeBlockStore(f, rootMap, width, height, length);
             return blockStore;
