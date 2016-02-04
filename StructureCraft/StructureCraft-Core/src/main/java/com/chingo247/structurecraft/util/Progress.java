@@ -5,13 +5,16 @@
  */
 package com.chingo247.structurecraft.util;
 
+import java.text.DecimalFormat;
+
 /**
  *
  * @author Chingo
  */
 public class Progress implements IProgressable{
     
-//    private static final DecimalFormat ONE_DECIMAL = new DecimalFormat("#.#");
+    public static final DecimalFormat ONE_DECIMAL = new DecimalFormat("#.#");
+    public static final DecimalFormat TWO_DECIMAL = new DecimalFormat("#.##");
     
     private double total;
     private double count;

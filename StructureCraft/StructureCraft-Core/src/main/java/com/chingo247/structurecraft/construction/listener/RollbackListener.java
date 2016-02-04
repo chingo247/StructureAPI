@@ -19,6 +19,7 @@ package com.chingo247.structurecraft.construction.listener;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
+import com.chingo247.structurecraft.util.Progress;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
 
@@ -65,10 +66,11 @@ public class RollbackListener extends ConstructionListener {
 
     @Override
     public void onProgress(IStructureEntry newEntry) {
+        System.out.println("ENTRY HAS PROGRESS ? " + newEntry.hasProgress());
         if (newEntry.hasProgress() && newEntry.getProgress() < 100.0) {
             APlatform platform = StructureAPI.getInstance().getPlatform();
             IColors colors = platform.getChatColors();
-            String message = colors.yellow() + "ROLLING BACK " + colors.reset() + newEntry.getProgress() + "% " + getStructureString(newEntry.getStructure());
+            String message = colors.yellow() + "ROLLING BACK " + colors.reset() + Progress.ONE_DECIMAL.format(newEntry.getProgress()) + "% " + getStructureString(newEntry.getStructure());
             handleEntry(newEntry, ConstructionStatus.ROLLING_BACK, true, message);
         }
     }

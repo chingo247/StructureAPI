@@ -19,6 +19,7 @@ package com.chingo247.structurecraft.construction.listener;
 import com.chingo247.structurecraft.StructureAPI;
 import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.model.structure.ConstructionStatus;
+import com.chingo247.structurecraft.util.Progress;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
 
@@ -68,7 +69,7 @@ public class DemolitionListener extends ConstructionListener {
         if (structureEntry.hasProgress() && structureEntry.getProgress() < 100.0) {
             APlatform platform = StructureAPI.getInstance().getPlatform();
             IColors colors = platform.getChatColors();
-            String message = colors.yellow() + "DEMOLISHING " + colors.reset() + structureEntry.getProgress() + "% " + getStructureString(structureEntry.getStructure());
+            String message = colors.yellow() + "DEMOLISHING " + colors.reset() + Progress.ONE_DECIMAL.format(structureEntry.getProgress()) + "% " + getStructureString(structureEntry.getStructure());
             handleEntry(structureEntry, ConstructionStatus.DEMOLISHING, true, message);
         }
     }

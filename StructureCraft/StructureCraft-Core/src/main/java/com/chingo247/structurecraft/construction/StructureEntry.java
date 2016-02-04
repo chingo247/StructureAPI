@@ -54,7 +54,7 @@ public class StructureEntry implements IStructureEntry {
         this.constractor = constractor;
         this.contract = contract;
         this.listeners = Lists.newArrayList();
-        this.reportableProgress = 5.0;
+        this.reportableProgress = 10.0;
         this.checker = new ProgressChecker();
     }
 
@@ -108,8 +108,7 @@ public class StructureEntry implements IStructureEntry {
         if (done == 0) {
             return 0.0; // Never divide by zero...
         }
-
-        return (double) ((done / total) * 100);
+        return ( (double) ((double) done / (double) total) * 100);
     }
 
     private boolean matchesAncestor(StructureEntry entry) {
@@ -258,7 +257,7 @@ public class StructureEntry implements IStructureEntry {
 
     @Override
     public boolean hasProgress() {
-        return (checker.checkProgress((done / total) * 100, reportableProgress));
+        return (checker.checkProgress(getProgress(), reportableProgress));
     }
 
 }
