@@ -66,7 +66,16 @@ public class DemolitionContract extends AContract {
                         getEditSession(),
                         position
                 );
-        task.setOptions(new PlaceOptions());        
+        
+        PlaceOptions placeOptions;
+        if(getPlaceOptions() == null) {
+            placeOptions = new PlaceOptions();
+            placeOptions.setCubeY(placement.getHeight() / 2);
+        } else {
+            placeOptions = getPlaceOptions();
+        }
+        
+        task.setOptions(placeOptions);        
         entry.addListener(DEMOLITION_LISTENER);        
         entry.addTask(task);
     }

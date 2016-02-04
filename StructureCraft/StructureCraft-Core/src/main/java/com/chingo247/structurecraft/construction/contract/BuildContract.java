@@ -40,6 +40,7 @@ public class BuildContract extends AContract {
     protected static final BlockPlacementProducer BUILD_PRODUCER = new BuildPlacementProducer();
     protected static final BuildListener BUILD_LISTENER = new BuildListener();
     
+    
 
     @Override
     public IPlacementProducer<IBlockPlacement> getPlacementProducer() {
@@ -50,6 +51,13 @@ public class BuildContract extends AContract {
     public BuildListener getConstructionListener() {
         return BUILD_LISTENER;
     }
+
+    @Override
+    public PlaceOptions getPlaceOptions() {
+        return super.getPlaceOptions(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
 
     @Override
     public void apply(IStructureEntry entry) throws StructureException {
@@ -65,7 +73,15 @@ public class BuildContract extends AContract {
                         getEditSession(),
                         position
                 );
-        task.setOptions(new PlaceOptions());        
+        PlaceOptions placeOptions;
+        if(getPlaceOptions() == null) {
+            placeOptions = new PlaceOptions();
+            placeOptions.setCubeY(placement.getHeight() / 2);
+        } else {
+            placeOptions = getPlaceOptions();
+        }
+        
+        task.setOptions(placeOptions);        
         entry.addListener(BUILD_LISTENER);        
         entry.addTask(task);
     }

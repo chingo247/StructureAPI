@@ -113,18 +113,25 @@ public class SafeContract extends AContract {
         World world = entryContract.getEditSession().getWorld();
         EditSession editSession = entryContract.getEditSession();
 
-        PlaceOptions option = contract.getPlaceOptions() != null ? contract.getPlaceOptions() : new PlaceOptions();
+        PlaceOptions placeOptions;
+        if(contract.getPlaceOptions() == null) {
+            placeOptions = new PlaceOptions();
+            placeOptions.setCubeY(placement.getHeight() / 2);
+        } else {
+            placeOptions = contract.getPlaceOptions();
+        }
+        
 
         Iterator<Vector> traversalSafe = new CuboidIterator(
-                CHUNK_SIZE,
-                CHUNK_SIZE,
-                CHUNK_SIZE
+                placeOptions.getCubeX() < 0 ? placement.getWidth(): placeOptions.getCubeX(),
+                placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
+                placeOptions.getCubeZ() < 0 ? placement.getLength(): placeOptions.getCubeZ()
         ).iterate(placement.getSize());
 
         Iterator<Vector> traversalPlace = new CuboidIterator(
-                CHUNK_SIZE,
-                CHUNK_SIZE,
-                CHUNK_SIZE
+                placeOptions.getCubeX() < 0 ? placement.getWidth(): placeOptions.getCubeX(),
+                placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
+                placeOptions.getCubeZ() < 0 ? placement.getLength(): placeOptions.getCubeZ()
         ).iterate(placement.getSize());
 
         PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
@@ -343,9 +350,11 @@ public class SafeContract extends AContract {
 
                     // only place these when having a greater xz-cubevalue to avoid placing torches etc in air and break them later
                     while (placeLater.peek() != null
-                            && placeLater.peek().getPosition().getBlockY() < v.getBlockY()
-                            && (placeLater.peek().getPosition().getBlockX() % option.getCubeX()) > (v.getBlockX() % option.getCubeX())
-                            && (placeLater.peek().getPosition().getBlockZ() % option.getCubeZ()) > (v.getBlockZ() % option.getCubeZ())) {
+                            && (
+                            placeLater.peek().getPosition().getBlockY() < (option.getCubeY() * (Math.ceil(v.getBlockY() / option.getCubeY())))
+                            || placeLater.peek().getPosition().getBlockX() < (option.getCubeX() * (Math.ceil(v.getBlockX() / option.getCubeX())))
+                            || placeLater.peek().getPosition().getBlockZ() < (option.getCubeZ() * (Math.ceil(v.getBlockZ() / option.getCubeZ())))
+                            )) {
                         StructureBlock plb = placeLater.poll();
                         doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
 

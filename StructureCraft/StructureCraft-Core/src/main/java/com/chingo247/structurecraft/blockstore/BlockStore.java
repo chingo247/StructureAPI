@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -278,7 +279,21 @@ public class BlockStore implements IBlockStore {
                     return input.startsWith("Chunk-[");
                 }
             });
-            Set<String> keys = new TreeSet<>(map.keySet()); // Ordering alphabetical = IN ORDER!
+            Set<String> keys = new TreeSet<>(new Comparator<String>() {
+
+                @Override
+                public int compare(String o1, String o2) {
+                    int[] coord1 = getCoords(o1);
+                    int[] coord2 = getCoords(o2);
+                    
+                    int comp1 = Integer.compare(coord1[0], coord2[0]);
+                    if(comp1 == 0) {
+                        return Integer.compare(coord1[1], coord2[1]);
+                    }
+                    return comp1;
+                }
+            }); // Ordering alphabetical = IN ORDER!
+            keys.addAll(map.keySet());
             keys.addAll(chunks.keySet());
             this.keyIterator = keys.iterator();
 
@@ -287,7 +302,7 @@ public class BlockStore implements IBlockStore {
         public int[] getCoords(String key) {
             String[] coordsString = key.split(",");
             String xString = coordsString[0].substring("Chunk-[".length());
-            String zString = coordsString[1].substring(0, 1);
+            String zString = coordsString[1].replaceAll("]", "");
             
             int[] coords = new int[2];
             coords[0] = Integer.parseInt(xString);

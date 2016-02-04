@@ -43,7 +43,6 @@ public abstract class AContract implements IContract {
     private PlaceOptions placeOptions;
 
     public AContract() {
-        this.placeOptions = new PlaceOptions();
     }
     
     public abstract ConstructionListener getConstructionListener();
