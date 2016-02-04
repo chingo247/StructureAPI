@@ -66,8 +66,8 @@ public class RollbackListener extends ConstructionListener {
 
     @Override
     public void onProgress(IStructureEntry newEntry) {
-        System.out.println("ENTRY HAS PROGRESS ? " + newEntry.hasProgress());
         if (newEntry.hasProgress() && newEntry.getProgress() < 100.0) {
+            System.out.println("HAS PROGRESS!!!");
             APlatform platform = StructureAPI.getInstance().getPlatform();
             IColors colors = platform.getChatColors();
             String message = colors.yellow() + "ROLLING BACK " + colors.reset() + Progress.ONE_DECIMAL.format(newEntry.getProgress()) + "% " + getStructureString(newEntry.getStructure());

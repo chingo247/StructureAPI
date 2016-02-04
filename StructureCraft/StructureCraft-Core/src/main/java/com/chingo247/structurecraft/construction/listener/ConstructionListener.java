@@ -57,36 +57,42 @@ public abstract class ConstructionListener implements com.chingo247.structurecra
                     GraphDatabaseService graph = StructureAPI.getInstance().getGraphDatabase();
                     Iterable<IPlayer> owners = null;
                     ConstructionStatus oldStatus = entry.getStructure().getStatus();
-                    try {
-                        tx = graph.beginTx();
-                        owners = getPlayers(entry.getStructure());
-                        StructureNode structureNode = new StructureNode(entry.getStructure().getUnderlyingNode());
-                        structureNode.setStatus(newStatus);
-                        if (newStatus == ConstructionStatus.REMOVED) {
-                            refund(entry.getStructure());
-                        }
-                        Structure structure = new Structure(structureNode);
-                        entry.update(structure);
+                    
+                    
+                    if (oldStatus != newStatus || isProgressUpdate) {
+                        try {
+                            tx = graph.beginTx();
+                            owners = getPlayers(entry.getStructure());
 
-                        tx.success();
-                    } catch (Exception ex) {
-                        if (tx != null) {
-                            tx.failure();
+                            
+                            
+                            if (oldStatus != newStatus) {
+                                StructureNode structureNode = new StructureNode(entry.getStructure().getUnderlyingNode());
+                                structureNode.setStatus(newStatus);
+                                if (newStatus == ConstructionStatus.REMOVED) {
+                                    refund(entry.getStructure());
+                                }
+                                Structure structure = new Structure(structureNode);
+                                entry.update(structure);
+                            }
+                            tx.success();
+                        } catch (Exception ex) {
+                            if (tx != null) {
+                                tx.failure();
+                            }
+                            LOG.log(Level.SEVERE, ex.getMessage(), ex);
+                        } finally {
+                            if (tx != null) {
+                                tx.close();
+                            }
                         }
-                        LOG.log(Level.SEVERE, ex.getMessage(), ex);
-                    } finally {
-                        if (tx != null) {
-                            tx.close();
-                        }
-                    }
-                    boolean shouldTell = (oldStatus != newStatus) || isProgressUpdate;
-
-                    if (shouldTell) {
                         // Tell the starter
                         for (IPlayer p : owners) {
                             p.sendMessage(messages);
                         }
+
                     }
+
                 } catch (Exception ex) {
                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                 }

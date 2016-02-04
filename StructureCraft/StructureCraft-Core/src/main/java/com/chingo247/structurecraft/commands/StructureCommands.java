@@ -58,8 +58,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang.math.NumberUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
@@ -71,7 +69,7 @@ import org.neo4j.graphdb.Transaction;
 public class StructureCommands {
 
     private static final UUID CONSOLE = UUID.randomUUID();
-    private static final Logger LOG = Logger.getLogger(StructureCommands.class.getSimpleName());
+//    private static final Logger LOG = Logger.getLogger(StructureCommands.class.getSimpleName());
     private static final int MAX_LINES = 10;
 
     private static final Comparator<String> ALPHABETICAL_ORDER = new Comparator<String>() {
@@ -232,7 +230,7 @@ public class StructureCommands {
                 tx.success();
             }
 
-            LOG.log(Level.INFO, "info in {0} ms", (System.currentTimeMillis() - start));
+//            LOG.log(Level.INFO, "info in {0} ms", (System.currentTimeMillis() - start));
         } else if (sender instanceof IPlayer) {
             // Find by position
             IPlayer ply = (IPlayer) sender;
@@ -252,7 +250,7 @@ public class StructureCommands {
                 sender.sendMessage(info);
                 tx.success();
             }
-            LOG.log(Level.INFO, "info in {0} ms", (System.currentTimeMillis() - start));
+//            LOG.log(Level.INFO, "info in {0} ms", (System.currentTimeMillis() - start));
         } else {
             throw new CommandException("Too few arguments \n" + "/structure:info [id]");
         }
@@ -288,7 +286,7 @@ public class StructureCommands {
             structure = new Structure(sn);
             tx.success();
         }
-        LOG.log(Level.INFO, "build in {0} ms", (System.currentTimeMillis() - start));
+//        LOG.log(Level.INFO, "build in {0} ms", (System.currentTimeMillis() - start));
 
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
@@ -332,7 +330,7 @@ public class StructureCommands {
             structure = new Structure(sn);
             tx.success();
         }
-        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
+//        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
 
         if(!structure.getRollbackData().hasBlockStore()) {
             throw new CommandException("Rollback not available for this structure");
@@ -386,7 +384,7 @@ public class StructureCommands {
 
             tx.success();
         }
-        LOG.log(Level.INFO, "demolish in {0} ms", (System.currentTimeMillis() - start));
+//        LOG.log(Level.INFO, "demolish in {0} ms", (System.currentTimeMillis() - start));
 
         // Use force?
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
@@ -439,7 +437,7 @@ public class StructureCommands {
 
             tx.success();
         }
-        LOG.log(Level.INFO, "stop in {0} ms", (System.currentTimeMillis() - start));
+//        LOG.log(Level.INFO, "stop in {0} ms", (System.currentTimeMillis() - start));
 
         // Use force?
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
@@ -728,7 +726,7 @@ public class StructureCommands {
 
             long countStart = System.currentTimeMillis();
             long totalStructures = structureOwner.getStructureCount();
-            LOG.log(Level.INFO, "list count in {0} ms", (System.currentTimeMillis() - countStart));
+//            LOG.log(Level.INFO, "list count in {0} ms", (System.currentTimeMillis() - countStart));
             long totalPages = Math.round(Math.ceil(totalStructures / (MAX_LINES - 1)));
             List<StructureNode> structures = structureOwner.getStructures(skip, limit);
             if (p > totalPages || p < 0) {
@@ -755,7 +753,7 @@ public class StructureCommands {
             }
             tx.success();
         }
-        LOG.log(Level.INFO, "list structures in {0} ms", (System.currentTimeMillis() - start));
+//        LOG.log(Level.INFO, "list structures in {0} ms", (System.currentTimeMillis() - start));
         sender.sendMessage(message);
     }
 
@@ -800,7 +798,7 @@ public class StructureCommands {
 
                 tx.success();
             }
-            LOG.log(Level.INFO, "relative location in {0} ms", (System.currentTimeMillis() - start));
+//            LOG.log(Level.INFO, "relative location in {0} ms", (System.currentTimeMillis() - start));
 
         } else {
             IPlayer ply = (IPlayer) player;
@@ -825,7 +823,7 @@ public class StructureCommands {
                 player.sendMessage("Your relative position is " + colors.yellow() + "x: " + colors.reset() + rel.getBlockX() + colors.yellow() + " y: " + colors.reset() + rel.getBlockY() + colors.yellow() + " z: " + colors.reset() + rel.getBlockZ());
                 tx.success();
             }
-            LOG.log(Level.INFO, "relative location in {0} ms", (System.currentTimeMillis() - start));
+//            LOG.log(Level.INFO, "relative location in {0} ms", (System.currentTimeMillis() - start));
         }
 
     }
