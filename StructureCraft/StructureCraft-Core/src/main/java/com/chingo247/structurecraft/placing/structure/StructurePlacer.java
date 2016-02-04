@@ -328,10 +328,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
     private CuboidRegion getAffectedRegion(IPlacement placement, Vector position, Direction direction) {
         Vector min = position;
         
-        System.out.println("Affected Area: " + placement.getCuboidRegion().getMaximumPoint());
-        System.out.println("Affected Area Size: " + new Vector(placement.getWidth(), placement.getHeight(), placement.getLength()));
-        
-        Vector max = PlacementUtil.getPoint2Right(min, direction, new Vector(placement.getWidth(), placement.getHeight(), placement.getLength()));
+        Vector max = PlacementUtil.getPoint2Right(min, direction, placement.getCuboidRegion().getMaximumPoint());
         return new CuboidRegion(min, max);
     }
 

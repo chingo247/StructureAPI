@@ -163,39 +163,4 @@ public class SchematicCommands {
         
     }
     
-    @CommandPermissions({Permissions.CONTENT_ROTATE_PLACEMENT})
-    @CommandExtras(async = true, senderType = CommandSenderType.CONSOLE)
-    @Command(aliases = {"schematic:rotatedir"}, usage = "/schematic:rotatedir [degrees]", desc = "Rotates schematics in update/schematics directory with given degrees", max = 1, min = 1)
-    public static void schematicRotateDir(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
-        File pluginDir = structureAPI.getPlugin().getDataFolder();
-        File updateDir = new File(pluginDir, SCHEMATICS_UPDATE_DIR);
-        System.out.println("update dir: " + updateDir.getAbsolutePath());
-        
-        String number = args.getString(0);
-        
-        
-        int degrees;
-        try {         
-            degrees  = Integer.parseInt(number);
-        } catch (NumberFormatException nfe) {
-            throw new CommandException("Expected a number value... but got '" + number + "'");
-        }
-        
-        if(degrees % 90 != 0) {
-            throw new CommandException("Value 'degrees' must be a multiple of 90");
-        }
-        
-        Iterator<File> schematicIt = FileUtils.iterateFiles(updateDir, new String[]{"schematic"}, true);
-        while(schematicIt.hasNext()) {
-            File next = schematicIt.next();
-            try {
-                FastClipboard.rotateAndWrite(next, degrees);
-                System.out.println("[SettlerCraft]: Rotated schematic '" + next.getName() + "' with "+String.valueOf(degrees)+" degrees");
-            } catch (IOException ex) {
-                Logger.getLogger(SchematicCommands.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        System.out.println("[SettlerCraft]: Done");
-    }
-    
 }

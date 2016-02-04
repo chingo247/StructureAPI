@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
+package com.chingo247.structurecraft.blockstore.safe;
 
-import com.chingo247.structurecraft.store.BlockStoreSection;
+import com.chingo247.structurecraft.blockstore.BlockStoreSection;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import java.util.Map;
@@ -56,6 +56,16 @@ public class SafeBlockStoreSection extends BlockStoreSection implements ISafeBlo
         int index = getArrayIndex(x, y, z);
         this.written[index] = 1;
     }
+
+    @Override
+    public BaseBlock getBlockAt(int x, int y, int z) {
+        if(isWritten(x, y, z)) {
+            return super.getBlockAt(x, y, z); //To change body of generated methods, choose Tools | Templates.
+        }
+        return null;
+    }
+    
+    
 
     @Override
     public void setBlockAt(int x, int y, int z, BaseBlock block) {

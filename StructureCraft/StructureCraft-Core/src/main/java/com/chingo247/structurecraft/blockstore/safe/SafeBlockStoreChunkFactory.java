@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore.safe;
 
+import com.chingo247.structurecraft.blockstore.IBlockStoreChunkFactory;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector2D;
 import java.util.HashMap;
@@ -25,23 +26,24 @@ import java.util.Map;
  *
  * @author Chingo
  */
-public class BlockStoreChunkFactory implements IBlockStoreChunkFactory<IBlockStoreChunk> {
+public class SafeBlockStoreChunkFactory implements IBlockStoreChunkFactory<ISafeBlockStoreChunk>{
     
-    private BlockStore blockstore;
+    private SafeBlockStore blockStore;
 
-    public BlockStoreChunkFactory(BlockStore blockstore) {
-        this.blockstore = blockstore;
+    public SafeBlockStoreChunkFactory(SafeBlockStore SafeBlockStore) {
+        this.blockStore = SafeBlockStore;
     }
     
     @Override
-    public IBlockStoreChunk newChunk( Tag sectionTagOrNull, int x, int z, Vector2D size) {
-        BlockStoreChunk bsc;
+    public ISafeBlockStoreChunk newChunk(Tag sectionTagOrNull, int x, int z, Vector2D size) {
+        ISafeBlockStoreChunk bsc;
         if (sectionTagOrNull == null) {
-            bsc = new BlockStoreChunk(blockstore, new HashMap<String, Tag>(), x, z, size);
+            bsc = new SafeBlockStoreChunk(blockStore, new HashMap<String, Tag>(), x, z, size);
         } else {
-            bsc = new BlockStoreChunk(blockstore, (Map) sectionTagOrNull.getValue(), x, z, size);
+            bsc = new SafeBlockStoreChunk(blockStore, (Map) sectionTagOrNull.getValue(), x, z, size);
         }
         return bsc;
     }
 
+    
 }

@@ -14,25 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore.safe;
 
-import com.sk89q.worldedit.Vector;
-import java.io.IOException;
+import com.chingo247.structurecraft.blockstore.IBlockStoreSection;
 
 /**
  *
  * @author Chingo
  */
-public interface IBlockStore extends IBlockContainer {
-    
-    int getHeight();
-    
-    int getLength();
-    
-    int getWidth();
-    
-    Vector getSize();
-    
-    void save() throws IOException;
+public interface ISafeBlockStoreSection extends IBlockStoreSection, ISafeBlockContainer{
     
 }

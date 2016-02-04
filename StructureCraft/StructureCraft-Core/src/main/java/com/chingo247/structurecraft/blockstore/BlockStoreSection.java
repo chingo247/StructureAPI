@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
-import static com.chingo247.structurecraft.store.NBTUtils.getChildTag;
+import static com.chingo247.structurecraft.blockstore.NBTUtils.getChildTag;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -96,10 +96,6 @@ public class BlockStoreSection implements IBlockStoreSection {
 
     protected final int getArrayIndex(int x, int y, int z) {
         Vector2D size = bsc.getSize();
-        System.out.println("[BlockStoreSection]: x: " + x + ", y: " + y + ", z: " + z);
-        System.out.println("[BlockStoreSection]: width: " + size.getBlockX() + ", length: " + size.getBlockZ());
-        System.out.println("[BlockStoreSection]: i1: " + (y * size.getBlockX() * size.getBlockZ()) + " + i2: " + (z * size.getBlockX()) + " + x: " + x);
-        System.out.println("[BlockStoreSection]: index: " + ((y * size.getBlockX() * size.getBlockZ()) + (z * size.getBlockX()) + x));
         return (y * size.getBlockX() * size.getBlockZ()) + (z * size.getBlockX()) + x;
     }
 

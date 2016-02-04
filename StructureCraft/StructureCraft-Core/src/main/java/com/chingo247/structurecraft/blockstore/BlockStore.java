@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -23,7 +23,6 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
@@ -75,7 +74,6 @@ public class BlockStore implements IBlockStore {
         Preconditions.checkArgument(height> 0, "height has to be > 0");
         Preconditions.checkArgument(length > 0, "length has to be > 0");
 
-        System.out.println("[BlockStore]: Width: " + width + ", Height: " + height + ", Length: " + length);
         this.width = width;
         this.height = height;
         this.length = length;
@@ -113,8 +111,6 @@ public class BlockStore implements IBlockStore {
         int chunkX = (x >> 4) * 16;
         int chunkZ = (z >> 4) * 16;
         
-        System.out.println("[BlockStore]: x: " + x + ", y: " + y + ", z: " + z);
-        System.out.println("[BlockStore]: chunkX: " + chunkX + ", chunkZ: " + chunkZ);
         
         chunk.setBlockAt(x - chunkX, y, z - chunkZ, b);
     }
@@ -193,9 +189,6 @@ public class BlockStore implements IBlockStore {
                 }
             }
             
-            System.out.println("[BlockStore]: Width: " + getWidth());
-            System.out.println("[BlockStore]: ChunkWidth: " + chunkWidth);
-            
             if(chunkWidth <= 0) {
                 throw new RuntimeException("Width was <= 0");
             }
@@ -213,8 +206,6 @@ public class BlockStore implements IBlockStore {
                 }
             }
             
-            System.out.println("[BlockStore]: Length: " + getLength());
-            System.out.println("[BlockStore]: ChunkLength: " + chunkLength);
             
             if(chunkLength <= 0) {
                 throw new RuntimeException("Length was <= 0");

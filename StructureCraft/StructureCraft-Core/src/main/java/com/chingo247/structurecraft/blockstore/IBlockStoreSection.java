@@ -14,33 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
 import com.sk89q.jnbt.Tag;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  *
  * @author Chingo
  */
-public class BlockStoreSectionFactory implements IBlockStoreSectionFactory<IBlockStoreSection> {
+public interface IBlockStoreSection extends IBlockContainer {
     
-    private BlockStoreChunk chunk;
-
-    public BlockStoreSectionFactory(BlockStoreChunk BlockStoreChunk) {
-        this.chunk = BlockStoreChunk;
-    }
+    boolean isEmpty();
     
-    @Override
-    public IBlockStoreSection newSection(Tag sectionTagOrNull, int y, int sectionHeight) {
-        IBlockStoreSection section;
-        if(sectionTagOrNull == null) {
-            section = new BlockStoreSection(chunk, new HashMap<String, Tag>(), y, sectionHeight);
-        } else {
-            section = new BlockStoreSection(chunk, (Map) sectionTagOrNull.getValue(), y, sectionHeight);
-        }
-        return section;
-    }
+    int getSectionY();
     
+    int getY();
+    
+    int numBlocks();
+    
+    Map<String, Tag> serialize();
 }

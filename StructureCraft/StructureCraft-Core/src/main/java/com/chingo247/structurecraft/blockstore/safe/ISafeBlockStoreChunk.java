@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
+package com.chingo247.structurecraft.blockstore.safe;
 
-import com.chingo247.structurecraft.store.IBlockStoreChunk;
+import com.chingo247.structurecraft.blockstore.IBlockStoreChunk;
 
 /**
  *

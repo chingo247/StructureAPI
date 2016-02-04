@@ -14,37 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  *
  * @author Chingo
  */
-public interface IBlockStoreChunk extends IBlockContainer {
+public class BlockStoreChunkFactory implements IBlockStoreChunkFactory<IBlockStoreChunk> {
     
-    CompoundTag getTileEntityData(int x, int y, int z);
+    private BlockStore blockstore;
+
+    public BlockStoreChunkFactory(BlockStore blockstore) {
+        this.blockstore = blockstore;
+    }
     
-    void setTileEntityData(int x, int y, int z, CompoundTag tag);
-    
-    boolean isEmpty();
-    
-    int getX();
-    
-    int getZ();
-    
-    int getChunkX();
-    
-    int getChunkZ();
-    
-    Vector2D getSize();
-    
-    Map<String, Tag> serialize();
-    
+    @Override
+    public IBlockStoreChunk newChunk( Tag sectionTagOrNull, int x, int z, Vector2D size) {
+        BlockStoreChunk bsc;
+        if (sectionTagOrNull == null) {
+            bsc = new BlockStoreChunk(blockstore, new HashMap<String, Tag>(), x, z, size);
+        } else {
+            bsc = new BlockStoreChunk(blockstore, (Map) sectionTagOrNull.getValue(), x, z, size);
+        }
+        return bsc;
+    }
+
 }

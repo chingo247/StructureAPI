@@ -14,24 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
-import com.sk89q.jnbt.Tag;
-import java.util.Map;
+import com.sk89q.worldedit.Vector;
+import java.io.IOException;
 
 /**
  *
  * @author Chingo
  */
-public interface IBlockStoreSection extends IBlockContainer {
+public interface IBlockStore extends IBlockContainer {
     
-    boolean isEmpty();
+    int getHeight();
     
-    int getSectionY();
+    int getLength();
     
-    int getY();
+    int getWidth();
     
-    int numBlocks();
+    Vector getSize();
     
-    Map<String, Tag> serialize();
+    void save() throws IOException;
+    
 }

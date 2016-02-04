@@ -58,10 +58,6 @@ public class StructurePlanMenuFactory {
         int height = region.getMaximumPoint().getBlockY();
         int length = region.getMaximumPoint().getBlockZ();
         
-        if(plan.getName().contains("AoE - Wall")) {
-            System.out.println("[StructurePlanMenuFactory]: Name: "+plan.getName()+" Width: " + width + " Height: " + height + " Length: " + length);
-        }
-        
         String id = plan.getId();
         String name = plan.getName();
         String category = plan.getCategory();

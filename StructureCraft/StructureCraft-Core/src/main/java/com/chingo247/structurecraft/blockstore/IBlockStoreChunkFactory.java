@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
+package com.chingo247.structurecraft.blockstore;
+
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.Vector2D;
 
 /**
  *
  * @author Chingo
  */
-public interface ISafeBlockContainer {
+public interface IBlockStoreChunkFactory<T extends IBlockStoreChunk> {
     
-    boolean isWritten(int x, int y, int z);
-    
-    boolean isDirty();
-    
-    void setDirty(boolean dirty);
-    
-    void setWritten(int x, int y, int z);
+    T newChunk(Tag sectionTagOrNull, int x, int z, Vector2D size);
     
 }

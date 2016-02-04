@@ -52,6 +52,7 @@ public class SchematicPlacementParser implements PlacementParser<SchematicPlacem
         SchematicManager sdm = SchematicManager.getInstance();
         Schematic schematic = sdm.getOrLoadSchematic(schematicFile);
         direction += schematic.getAxisOffset();
+        
         return new SchematicPlacement(schematic, direction, pos);
     }
 

@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import com.chingo247.structurecraft.construction.IStructureEntry;
 import com.chingo247.structurecraft.placement.RotationalPlacement;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
-import com.chingo247.structurecraft.store.safe.SafeBlockStore;
+import com.chingo247.structurecraft.blockstore.safe.SafeBlockStore;
 import com.chingo247.structurecraft.util.WorldUtil;
 import com.sk89q.worldedit.BlockVector;
 import java.io.File;
@@ -122,12 +122,7 @@ class SafeTask extends StructureTask {
                             default:
                                 throw new AssertionError("unreachable");
                         }
-                        System.out.println("SafeTask: " + d);
-
                         BaseBlock block = world.getBlock(p);
-
-                        System.out.println("Saving: " + p.subtract(position));
-                        
                         safeBlockStore.setBlockAt(p.subtract(position), block);
 
                         count++;

@@ -14,14 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
-
-import com.chingo247.structurecraft.store.IBlockStoreSection;
+package com.chingo247.structurecraft.blockstore.safe;
 
 /**
  *
  * @author Chingo
  */
-public interface ISafeBlockStoreSection extends IBlockStoreSection, ISafeBlockContainer{
+public interface ISafeBlockContainer {
+    
+    boolean isWritten(int x, int y, int z);
+    
+    boolean isDirty();
+    
+    void setDirty(boolean dirty);
+    
+    void setWritten(int x, int y, int z);
     
 }

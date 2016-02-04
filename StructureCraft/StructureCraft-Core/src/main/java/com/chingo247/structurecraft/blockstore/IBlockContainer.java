@@ -14,18 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
+import com.sk89q.worldedit.blocks.BaseBlock;
 
 /**
  *
  * @author Chingo
  */
-public interface IBlockStoreChunkFactory<T extends IBlockStoreChunk> {
+public interface IBlockContainer {
     
-    T newChunk(Tag sectionTagOrNull, int x, int z, Vector2D size);
+    BaseBlock getBlockAt(Vector position);
+    
+    BaseBlock getBlockAt(int x, int y, int z);
+    
+    void setBlockAt(int x, int y, int z, BaseBlock b);
+    
+    void setBlockAt(Vector position, BaseBlock b);
     
 }

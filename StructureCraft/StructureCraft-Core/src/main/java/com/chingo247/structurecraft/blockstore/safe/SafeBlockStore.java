@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
+package com.chingo247.structurecraft.blockstore.safe;
 
-import com.chingo247.structurecraft.store.BlockStore;
-import static com.chingo247.structurecraft.store.BlockStore.ROOT_NODE;
-import com.chingo247.structurecraft.store.IBlockStoreChunkFactory;
-import com.chingo247.structurecraft.store.NBTUtils;
+import com.chingo247.structurecraft.blockstore.BlockStore;
+import static com.chingo247.structurecraft.blockstore.BlockStore.ROOT_NODE;
+import com.chingo247.structurecraft.blockstore.IBlockStoreChunkFactory;
+import com.chingo247.structurecraft.blockstore.NBTUtils;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.BlockVector;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
 import java.io.FileInputStream;

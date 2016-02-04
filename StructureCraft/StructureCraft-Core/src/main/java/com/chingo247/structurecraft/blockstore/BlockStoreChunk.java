@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store;
+package com.chingo247.structurecraft.blockstore;
 
-import static com.chingo247.structurecraft.store.BlockStore.DEFAULT_SIZE;
-import static com.chingo247.structurecraft.store.NBTUtils.getChildTag;
+import static com.chingo247.structurecraft.blockstore.BlockStore.DEFAULT_SIZE;
+import static com.chingo247.structurecraft.blockstore.NBTUtils.getChildTag;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -106,21 +106,11 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         return sectionFactory;
     }
 
-    /**
-     * Gets the blocksection, may never return null
-     *
-     * @param sectionTagOrNull The tag or a null value
-     * @return The BlockStoreSection
-     */
-//    protected IBlockStoreSection makeBlockSection(Tag sectionTagOrNull) {
-//        BlockStoreSection section;
-//        if (sectionTagOrNull == null) {
-//            section = new BlockStoreSection(this, new HashMap<String, Tag>());
-//        } else {
-//            section = new BlockStoreSection(this, (Map) sectionTagOrNull.getValue());
-//        }
-//        return section;
-//    }
+    public boolean hasSectionAt(int y) {
+        String key = getSectionKey(y);
+        return sections.get(key) != null || chunkTagMap.get(key) != null;
+    }
+
     @Override
     public CompoundTag getTileEntityData(int x, int y, int z) {
         Map<String, Tag> compoundData = tileEntitiesMap.get(new BlockVector(x, y, z));
@@ -211,7 +201,6 @@ public class BlockStoreChunk implements IBlockStoreChunk {
 
     @Override
     public void setBlockAt(int x, int y, int z, BaseBlock block) {
-        System.out.println("[BlockStoreChunk]: setBlock x: " + x + " y: " + y + " z: " + z);
         int sectionY = (y >> 4) * 16;
         IBlockStoreSection section = getSection(y);
         section.setBlockAt(x, y - sectionY, z, block);

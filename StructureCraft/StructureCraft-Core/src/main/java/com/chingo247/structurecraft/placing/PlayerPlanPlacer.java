@@ -161,15 +161,6 @@ public class PlayerPlanPlacer {
 
                         CuboidRegion selection = plan.getPlacement().getCuboidRegion();
                         
-                        
-                        IPlacement p = plan.getPlacement();
-                        
-                        System.out.println("[PlayerPlanPlacer]: Selection-Max: " + selection.getMaximumPoint());
-                        System.out.println("[PlayerPlanPlacer]: Selection: " + selection);
-                        System.out.println("[PlayerPlanPlacer]: Width: " + selection.getWidth() + " Height: " + selection.getHeight() + " Length: " + selection.getLength());
-                        System.out.println("[PlayerPlanPlacer]: PlacementWidth: " + p.getWidth() + " PlacementHeight: " + p.getHeight() + " PlacementLength: " + p.getLength());
-                        
-                        
                         if (toLeft) {
                             pos2 = PlacementUtil.getPoint2Left(pos1, direction, selection.getMaximumPoint());
                         } else {

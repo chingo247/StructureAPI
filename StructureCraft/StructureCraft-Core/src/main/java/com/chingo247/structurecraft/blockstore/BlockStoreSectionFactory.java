@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
+package com.chingo247.structurecraft.blockstore;
 
-import com.chingo247.structurecraft.store.IBlockStoreSectionFactory;
 import com.sk89q.jnbt.Tag;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,21 +24,21 @@ import java.util.Map;
  *
  * @author Chingo
  */
-public class SafeBlockStoreSectionFactory implements IBlockStoreSectionFactory<ISafeBlockStoreSection> {
-
-    private ISafeBlockStoreChunk safeChunk;
+public class BlockStoreSectionFactory implements IBlockStoreSectionFactory<IBlockStoreSection> {
     
-    public SafeBlockStoreSectionFactory(ISafeBlockStoreChunk chunk) {
-        this.safeChunk = chunk;
-    }
+    private BlockStoreChunk chunk;
 
+    public BlockStoreSectionFactory(BlockStoreChunk BlockStoreChunk) {
+        this.chunk = BlockStoreChunk;
+    }
+    
     @Override
-    public ISafeBlockStoreSection newSection(Tag sectionTagOrNull, int y, int sectionHeight) {
-        ISafeBlockStoreSection section;
+    public IBlockStoreSection newSection(Tag sectionTagOrNull, int y, int sectionHeight) {
+        IBlockStoreSection section;
         if(sectionTagOrNull == null) {
-            section = new SafeBlockStoreSection(safeChunk, new HashMap<String, Tag>(), y, sectionHeight);
+            section = new BlockStoreSection(chunk, new HashMap<String, Tag>(), y, sectionHeight);
         } else {
-            section = new SafeBlockStoreSection(safeChunk, (Map) sectionTagOrNull.getValue(), y, sectionHeight);
+            section = new BlockStoreSection(chunk, (Map) sectionTagOrNull.getValue(), y, sectionHeight);
         }
         return section;
     }

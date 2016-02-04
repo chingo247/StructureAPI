@@ -29,7 +29,7 @@ import com.chingo247.structurecraft.model.structure.IStructure;
 import com.chingo247.structurecraft.placement.StructureBlock;
 import com.chingo247.structurecraft.placement.block.IBlockPlacement;
 import com.chingo247.structurecraft.placement.options.PlaceOptions;
-import com.chingo247.structurecraft.store.safe.SafeBlockStore;
+import com.chingo247.structurecraft.blockstore.safe.SafeBlockStore;
 import com.chingo247.structurecraft.util.iterator.CuboidIterator;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.EditSession;
@@ -87,7 +87,6 @@ public class SafeContract extends AContract {
                 throw new RuntimeException(ex);
             }
         } else {
-            System.out.println("[SafeContract]: Width: "+ region.getWidth() + " Height: " + region.getHeight() + " Length: " + region.getLength());
             blockStore = new SafeBlockStore(data.getBlockStoreFile(), region.getWidth(), region.getHeight(), region.getLength());
         }
         
@@ -100,7 +99,6 @@ public class SafeContract extends AContract {
 
         PlaceOptions option = contract.getPlaceOptions() != null ? contract.getPlaceOptions() : new PlaceOptions();
 
-        System.out.println("RegionTraversal: " + placement.getSize());
         Iterator<Vector> traversalSafe = new CuboidIterator(
                 CHUNK_SIZE,
                 CHUNK_SIZE,

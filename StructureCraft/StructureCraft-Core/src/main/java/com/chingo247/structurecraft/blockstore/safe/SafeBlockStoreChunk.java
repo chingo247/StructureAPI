@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structurecraft.store.safe;
+package com.chingo247.structurecraft.blockstore.safe;
 
-import com.chingo247.structurecraft.store.BlockStoreChunk;
+import com.chingo247.structurecraft.blockstore.BlockStoreChunk;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -33,10 +33,14 @@ public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockSt
     public SafeBlockStoreChunk(SafeBlockStore blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
         super(blockStore, chunkTagMap, x, z, dimension);
     }
-
+    
     @Override
     public boolean isWritten(int x, int y, int z) {
-        ISafeBlockStoreSection section = (SafeBlockStoreSection) getSection(y);
+        if(!hasSectionAt(y)) {
+            return false;
+        }
+        
+        ISafeBlockStoreSection section = (ISafeBlockStoreSection) getSection(y);
         int sectionY = (y >> 4) * 16;
         return section.isWritten(x, y - sectionY, z);
     }
@@ -46,6 +50,16 @@ public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockSt
         super.setBlockAt(x, y, z, block); //To change body of generated methods, choose Tools | Templates.
         setDirty(true);
     }
+
+    @Override
+    public BaseBlock getBlockAt(int x, int y, int z) {
+        if(!isWritten(x, y, z)) {
+            return null;
+        }
+        return super.getBlockAt(x, y, z); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
     
     @Override
     public boolean isDirty() {
