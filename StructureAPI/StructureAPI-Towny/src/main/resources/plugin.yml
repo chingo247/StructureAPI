@@ -1,0 +1,17 @@
+name: StructureAPI-Towny
+main: com.chingo247.settlercraft.towny.plugin.SettlerCraftTowny
+version: 2.2.0
+author: Chingo247
+description: Towny support for StructureAPI
+depend: [SettlerCraft-StructureAPI, Towny]
+          
+        
+                
+            
+
+                    
+                    
+
+            
+               
+               

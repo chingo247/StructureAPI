@@ -1,0 +1,74 @@
+/*
+ * Copyright (C) 2015 Chingo
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package com.chingo247.structureapi.placement.block;
+
+import com.chingo247.structureapi.placement.options.PlaceOptions;
+import com.chingo247.structureapi.util.iterator.CuboidIterator;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.blocks.BlockType;
+import java.util.Iterator;
+
+/**
+ *
+ * @author Chingo
+ */
+public class DemolishingPlacement extends BlockPlacement implements IBlockPlacement {
+    
+
+    public DemolishingPlacement(Vector size) {
+        super(size.getBlockX(), size.getBlockY(), size.getBlockZ());
+    }
+
+    @Override
+    public void place(EditSession session, Vector pos, PlaceOptions option) {
+       Iterator<Vector> traversal = new CuboidIterator(
+                option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
+                option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
+                option.getCubeZ() <= 0 ? getSize().getBlockZ() : option.getCubeZ()
+        ).iterate(getSize(), true);
+        
+        while(traversal.hasNext()) {
+            Vector relativePosition = traversal.next();
+            Vector worldPosition = relativePosition.add(pos);
+            BaseBlock currentBlock = session.getWorld().getBlock(worldPosition);
+            
+            if (currentBlock.isAir()  || currentBlock.getId() == BlockID.BEDROCK) {
+                continue;
+            }
+            
+            if (relativePosition.getBlockY() == 0 && !currentBlock.isAir()) {
+                Vector wUnderPos = worldPosition.subtract(0, 1, 0);
+                BaseBlock worldBlockUnder = session.getWorld().getBlock(wUnderPos);
+            // replace the block with the block underneath you if it is a natural block
+                if (BlockType.isNaturalTerrainBlock(worldBlockUnder)) {
+                    session.rawSetBlock(worldPosition, worldBlockUnder);
+                }
+            } else {
+                session.rawSetBlock(worldPosition, new BaseBlock(BlockID.AIR));
+            }
+        }
+    }
+
+    @Override
+    public BaseBlock getBlock(Vector position) {
+        return new BaseBlock(0); 
+    }
+
+}
