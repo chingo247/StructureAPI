@@ -34,8 +34,8 @@ public class RollbackListener extends ConstructionListener {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String[] message = new String[]{
-            colors.green() + "COMPLETED " + colors.reset() + getStructureString(newEntry.getStructure()),
-            colors.red() + "REMOVED " + colors.reset() + getStructureString(newEntry.getStructure())
+            getStructureString(newEntry.getStructure()) + colors.green() + " COMPLETED",
+            getStructureString(newEntry.getStructure()) + colors.red() + " REMOVED" 
         };
         handleEntry(newEntry, ConstructionStatus.REMOVED, false, message);
     }
@@ -44,7 +44,7 @@ public class RollbackListener extends ConstructionListener {
     public void onCancelled(IStructureEntry newEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = colors.red() + "CANCELLED " + colors.reset() + getStructureString(newEntry.getStructure());
+        String message =  getStructureString(newEntry.getStructure()) + colors.red() + " ROLLBACK CANCELLED";
         handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
     }
 
@@ -52,7 +52,7 @@ public class RollbackListener extends ConstructionListener {
     public void onStarted(IStructureEntry newEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = colors.yellow() + "ROLLING BACK " + colors.reset() + getStructureString(newEntry.getStructure());
+        String message = getStructureString(newEntry.getStructure()) + colors.yellow() + " ROLLING BACK";
         handleEntry(newEntry, ConstructionStatus.ROLLING_BACK, false, message);
     }
 
@@ -60,17 +60,16 @@ public class RollbackListener extends ConstructionListener {
     public void onQueued(IStructureEntry newEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = "QUEUED " + colors.reset() + getStructureString(newEntry.getStructure());
+        String message = getStructureString(newEntry.getStructure()) + colors.reset() + " QUEUED ";
         handleEntry(newEntry, ConstructionStatus.QUEUED, false, message);
     }
 
     @Override
     public void onProgress(IStructureEntry newEntry) {
         if (newEntry.hasProgress() && newEntry.getProgress() < 100.0) {
-            System.out.println("HAS PROGRESS!!!");
             APlatform platform = StructureAPI.getInstance().getPlatform();
             IColors colors = platform.getChatColors();
-            String message = colors.yellow() + "ROLLING BACK " + colors.reset() + Progress.ONE_DECIMAL.format(newEntry.getProgress()) + "% " + getStructureString(newEntry.getStructure());
+            String message = getStructureString(newEntry.getStructure()) + colors.yellow() + " ROLLING BACK " + colors.reset() + Progress.ONE_DECIMAL.format(newEntry.getProgress()) + "%";
             handleEntry(newEntry, ConstructionStatus.ROLLING_BACK, true, message);
         }
     }
@@ -79,7 +78,7 @@ public class RollbackListener extends ConstructionListener {
     public void onFailed(IStructureEntry newEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = colors.red() + "FAILED " + colors.reset() + getStructureString(newEntry.getStructure());
+        String message = getStructureString(newEntry.getStructure()) + colors.red() + " ROLLBACK FAILED";
         handleEntry(newEntry, ConstructionStatus.STOPPED, false, message);
     }
 

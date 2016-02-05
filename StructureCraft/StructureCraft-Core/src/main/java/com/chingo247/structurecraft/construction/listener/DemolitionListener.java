@@ -34,8 +34,8 @@ public class DemolitionListener extends ConstructionListener {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String[] message = new String[]{
-            colors.green() + "COMPLETED " + colors.reset() + getStructureString(structureEntry.getStructure()),
-            colors.red() + "REMOVED " + colors.reset() + getStructureString(structureEntry.getStructure())
+            getStructureString(structureEntry.getStructure()) + colors.green() + " COMPLETED" + colors.reset(),
+            getStructureString(structureEntry.getStructure()) + colors.red() + " REMOVED" + colors.reset() 
         };
         handleEntry(structureEntry, ConstructionStatus.REMOVED, false, message);
     }
@@ -44,7 +44,7 @@ public class DemolitionListener extends ConstructionListener {
     public void onCancelled(IStructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = colors.red() + "CANCELLED " + colors.reset() + getStructureString(structureEntry.getStructure());
+        String message = getStructureString(structureEntry.getStructure()) + colors.red() + " DEMOLITION CANCELLED" ;
         handleEntry(structureEntry, ConstructionStatus.STOPPED, false, message);
     }
 
@@ -52,7 +52,7 @@ public class DemolitionListener extends ConstructionListener {
     public void onStarted(IStructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = colors.yellow() + "DEMOLISHING " + colors.reset() + getStructureString(structureEntry.getStructure());
+        String message = getStructureString(structureEntry.getStructure()) + colors.yellow() + " DEMOLISHING";
         handleEntry(structureEntry, ConstructionStatus.DEMOLISHING, false, message);
     }
 
@@ -60,7 +60,7 @@ public class DemolitionListener extends ConstructionListener {
     public void onQueued(IStructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = "QUEUED " + colors.reset() + getStructureString(structureEntry.getStructure());
+        String message = getStructureString(structureEntry.getStructure())  + colors.reset() + " QUEUED";
         handleEntry(structureEntry, ConstructionStatus.QUEUED, false, message);
     }
 
@@ -69,7 +69,7 @@ public class DemolitionListener extends ConstructionListener {
         if (structureEntry.hasProgress() && structureEntry.getProgress() < 100.0) {
             APlatform platform = StructureAPI.getInstance().getPlatform();
             IColors colors = platform.getChatColors();
-            String message = colors.yellow() + "DEMOLISHING " + colors.reset() + Progress.ONE_DECIMAL.format(structureEntry.getProgress()) + "% " + getStructureString(structureEntry.getStructure());
+            String message = getStructureString(structureEntry.getStructure()) +  colors.yellow() + " DEMOLISHING " + colors.reset() + Progress.ONE_DECIMAL.format(structureEntry.getProgress()) + "% ";
             handleEntry(structureEntry, ConstructionStatus.DEMOLISHING, true, message);
         }
     }
@@ -78,7 +78,7 @@ public class DemolitionListener extends ConstructionListener {
     public void onFailed(IStructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
-        String message = colors.red() + "FAILED " + colors.reset() + getStructureString(structureEntry.getStructure());
+        String message = getStructureString(structureEntry.getStructure()) + colors.red() + " FAILED";
         handleEntry(structureEntry, ConstructionStatus.STOPPED, false, message);
     }
 
