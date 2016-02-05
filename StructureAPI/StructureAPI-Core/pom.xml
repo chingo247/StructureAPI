@@ -39,6 +39,13 @@
     </build>
     
     <name>StructureAPI-Core</name>
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>StructureAPI-BlockStore</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <reporting>
         <plugins>
             <plugin>
