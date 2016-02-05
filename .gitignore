@@ -9,3 +9,7 @@
 /StructureAPI/StructureAPI-Towny/target/
 /StructureAPI/StructureAPI-WorldGuard/target/
 /StructureAPI/StructureAPI-BlockStore/target/
+StructureAPI/nb-configuration.xml
+StructureAPI/StructureAPI-Towny/nbactions.xml
+StructureAPI/StructureAPI-Bukkit/StructureCraft-Bukkit.iml
+StructureAPI/StructureAPI-WorldGuard/SettlerCraft-WorldGuard.iml
