@@ -47,7 +47,7 @@ public class StructurePlanCommands {
     }
 
     @CommandExtras(senderType = CommandSenderType.OP)
-    @CommandPermissions({Permissions.CONTENT_RELOAD_PLANS})
+    @CommandPermissions({Permissions.RELOAD_PLANS})
     @Command(aliases = {"plans:reload"}, usage = "/plans:reload", desc = "Reloads structure plans", max = 0)
     public static void reload(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
         if (!structureAPI.isLoadingPlans()) {

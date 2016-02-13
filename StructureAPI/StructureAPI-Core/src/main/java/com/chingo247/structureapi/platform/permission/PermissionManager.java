@@ -65,8 +65,8 @@ public class PermissionManager {
     public enum Perms {
 //        CONTENT_GENERATE_PLANS(new Permission(Permissions.CONTENT_GENERATE_PLANS, PermissionDefault.OP, "Allows to generate plans from schematics on the server - is CONSOLE only")),
 //        CONTENT_GENERATE_PLANS(new Permission(Permissions.CONTENT_GENERATE_PLANS, PermissionDefault.OP, "Allows to generate plans from schematics on the server - is CONSOLE only")),
-        CONTENT_RELOAD_PLANS(new Permission(Permissions.CONTENT_RELOAD_PLANS, PermissionDefault.OP, "Allows a player to reload plans on the server")),
-        CONTENT_ROTATE_PLACEMENT(new Permission(Permissions.CONTENT_ROTATE_PLACEMENT, PermissionDefault.OP, "Allows a player to rotate the original schematic for all future placing")),
+        CONTENT_RELOAD_PLANS(new Permission(Permissions.RELOAD_PLANS, PermissionDefault.OP, "Allows a player to reload plans on the server")),
+        CONTENT_ROTATE_PLACEMENT(new Permission(Permissions.ROTATE_SCHEMATIC, PermissionDefault.OP, "Allows a player to rotate the original schematic for all future placing")),
         
         SETTLER_OPEN_PLAN_MENU(new Permission(Permissions.OPEN_PLANMENU, PermissionDefault.OP, "Allows a player to use the plan menu (contains plans for FREE)")),
         SETTLER_OPEN_SHOP_MENU(new Permission(Permissions.OPEN_PLANSHOP, PermissionDefault.TRUE, "Allows a player to use the plan shop")),

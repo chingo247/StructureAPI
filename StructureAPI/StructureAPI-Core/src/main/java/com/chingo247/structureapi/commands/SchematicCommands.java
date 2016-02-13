@@ -62,7 +62,7 @@ public class SchematicCommands {
     
     public static final String SCHEMATICS_UPDATE_DIR = "update/schematics";
     
-    @CommandPermissions({Permissions.CONTENT_ROTATE_PLACEMENT})
+    @CommandPermissions({Permissions.ROTATE_SCHEMATIC})
     @CommandExtras(async = true)
     @Command(aliases = {"schematic:rotate"}, usage = "/schematic:rotate [structure-id][degrees]",desc = "Rotates a schematic of a structure, only affects future structures with the same schematic", min = 2, max = 2)
     public static void schematicRotate(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {

@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.platform.permission;
 
 /**
- * Permissions as of 2.2.0 in format {who/which}.{what}.{operation}
+ * Permissions as of 2.2.0 in format {on-what}.{operation}
  * @author Chingo
  */
 public class Permissions {
@@ -26,9 +26,9 @@ public class Permissions {
     
     private static final String PREFIX = "settlercraft.";
     
-    public static final String CONTENT_RELOAD_PLANS = PREFIX + "plans.reload";
-    public static final String CONTENT_GENERATE_PLANS = PREFIX + "plans.generate";
-    public static final String CONTENT_ROTATE_PLACEMENT = PREFIX + "schematic.rotate";
+    public static final String RELOAD_PLANS = PREFIX + "plans.reload";
+    public static final String GENERATE_PLANS = PREFIX + "plans.generate";
+    public static final String ROTATE_SCHEMATIC = PREFIX + "schematic.rotate";
     
     public static final String STRUCTURE_PLACE = PREFIX + "structure.place";
     public static final String STRUCTURE_CREATE = PREFIX + "structure.create";
