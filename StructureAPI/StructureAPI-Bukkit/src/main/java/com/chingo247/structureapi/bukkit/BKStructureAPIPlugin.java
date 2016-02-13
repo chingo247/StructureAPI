@@ -24,7 +24,6 @@ import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureInvalidator;
-import com.chingo247.structureapi.bukkit.listener.PhysicsListener;
 import com.chingo247.structureapi.commands.SchematicCommands;
 import com.chingo247.structureapi.commands.SettlerCommands;
 import com.chingo247.structureapi.commands.StructureCommands;
