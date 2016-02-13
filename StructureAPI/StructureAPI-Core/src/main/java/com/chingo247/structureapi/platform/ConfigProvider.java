@@ -120,6 +120,8 @@ public class ConfigProvider {
         }
         
         YAMLProcessor yamlp = new YAMLProcessor(f, true, YAMLFormat.EXTENDED);
+        yamlp.load();
+        
         ConfigProvider config = new ConfigProvider(f);
         config.setAllowsSubstructures(yamlp.getBoolean("structures.allow-substructures", true));
         config.setRestrictedToZones(yamlp.getBoolean("structures.restricted-to-zones", false));
