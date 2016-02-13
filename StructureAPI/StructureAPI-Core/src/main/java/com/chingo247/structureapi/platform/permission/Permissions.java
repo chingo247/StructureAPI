@@ -26,22 +26,20 @@ public class Permissions {
     
     private static final String PREFIX = "settlercraft.";
     
-    public static final String CONTENT_RELOAD_PLANS = PREFIX + "content.plans.reload";
-    public static final String CONTENT_GENERATE_PLANS = PREFIX + "content.plans.generate";
-    public static final String CONTENT_ROTATE_PLACEMENT = PREFIX + "content.rotate.placement";
+    public static final String CONTENT_RELOAD_PLANS = PREFIX + "plans.reload";
+    public static final String CONTENT_GENERATE_PLANS = PREFIX + "plans.generate";
+    public static final String CONTENT_ROTATE_PLACEMENT = PREFIX + "schematic.rotate";
     
-    public static final String STRUCTURE_PLACE = PREFIX + "settler.structure.place";
-    public static final String STRUCTURE_CREATE = PREFIX + "settler.structure.create";
-    public static final String STRUCTURE_INFO = PREFIX + "settler.structure.info";
-    public static final String STRUCTURE_LIST = PREFIX + "settler.structure.list";
-    public static final String STRUCTURE_CONSTRUCTION = PREFIX + "settler.structure.construction";
-    public static final String STRUCTURE_LOCATION = PREFIX + "settler.structure.location";
+    public static final String STRUCTURE_PLACE = PREFIX + "structure.place";
+    public static final String STRUCTURE_CREATE = PREFIX + "structure.create";
+    public static final String STRUCTURE_INFO = PREFIX + "structure.info";
+    public static final String STRUCTURE_LIST = PREFIX + "structure.list";
+    public static final String STRUCTURE_CONSTRUCTION = PREFIX + "structure.construction";
+    public static final String STRUCTURE_LOCATION = PREFIX + "structure.location";
     
-    public static final String STRUCTURE_BACKUP = PREFIX + "advanced.structure.backup";
-    
-    public static final String SETTLER_OPEN_PLANMENU = PREFIX + "settler.planmenu.open";
-    public static final String SETTLER_OPEN_PLANSHOP = PREFIX + "settler.planshop.open";
-    public static final String SETTLER_ME = PREFIX + "settler.me.info";
+    public static final String OPEN_PLANMENU = PREFIX + "planmenu.open";
+    public static final String OPEN_PLANSHOP = PREFIX + "planshop.open";
+    public static final String SETTLER_ME = PREFIX + "settler.info";
     
     public static final String CONSTRUCTIONZONE_CREATE = PREFIX + "constructionzone.create";
     public static final String CONSTRUCTIONZONE_DELETE = PREFIX + "constructionzone.delete";

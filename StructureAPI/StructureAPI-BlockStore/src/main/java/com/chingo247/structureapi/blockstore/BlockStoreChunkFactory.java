@@ -27,9 +27,9 @@ import java.util.Map;
  */
 public class BlockStoreChunkFactory implements IBlockStoreChunkFactory<IBlockStoreChunk> {
     
-    private BlockStore blockstore;
+    private BlockStoreRegion blockstore;
 
-    public BlockStoreChunkFactory(BlockStore blockstore) {
+    public BlockStoreChunkFactory(BlockStoreRegion blockstore) {
         this.blockstore = blockstore;
     }
     

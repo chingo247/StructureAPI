@@ -29,7 +29,7 @@ import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.placement.RotationalPlacement;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
@@ -96,15 +96,15 @@ public class SafeContract extends AContract {
 
         // Get or create rollback data
         IRollbackData data = structure.getRollbackData();
-        SafeBlockStore blockStore;
+        SafeBlockStoreRegion blockStore;
         if (data.hasBlockStore()) {
             try {
-                blockStore = SafeBlockStore.load(data.getBlockStoreFile());
+                blockStore = SafeBlockStoreRegion.load(data.getBlockStoreFile());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
-            blockStore = new SafeBlockStore(data.getBlockStoreFile(), region.getWidth(), region.getHeight(), region.getLength());
+            blockStore = new SafeBlockStoreRegion(data.getBlockStoreFile(), region.getWidth(), region.getHeight(), region.getLength());
         }
 
         // Create place areas...
@@ -169,7 +169,7 @@ public class SafeContract extends AContract {
         /**
          * The schematicSaveData object.
          */
-        private SafeBlockStore safeBlockStore;
+        private SafeBlockStoreRegion safeBlockStore;
 
 
         private int maxBlocks;
@@ -186,7 +186,7 @@ public class SafeContract extends AContract {
          * @param safeBlockData The safe block data that will be used to save
          * @param callback
          */
-        public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStore safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
+        public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStoreRegion safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
             super(entry, submitter);
             this.world = world;
             this.traversal = traversal;

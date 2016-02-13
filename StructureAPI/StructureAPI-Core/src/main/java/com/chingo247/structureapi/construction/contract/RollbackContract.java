@@ -19,7 +19,7 @@ package com.chingo247.structureapi.construction.contract;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.construction.IStructureEntry;
@@ -78,7 +78,7 @@ public class RollbackContract extends AContract {
         }
         
         try {
-            SafeBlockStore safeBlockStore = SafeBlockStore.load(blockStoreFile);
+            SafeBlockStoreRegion safeBlockStore = SafeBlockStoreRegion.load(blockStoreFile);
             Iterator<IBlockStoreChunk> chunkIt = safeBlockStore.iterator();
             while(chunkIt.hasNext()) {
                 IBlockStoreChunk chunk = chunkIt.next();

@@ -16,43 +16,23 @@
  */
 package com.chingo247.structureapi.blockstore;
 
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldedit.blocks.BaseBlock;
-import java.util.Map;
+import java.io.IOException;
 
 /**
  *
  * @author Chingo
  */
-public interface IBlockStoreChunk extends IBlockContainer {
+public interface IBlockStoreRegion extends IBlockContainer, Iterable<IBlockStoreChunk> {
     
-    IBlockStoreRegion getBlockStore();
-    
-    CompoundTag getTileEntityData(int x, int y, int z);
-    
-    void setTileEntityData(int x, int y, int z, CompoundTag tag);
-    
-    boolean isEmpty();
-    
-    boolean hasSectionAt(int y);
-    
-    int getX();
-    
-    int getZ();
-    
-    int getChunkX();
-    
-    int getChunkZ();
-    
-    Vector2D getDimension();
-    
-    int getWidth();
+    int getHeight();
     
     int getLength();
     
-    Map<String, Tag> serialize();
+    int getWidth();
+    
+    Vector getSize();
+    
+    void save() throws IOException;
     
 }

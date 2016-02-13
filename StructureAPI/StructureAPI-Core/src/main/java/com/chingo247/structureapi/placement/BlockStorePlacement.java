@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.placement;
 
-import com.chingo247.structureapi.blockstore.IBlockStore;
+import com.chingo247.structureapi.blockstore.IBlockStoreRegion;
 import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
@@ -32,10 +32,10 @@ import java.util.Iterator;
  */
 public class BlockStorePlacement extends BlockPlacement {
     
-    private final IBlockStore blockStore;
+    private final IBlockStoreRegion blockStore;
     private boolean reversed;
 
-    public BlockStorePlacement(IBlockStore blockStore) {
+    public BlockStorePlacement(IBlockStoreRegion blockStore) {
         super(blockStore.getWidth(), blockStore.getHeight(), blockStore.getLength());
         
         this.reversed = false;

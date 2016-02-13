@@ -58,7 +58,7 @@ public class StructurePlanCommands {
     }
 
     @CommandExtras(senderType = CommandSenderType.PLAYER)
-    @CommandPermissions({Permissions.SETTLER_OPEN_PLANMENU})
+    @CommandPermissions({Permissions.OPEN_PLANMENU})
     @Command(aliases = {"plans:menu"}, usage = "/plans:menu", desc = "Opens the plan menu", max = 0)
     public static void openMenu(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
         if (!structureAPI.getConfig().isMenuEnabled()) {
@@ -68,7 +68,7 @@ public class StructurePlanCommands {
     }
 
     @CommandExtras(senderType = CommandSenderType.PLAYER)
-    @CommandPermissions({Permissions.SETTLER_OPEN_PLANSHOP})
+    @CommandPermissions({Permissions.OPEN_PLANSHOP})
     @Command(aliases = {"plans:shop"}, usage = "/plans:shop", desc = "Opens the plan shop", max = 0)
     public static void openShop(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
         if (!structureAPI.getConfig().isShopEnabled()) {

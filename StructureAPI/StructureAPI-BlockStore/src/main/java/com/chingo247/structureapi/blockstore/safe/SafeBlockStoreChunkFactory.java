@@ -28,9 +28,9 @@ import java.util.Map;
  */
 public class SafeBlockStoreChunkFactory implements IBlockStoreChunkFactory<ISafeBlockStoreChunk>{
     
-    private SafeBlockStore blockStore;
+    private SafeBlockStoreRegion blockStore;
 
-    public SafeBlockStoreChunkFactory(SafeBlockStore SafeBlockStore) {
+    public SafeBlockStoreChunkFactory(SafeBlockStoreRegion SafeBlockStore) {
         this.blockStore = SafeBlockStore;
     }
     

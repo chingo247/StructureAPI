@@ -184,7 +184,7 @@ public class BlockStoreSection implements IBlockStoreSection {
         Map<String, Tag> rootMap = Maps.newHashMap();
         
         if(!isEmpty()) {
-            if(sectionHeight != BlockStore.DEFAULT_SIZE) {
+            if(sectionHeight != BlockStoreRegion.DEFAULT_SIZE) {
                 rootMap.put("Height", new ShortTag((short)sectionHeight));
             }
         

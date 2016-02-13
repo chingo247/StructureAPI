@@ -16,11 +16,10 @@
  */
 package com.chingo247.structureapi.blockstore.safe;
 
-import com.chingo247.structureapi.blockstore.BlockStore;
-import static com.chingo247.structureapi.blockstore.BlockStore.ROOT_NODE;
+import com.chingo247.structureapi.blockstore.BlockStoreRegion;
+import static com.chingo247.structureapi.blockstore.BlockStoreRegion.ROOT_NODE;
 import com.chingo247.structureapi.blockstore.IBlockStoreChunkFactory;
 import com.chingo247.structureapi.blockstore.NBTUtils;
-import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.ShortTag;
@@ -36,23 +35,23 @@ import java.util.zip.GZIPInputStream;
  *
  * @author Chingo
  */
-public class SafeBlockStore extends BlockStore {
+public class SafeBlockStoreRegion extends BlockStoreRegion {
 
     private final SafeBlockStoreChunkFactory chunkFactory;
 
-    public SafeBlockStore(File file, Map<String, Tag> root, int width, int height, int length) {
+    public SafeBlockStoreRegion(File file, Map<String, Tag> root, int width, int height, int length) {
         super(file, root, width, height, length);
 
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
-    public SafeBlockStore(File file, CuboidRegion region) {
+    public SafeBlockStoreRegion(File file, CuboidRegion region) {
         super(file, region);
 
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
-    public SafeBlockStore(File file, int width, int height, int length) {
+    public SafeBlockStoreRegion(File file, int width, int height, int length) {
         super(file, width, height, length);
 
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
@@ -63,7 +62,7 @@ public class SafeBlockStore extends BlockStore {
         return chunkFactory;
     }
 
-    public static SafeBlockStore load(File f) throws IOException {
+    public static SafeBlockStoreRegion load(File f) throws IOException {
         try (NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(new FileInputStream(f)))) {
             NamedTag root = nbtStream.readNamedTag();
             if (!root.getName().equals(ROOT_NODE)) {
@@ -76,7 +75,7 @@ public class SafeBlockStore extends BlockStore {
             int height = NBTUtils.getChildTag(rootMap, "Height", ShortTag.class).getValue();
             int length = NBTUtils.getChildTag(rootMap, "Length", ShortTag.class).getValue();
 
-            SafeBlockStore blockStore = new SafeBlockStore(f, rootMap, width, height, length);
+            SafeBlockStoreRegion blockStore = new SafeBlockStoreRegion(f, rootMap, width, height, length);
             return blockStore;
         }
 

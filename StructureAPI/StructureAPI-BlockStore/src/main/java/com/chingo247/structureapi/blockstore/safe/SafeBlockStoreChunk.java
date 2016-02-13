@@ -33,7 +33,7 @@ public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockSt
     private boolean dirty;
     private SafeBlockStoreSectionFactory factory;
     
-    public SafeBlockStoreChunk(SafeBlockStore blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
+    public SafeBlockStoreChunk(SafeBlockStoreRegion blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
         super(blockStore, chunkTagMap, x, z, dimension);
         
         this.factory = new SafeBlockStoreSectionFactory(this);

@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.blockstore;
 
-import static com.chingo247.structureapi.blockstore.BlockStore.DEFAULT_SIZE;
+import static com.chingo247.structureapi.blockstore.BlockStoreRegion.DEFAULT_SIZE;
 import static com.chingo247.structureapi.blockstore.NBTUtils.getChildTag;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class BlockStoreChunk implements IBlockStoreChunk {
 
-    protected IBlockStore blockStore;
+    protected IBlockStoreRegion blockStore;
     protected Map<String, Tag> chunkTagMap;
     protected Map<String, Tag> sectionsTagMap;
     protected Map<String, IBlockStoreSection> sections;
@@ -53,7 +53,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     protected final int z;
     private final Vector2D dimension;
 
-    protected BlockStoreChunk(IBlockStore blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
+    protected BlockStoreChunk(IBlockStoreRegion blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
         this.blockStore = blockStore;
         this.chunkTagMap = chunkTagMap;
         this.x = x;
@@ -112,7 +112,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     }
 
     @Override
-    public IBlockStore getBlockStore() {
+    public IBlockStoreRegion getBlockStore() {
         return blockStore;
     }
     

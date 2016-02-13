@@ -68,8 +68,8 @@ public class PermissionManager {
         CONTENT_RELOAD_PLANS(new Permission(Permissions.CONTENT_RELOAD_PLANS, PermissionDefault.OP, "Allows a player to reload plans on the server")),
         CONTENT_ROTATE_PLACEMENT(new Permission(Permissions.CONTENT_ROTATE_PLACEMENT, PermissionDefault.OP, "Allows a player to rotate the original schematic for all future placing")),
         
-        SETTLER_OPEN_PLAN_MENU(new Permission(Permissions.SETTLER_OPEN_PLANMENU, PermissionDefault.OP, "Allows a player to use the plan menu (contains plans for FREE)")),
-        SETTLER_OPEN_SHOP_MENU(new Permission(Permissions.SETTLER_OPEN_PLANSHOP, PermissionDefault.TRUE, "Allows a player to use the plan shop")),
+        SETTLER_OPEN_PLAN_MENU(new Permission(Permissions.OPEN_PLANMENU, PermissionDefault.OP, "Allows a player to use the plan menu (contains plans for FREE)")),
+        SETTLER_OPEN_SHOP_MENU(new Permission(Permissions.OPEN_PLANSHOP, PermissionDefault.TRUE, "Allows a player to use the plan shop")),
         
         SETTLER_STRUCTURE_CREATE(new Permission(Permissions.STRUCTURE_CREATE, PermissionDefault.OP, "Allows a player to create structures from selections")),
         SETTLER_STRUCTURE_PLACE(new Permission(Permissions.STRUCTURE_PLACE, PermissionDefault.TRUE, "Allows the player to place structures")),

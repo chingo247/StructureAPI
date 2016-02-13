@@ -17,8 +17,8 @@
 package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.placement.BlockStorePlacement;
-import com.chingo247.structureapi.blockstore.IBlockStore;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.IBlockStoreRegion;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.structure.IStructure;
@@ -39,7 +39,7 @@ public class RollbackPlacementProducer extends BlockPlacementProducer {
             throw new StructureException("Structure doesn't have a rollback file");
         }
         try {
-            IBlockStore blockStore = SafeBlockStore.load(blockStoreFile);
+            IBlockStoreRegion blockStore = SafeBlockStoreRegion.load(blockStoreFile);
             BlockStorePlacement placement =  new BlockStorePlacement(blockStore);
             placement.setReversed(true);
             return placement;

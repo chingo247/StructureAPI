@@ -270,7 +270,7 @@ public class StructureCommands {
             throw new CommandException("Expected a number but got '" + structureIdArg + "' \n" + "/structure:build [id]");
         }
         long id = Long.parseLong(structureIdArg);
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
             StructureNode sn = structureRepository.findById(id);
 
@@ -286,6 +286,11 @@ public class StructureCommands {
             structure = new Structure(sn);
             tx.success();
         }
+        
+        if(structure.getStatus() == ConstructionStatus.REMOVED) {
+            throw new CommandException("Can't BUILD a REMOVED structure!");
+        }
+        
 //        LOG.log(Level.INFO, "build in {0} ms", (System.currentTimeMillis() - start));
 
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
@@ -331,6 +336,10 @@ public class StructureCommands {
             tx.success();
         }
 //        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
+        
+        if(structure.getStatus() == ConstructionStatus.REMOVED) {
+            throw new CommandException("Can't ROLLBACK a REMOVED structure!");
+        }
 
         if(!structure.getRollbackData().hasBlockStore()) {
             throw new CommandException("Rollback not available for this structure");
@@ -365,7 +374,7 @@ public class StructureCommands {
 
         // Check structure
         long id = Long.parseLong(structureIdArg);
-        long start = System.currentTimeMillis();
+//        long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
             StructureNode sn = structureRepository.findById(id);
 
@@ -384,6 +393,13 @@ public class StructureCommands {
 
             tx.success();
         }
+        
+        
+        if(structure.getStatus() == ConstructionStatus.REMOVED) {
+            throw new CommandException("Can't DEMOLISH a REMOVED structure!");
+        }
+        
+        
 //        LOG.log(Level.INFO, "demolish in {0} ms", (System.currentTimeMillis() - start));
 
         // Use force?

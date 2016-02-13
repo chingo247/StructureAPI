@@ -1,38 +1,44 @@
 /*
- * Copyright (C) 2016 Chingo
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package com.chingo247.structureapi.blockstore;
 
-import com.sk89q.worldedit.Vector;
-import java.io.IOException;
+import java.io.File;
 
 /**
  *
  * @author Chingo
  */
-public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreChunk> {
+public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion> {
     
-    int getHeight();
+    /**
+     * Gets the directory for this blockstore
+     * @return The directory
+     */
+    File getDirectory();
     
-    int getLength();
-    
+    /**
+     * Gets the maxWidth, returns -1 if width is infinite
+     * @return The max width
+     */
     int getWidth();
     
-    Vector getSize();
+    /**
+     * Gets the maxLength, returns -1 if length is infinite
+     * @return The max length
+     */
+    int getLength();
     
-    void save() throws IOException;
+    /**
+     * Gets the region for the given x and z coordinates.
+     * Never returns null
+     * @param x The x
+     * @param z The z
+     * @return The region
+     */
+    IBlockStoreRegion getRegion(int x, int z);
+    
     
 }
