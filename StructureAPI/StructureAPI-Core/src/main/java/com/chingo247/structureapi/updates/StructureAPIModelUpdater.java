@@ -16,7 +16,13 @@
  */
 package com.chingo247.structureapi.updates;
 
+import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
+import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -27,11 +33,11 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-public class StructureAPI_Update_2_2_0 implements IStructureAPIUpdate{
+public class StructureAPIModelUpdater implements IStructureAPIUpdate{
     
     private GraphDatabaseService graph;
 
-    public StructureAPI_Update_2_2_0(GraphDatabaseService graph) {
+    public StructureAPIModelUpdater(GraphDatabaseService graph) {
         this.graph = graph;
     }
     
@@ -46,10 +52,10 @@ public class StructureAPI_Update_2_2_0 implements IStructureAPIUpdate{
             tx.success();
         } 
         
-        System.out.println("[SettlerCraft]: updating model to " + UPDATE_VERSION);
         try(Transaction tx = graph.beginTx()) {
             Node n = graph.findNode(UPDATE_LABEL, UPDATE_KEY, UPDATE_VERSION);
             if(n == null) {
+                System.out.println("[SettlerCraft]: updating model to " + UPDATE_VERSION);
                 // Update 'StructureHologram' to 'STRUCTURE_HOLOGRAM'
                 graph.execute("MATCH (s:SchematicData) SET s:SCHEMATIC_DATA REMOVE s:SchematicData");
                 // Update 'StructureHologram' to 'STRUCTURE_HOLOGRAM'
@@ -75,14 +81,10 @@ public class StructureAPI_Update_2_2_0 implements IStructureAPIUpdate{
                         +     "CREATE (a)-[:PROTECTED_BY]->(w:WORLDGUARD_REGION {region: a.WGRegion}) "
                         +     "REMOVE a.WGRegion"
                 );
-                
                 n = graph.createNode(UPDATE_LABEL);
                 n.setProperty(UPDATE_KEY, UPDATE_VERSION);
             } 
-            
             tx.success();
         }
-        
     }
-    
 }

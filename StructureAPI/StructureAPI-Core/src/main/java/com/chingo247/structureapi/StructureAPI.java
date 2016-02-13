@@ -74,6 +74,7 @@ import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 import com.chingo247.structureapi.construction.IContractor;
+import com.chingo247.structureapi.updates.StructureAPIModelUpdater;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
 
 /**
@@ -212,8 +213,8 @@ public class StructureAPI implements IStructureAPI {
     }
 
     private void applyUpdates() {
-//        StructureAPI_Update_2_2_0 update = new StructureAPI_Update_2_2_0(graph);
-//        update.update();
+        StructureAPIModelUpdater update = new StructureAPIModelUpdater(graph);
+        update.update();
     }
 
     @Override
