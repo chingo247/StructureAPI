@@ -59,20 +59,21 @@ public class BlockStoreRegion implements IBlockStoreRegion {
     protected Map<String, Tag> chunkTags;
     protected Map<String, IBlockStoreChunk> chunks;
     protected File file;
+    private boolean dirty;
 
     private int width, height, length;
-
+    private IBlockStore blockStore;
     private BlockStoreChunkFactory chunkFactory;
 
-    public BlockStoreRegion(File file, CuboidRegion region) {
-        this(file, region.getWidth(), region.getHeight(), region.getLength());
+    public BlockStoreRegion(IBlockStore blockstore, File file, CuboidRegion region) {
+        this(blockstore, file, region.getWidth(), region.getHeight(), region.getLength());
     }
 
-    public BlockStoreRegion(File file, int width, int height, int length) {
-        this(file, new HashMap<String, Tag>(), width, height, length);
+    public BlockStoreRegion(IBlockStore blockstore, File file, int width, int height, int length) {
+        this(blockstore, file, new HashMap<String, Tag>(), width, height, length);
     }
 
-    protected BlockStoreRegion(File file, Map<String, Tag> root, int width, int height, int length) {
+    public BlockStoreRegion(IBlockStore blockstore, File file, Map<String, Tag> root, int width, int height, int length) {
         Preconditions.checkArgument(width > 0, "width has to be > 0");
         Preconditions.checkArgument(height > 0, "height has to be > 0");
         Preconditions.checkArgument(length > 0, "length has to be > 0");
@@ -83,12 +84,25 @@ public class BlockStoreRegion implements IBlockStoreRegion {
         this.chunks = Maps.newHashMap();
         this.chunkTags = root;
         this.file = file;
+        this.blockStore = blockstore;
         this.chunkFactory = new BlockStoreChunkFactory(this);
     }
 
     public IBlockStoreChunkFactory getChunkFactory() {
         return chunkFactory;
     }
+
+    @Override
+    public void setDirty(boolean dirty) {
+        this.dirty = dirty;
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+    
+    
 
     @Override
     public BaseBlock getBlockAt(int x, int y, int z) {
@@ -224,12 +238,26 @@ public class BlockStoreRegion implements IBlockStoreRegion {
 
     @Override
     public void save() throws IOException {
+        save(blockStore.getDirectory());
+    }
+
+    @Override
+    public IBlockStore getBlockStore() {
+        return blockStore;
+    }
+    
+    
+
+    @Override
+    public void save(File directory) throws IOException {
         Map<String, Tag> rootMap = serialize();
 
-        try (NBTOutputStream outputStream = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(file)))) {
+        try (NBTOutputStream outputStream = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(new File(directory, file.getName()))))) {
             outputStream.writeNamedTag("BlockStore", new CompoundTag(rootMap));
         }
     }
+    
+    
 
     public Map<String, Tag> serialize() {
         Map<String, Tag> rootMap = new HashMap<>(chunkTags);
@@ -244,25 +272,6 @@ public class BlockStoreRegion implements IBlockStoreRegion {
         rootMap.put("Length", new ShortTag((short) length));
 
         return rootMap;
-    }
-
-    public static BlockStoreRegion load(File f) throws IOException {
-        try (NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(new FileInputStream(f)))) {
-            NamedTag root = nbtStream.readNamedTag();
-            if (!root.getName().equals(ROOT_NODE)) {
-                throw new RuntimeException("File not of type '" + ROOT_NODE + "'");
-            }
-
-            Map<String, Tag> rootMap = (Map) root.getTag().getValue();
-
-            int width = NBTUtils.getChildTag(rootMap, "Width", ShortTag.class).getValue();
-            int height = NBTUtils.getChildTag(rootMap, "Height", ShortTag.class).getValue();
-            int length = NBTUtils.getChildTag(rootMap, "Length", ShortTag.class).getValue();
-
-            BlockStoreRegion blockStore = new BlockStoreRegion(f, rootMap, width, height, length);
-            return blockStore;
-        }
-
     }
 
     private class BlockStoreChunkIterator implements Iterator<IBlockStoreChunk> {

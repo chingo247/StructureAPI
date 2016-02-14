@@ -41,7 +41,8 @@ public class BlockStoreSection implements IBlockStoreSection {
     private byte[] data;
     private byte[] addId;
     private IBlockStoreChunk bsc;
-
+    
+    
     private boolean empty;
 
     protected BlockStoreSection(IBlockStoreChunk bsc, Map<String, Tag> sectionTagMap, int y, int sectionHeight) {
@@ -141,7 +142,9 @@ public class BlockStoreSection implements IBlockStoreSection {
         Vector2D size = bsc.getDimension();
         return size.getBlockX() * sectionHeight * size.getBlockZ();
     }
-    
+
+   
+
     @Override
     public void setBlockAt(int x, int y, int z, BaseBlock block) {
         if (empty) {
@@ -153,7 +156,7 @@ public class BlockStoreSection implements IBlockStoreSection {
         }
 
         int index = getArrayIndex(x, y, z);
-        
+        bsc.setDirty(true);
         
 
         this.ids[index] = (byte) block.getType();

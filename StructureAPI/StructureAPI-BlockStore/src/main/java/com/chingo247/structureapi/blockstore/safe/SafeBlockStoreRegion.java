@@ -17,19 +17,11 @@
 package com.chingo247.structureapi.blockstore.safe;
 
 import com.chingo247.structureapi.blockstore.BlockStoreRegion;
-import static com.chingo247.structureapi.blockstore.BlockStoreRegion.ROOT_NODE;
 import com.chingo247.structureapi.blockstore.IBlockStoreChunkFactory;
-import com.chingo247.structureapi.blockstore.NBTUtils;
-import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NamedTag;
-import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Map;
-import java.util.zip.GZIPInputStream;
 
 /**
  *
@@ -39,20 +31,20 @@ public class SafeBlockStoreRegion extends BlockStoreRegion {
 
     private final SafeBlockStoreChunkFactory chunkFactory;
 
-    public SafeBlockStoreRegion(File file, Map<String, Tag> root, int width, int height, int length) {
-        super(file, root, width, height, length);
+    public SafeBlockStoreRegion(SafeBlockStore blockStore, File file, Map<String, Tag> root, int width, int height, int length) {
+        super(blockStore, file, root, width, height, length);
 
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
-    public SafeBlockStoreRegion(File file, CuboidRegion region) {
-        super(file, region);
+    public SafeBlockStoreRegion(SafeBlockStore blockStore, File file, CuboidRegion region) {
+        super(blockStore, file, region);
 
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
 
-    public SafeBlockStoreRegion(File file, int width, int height, int length) {
-        super(file, width, height, length);
+    public SafeBlockStoreRegion(SafeBlockStore blockStore, File file, int width, int height, int length) {
+        super(blockStore, file, width, height, length);
 
         this.chunkFactory = new SafeBlockStoreChunkFactory(this);
     }
@@ -62,23 +54,6 @@ public class SafeBlockStoreRegion extends BlockStoreRegion {
         return chunkFactory;
     }
 
-    public static SafeBlockStoreRegion load(File f) throws IOException {
-        try (NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(new FileInputStream(f)))) {
-            NamedTag root = nbtStream.readNamedTag();
-            if (!root.getName().equals(ROOT_NODE)) {
-                throw new RuntimeException("File not of type '" + ROOT_NODE + "'");
-            }
-
-            Map<String, Tag> rootMap = (Map) root.getTag().getValue();
-
-            int width = NBTUtils.getChildTag(rootMap, "Width", ShortTag.class).getValue();
-            int height = NBTUtils.getChildTag(rootMap, "Height", ShortTag.class).getValue();
-            int length = NBTUtils.getChildTag(rootMap, "Length", ShortTag.class).getValue();
-
-            SafeBlockStoreRegion blockStore = new SafeBlockStoreRegion(f, rootMap, width, height, length);
-            return blockStore;
-        }
-
-    }
+   
 
 }

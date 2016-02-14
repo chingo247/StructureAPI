@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class BlockStoreChunk implements IBlockStoreChunk {
 
-    protected IBlockStoreRegion blockStore;
+    protected IBlockStoreRegion region;
     protected Map<String, Tag> chunkTagMap;
     protected Map<String, Tag> sectionsTagMap;
     protected Map<String, IBlockStoreSection> sections;
@@ -54,7 +54,7 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     private final Vector2D dimension;
 
     protected BlockStoreChunk(IBlockStoreRegion blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
-        this.blockStore = blockStore;
+        this.region = blockStore;
         this.chunkTagMap = chunkTagMap;
         this.x = x;
         this.z = z;
@@ -112,8 +112,15 @@ public class BlockStoreChunk implements IBlockStoreChunk {
     }
 
     @Override
+    public void setDirty(boolean dirty) {
+        if(dirty) {
+            region.setDirty(dirty);
+        }
+    }
+
+    @Override
     public IBlockStoreRegion getBlockStore() {
-        return blockStore;
+        return region;
     }
     
     public IBlockStoreSectionFactory<? extends IBlockStoreSection> getSectionFactory() {
@@ -183,11 +190,11 @@ public class BlockStoreChunk implements IBlockStoreChunk {
         int sectionY = (y >> 4) * 16;
         if (section == null) {
             Tag sectionTag = sectionsTagMap.get(key);
-            int sectionHeight = sectionY + 16 > blockStore.getHeight() ? (blockStore.getHeight() - sectionY) : DEFAULT_SIZE;
+            int sectionHeight = sectionY + 16 > region.getHeight() ? (region.getHeight() - sectionY) : DEFAULT_SIZE;
             
             int height; 
             if(sectionTag == null) {
-                height = sectionY + 16 > blockStore.getHeight() ? (blockStore.getHeight() - sectionY) : DEFAULT_SIZE;
+                height = sectionY + 16 > region.getHeight() ? (region.getHeight() - sectionY) : DEFAULT_SIZE;
             } else {
                 Map<String,Tag> map = (Map)sectionTag.getValue();
                 if(map.containsKey("Height")) {

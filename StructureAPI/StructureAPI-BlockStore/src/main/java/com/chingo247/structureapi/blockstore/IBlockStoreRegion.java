@@ -17,6 +17,7 @@
 package com.chingo247.structureapi.blockstore;
 
 import com.sk89q.worldedit.Vector;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -24,6 +25,8 @@ import java.io.IOException;
  * @author Chingo
  */
 public interface IBlockStoreRegion extends IBlockContainer, Iterable<IBlockStoreChunk> {
+    
+    IBlockStore getBlockStore();
     
     int getHeight();
     
@@ -33,6 +36,12 @@ public interface IBlockStoreRegion extends IBlockContainer, Iterable<IBlockStore
     
     Vector getSize();
     
+    boolean isDirty();
+    
+    void setDirty(boolean dirty);
+    
     void save() throws IOException;
+    
+    void save(File directory) throws IOException;
     
 }

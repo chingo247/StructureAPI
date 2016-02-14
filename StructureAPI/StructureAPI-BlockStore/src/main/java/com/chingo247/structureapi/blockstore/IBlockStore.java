@@ -13,6 +13,10 @@ import java.io.File;
  */
 public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion> {
     
+    String getVersion();
+    
+    String getName();
+    
     /**
      * Gets the directory for this blockstore
      * @return The directory
@@ -20,16 +24,28 @@ public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion
     File getDirectory();
     
     /**
-     * Gets the maxWidth, returns -1 if width is infinite
-     * @return The max width
+     * Gets the width
+     * @return The width
      */
     int getWidth();
     
     /**
-     * Gets the maxLength, returns -1 if length is infinite
-     * @return The max length
+     * Gets the length
+     * @return The length
      */
     int getLength();
+    
+    /**
+     * Gets the height
+     * @return The height
+     */
+    int getHeight();
+    
+    /**
+     * Gets the size of chunks, DEFAULT = 16
+     * @return The size of chunks
+     */
+    int getChunkSize();
     
     /**
      * Gets the region for the given x and z coordinates.
@@ -39,6 +55,8 @@ public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion
      * @return The region
      */
     IBlockStoreRegion getRegion(int x, int z);
+    
+    
     
     
 }

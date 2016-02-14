@@ -18,9 +18,7 @@ package com.chingo247.structureapi.blockstore;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldedit.blocks.BaseBlock;
 import java.util.Map;
 
 /**
@@ -38,6 +36,8 @@ public interface IBlockStoreChunk extends IBlockContainer {
     boolean isEmpty();
     
     boolean hasSectionAt(int y);
+    
+    void setDirty(boolean dirty);
     
     int getX();
     
