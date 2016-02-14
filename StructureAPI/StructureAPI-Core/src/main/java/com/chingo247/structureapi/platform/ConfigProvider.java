@@ -32,8 +32,10 @@ public class ConfigProvider {
     private boolean useHolograms = false;
     private boolean allowsSubstructures = false;
     private boolean protectStructures = false;
+    private boolean protectConstructionZones = false;
     private boolean allowStructures = false;
     private boolean restrictedToZones = false;
+    private String version;
     
     private final File f;
     
@@ -41,6 +43,22 @@ public class ConfigProvider {
         this.f = f;
     }
 
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+    
+    public void setProtectConstructionZones(boolean protectConstructionZones) {
+        this.protectConstructionZones = protectConstructionZones;
+    }
+
+    public boolean isProtectConstructionZones() {
+        return protectConstructionZones;
+    }
+    
     public void setRestrictedToZones(boolean restrictedToZones) {
         this.restrictedToZones = restrictedToZones;
     }
@@ -97,24 +115,7 @@ public class ConfigProvider {
         this.protectStructures = protectStructures;
     }
     
-    public void save() {
-        save(new YAMLProcessor(f, true));
-    }
-    
-    private void save(YAMLProcessor yamlp) {
-        yamlp.setProperty("structures.allow-substructures", allowsSubstructures);
-        yamlp.setProperty("structures.allow-structures", allowStructures);
-        yamlp.setProperty("structures.restricted-to-zones", restrictedToZones);
-        yamlp.setProperty("structures.use-holograms", useHolograms);
-        yamlp.setProperty("structures.protected", protectStructures);
-        yamlp.setProperty("menus.planmenu-enabled", menuEnabled);
-        yamlp.setProperty("menus.planshop-enabled", shopEnabled);
-        yamlp.save();
-    }
-    
-    
-    
-    public static ConfigProvider loadOrCreateDefault(File f) throws IOException {
+    public static ConfigProvider load(File f) throws IOException {
         if(!f.exists()) {
             f.createNewFile();
         }
@@ -123,22 +124,15 @@ public class ConfigProvider {
         yamlp.load();
         
         ConfigProvider config = new ConfigProvider(f);
+        config.setVersion(yamlp.getString("version", null));
         config.setAllowsSubstructures(yamlp.getBoolean("structures.allow-substructures", true));
         config.setRestrictedToZones(yamlp.getBoolean("structures.restricted-to-zones", false));
         config.setAllowStructures(yamlp.getBoolean("structures.allow-structures", true));
         config.setUseHolograms(yamlp.getBoolean("structures.use-holograms", true));
         config.setProtectStructures(yamlp.getBoolean("structures.protected", true));
+        config.setProtectConstructionZones(yamlp.getBoolean("constructionzones.protected", true));
         config.setMenuEnabled(yamlp.getBoolean("menus.planmenu-enabled", true));
         config.setShopEnabled(yamlp.getBoolean("menus.planshop-enabled", true));
-        yamlp.setComment("structures.allow-substructures", "Determines if placing of substructures (placing structures within structures) is allowed");
-        yamlp.setComment("structures.planmenmu-enabled", "Determines whether the StructureAPI planmenu should be enabled", "Players can SELECT plans in this menu for FREE");
-        yamlp.setComment("structures.protected", "Determines whether structures should be protected (Requires WorldGuard)");
-        yamlp.setComment("structures.use-holograms", "Determines whether structures should place holograms (Requires HolographicDisplays)");
-        yamlp.setComment("structures.allow-structures", "Determines if placing structures is allowed");
-        yamlp.setComment("structures.restricted-to-zones", "Determines if placing structures is only allowed within zones");
-        yamlp.setComment("structures.planmenmu-enabled", "Determines whether the StructureAPI planshop should be enabled", "Players can BUY plans from the menu (Requires Vault + a Vault supported Economy plugin)");
-        config.save(yamlp);
-        
         return config;
         
     }

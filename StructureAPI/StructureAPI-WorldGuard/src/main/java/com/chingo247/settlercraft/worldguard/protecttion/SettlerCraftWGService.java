@@ -20,20 +20,25 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.settlercraft.worldguard.restriction.WorldGuardRestriction;
-import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.IWorldConfig;
-import com.chingo247.structurecraft.StructureAPI;
-import com.chingo247.structurecraft.model.RelTypes;
-import com.chingo247.structurecraft.model.owner.OwnerType;
-import com.chingo247.structurecraft.model.owner.Ownership;
-import com.chingo247.structurecraft.model.plot.IPlot;
-import com.chingo247.structurecraft.model.structure.ConstructionStatus;
-import com.chingo247.structurecraft.model.structure.IStructure;
-import com.chingo247.structurecraft.model.structure.IStructureRepository;
-import com.chingo247.structurecraft.model.structure.Structure;
-import com.chingo247.structurecraft.model.structure.StructureNode;
-import com.chingo247.structurecraft.model.structure.StructureRepository;
-import com.chingo247.structurecraft.model.zone.IConstructionZone;
+import com.chingo247.structureapi.IStructureAPI;
+import com.chingo247.structureapi.IWorldConfig;
+import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.model.RelTypes;
+import com.chingo247.structureapi.model.owner.OwnerDomainNode;
+import com.chingo247.structureapi.model.owner.OwnerType;
+import com.chingo247.structureapi.model.owner.Ownership;
+import com.chingo247.structureapi.model.plot.IPlot;
+import com.chingo247.structureapi.model.structure.ConstructionStatus;
+import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.IStructureRepository;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.structure.StructureNode;
+import com.chingo247.structureapi.model.structure.StructureRepository;
+import com.chingo247.structureapi.model.zone.ConstructionZone;
+import com.chingo247.structureapi.model.zone.ConstructionZoneNode;
+import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.platform.ConfigProvider;
+import com.chingo247.structureapi.platform.IConfigProvider;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -53,7 +58,6 @@ import java.util.logging.Logger;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldguard.LocalPlayer;
-import fiber.core.api.service.Service;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -69,7 +73,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
+public class SettlerCraftWGService implements IPlotProtector<IPlot> {
 
     private static final Label LABEL = DynamicLabel.label("WORLDGUARD_REGION");
      private static final String PREFIX = "SC_";
@@ -100,8 +104,11 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
      */
     @Override
     public synchronized void protect(IPlot plot) {
-        IWorldConfig worldConfig = structureAPI.loadOrGetConfig(plot.getWorldName());
-
+        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+        if(!configProvider.isProtectStructures() && (plot instanceof IStructure)) {
+            return;
+        }
+        
 //        if (!worldConfig.getConfig().isProtectStructures()) {
 //            return;
 //        }
@@ -129,7 +136,7 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
         );
 
         try (Transaction tx = graph.beginTx()) {
-            OwnerDomain ownerDomain = new OwnerDomain(plot.getNode());
+            OwnerDomainNode ownerDomain = new OwnerDomainNode(plot.getUnderlyingNode());
 
             for (Ownership owner : ownerDomain.getOwnerships()) {
                 
@@ -152,7 +159,7 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
                 tx.failure();
             }
             Node worldGuardNode = graph.createNode(LABEL);
-            plot.getNode().createRelationshipTo(worldGuardNode, RelTypes.PROTECTED_BY);
+            plot.getUnderlyingNode().createRelationshipTo(worldGuardNode, RelTypes.PROTECTED_BY);
             tx.success();
 
         }
@@ -166,7 +173,7 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
                 regionId = STRUCTURE_PREFIX + String.valueOf(((IStructure) plot).getId());
             } else if (plot instanceof IConstructionZone) {
                 System.out.println("Protecting construction zone!");
-                regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IStructure) plot).getId());
+                regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IConstructionZone) plot).getId());
             } else {
                 regionId = UUID.randomUUID().toString();
             }
@@ -213,6 +220,44 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
         });
 
     }
+    
+    private void processConstructionZonesWithoutRegion() {
+        final List<ConstructionZone> zones = Lists.newArrayList();
+        try (Transaction tx = graph.beginTx()) {
+            // (a)-[:PROTECTED_BY]->(w:WORLDGUARD_REGION {region: a.WGRegion})
+
+            String query = "MATCH(s:" + ConstructionZoneNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(:WORLDGUARD_REGION) "
+                    + "WHERE r IS NULL "
+                    + "RETURN s";
+
+            Result r = graph.execute(query);
+            while (r.hasNext()) {
+                Map<String, Object> map = r.next();
+                for (Object o : map.values()) { // all structures
+                    Node n = (Node) o;
+                    ConstructionZone constructionZone = new ConstructionZone(n);
+                    zones.add(constructionZone);
+                }
+            }
+            tx.success();
+        }
+
+        if (!zones.isEmpty()) {
+            System.out.println("[SettlerCraft]: Processing " + zones.size() + " structures without a worldguard region");
+        }
+
+        SettlerCraft.getInstance().getExecutor().submit(new Runnable() {
+
+            @Override
+            public void run() {
+                for (ConstructionZone constructionZone : zones) {
+                    protect(constructionZone);
+                    System.out.println("[SettlerCraft]: Protected constructionzone #" + constructionZone.getId() + " with 'WorldGuard'");
+                }
+            }
+        });
+
+    }
 
     @Override
     public String getName() {
@@ -220,10 +265,10 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
     }
 
     @Override
-    public void removeProtection(IPlot structure) {
-        World world = Bukkit.getWorld(structure.getWorld().getName());
+    public void removeProtection(IPlot plot) {
+        World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String region = getRegionId(structure);
+        String region = getRegionId(plot);
         if (mgr.hasRegion(region)) {
             mgr.removeRegion(region);
             try {
@@ -234,7 +279,7 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
         }
         
         Map<String,Object> params = Maps.newHashMap();
-        params.put("regionId", getRegionId(structure));
+        params.put("regionId", getRegionId(plot));
         
         String query = "MATCH (wg:" + LABEL.name() + " { "+REGION_PROPERTY+": {regionId} }) "
                      + "RETURN wg";
@@ -251,25 +296,29 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
     }
 
     @Override
-    public boolean hasProtection(IPlot structure) {
-        World world = Bukkit.getWorld(structure.getWorld().getName());
+    public boolean hasProtection(IPlot plot) {
+        World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String region = getRegionId(structure);
+        String region = getRegionId(plot);
         return mgr.hasRegion(region);
     }
 
-    @Override
     public void initialize() {
-        EventManager.getInstance().getEventBus().register(new WorldGuardStructureListener(this, graph));
+        StructureAPI.getInstance().getAsyncEventBus().register(new WorldGuardStructureListener(this, graph));
         StructureAPI.getInstance().addRestriction(new WorldGuardRestriction());
+        
         processStructuresWithoutRegion();
         processInvalidStructures();
+        
+        processConstructionZonesWithoutRegion();
+        processInvalidConstructionZones();
+        
     }
 
-    void addMember(UUID player, Structure structure) {
-        World world = Bukkit.getWorld(structure.getWorld().getName());
+    void addMember(UUID player, IPlot plot) {
+        World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String regionId = getRegionId(structure);
+        String regionId = getRegionId(plot);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             if (!region.getMembers().contains(player)) {
@@ -283,10 +332,10 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
         }
     }
 
-    void addOwner(UUID player, Structure structure) {
-        World world = Bukkit.getWorld(structure.getWorld().getName());
+    void addOwner(UUID player, IPlot plot) {
+        World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String regionId = getRegionId(structure);
+        String regionId = getRegionId(plot);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             if (!region.getOwners().contains(player)) {
@@ -300,10 +349,10 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
         }
     }
 
-    void removeOwner(UUID player, Structure structure) {
-        World world = Bukkit.getWorld(structure.getWorld().getName());
+    void removeOwner(UUID player, IPlot plot) {
+        World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String regionId = getRegionId(structure);
+        String regionId = getRegionId(plot);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             region.getOwners().removePlayer(player);
@@ -315,10 +364,10 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
         }
     }
 
-    void removeMember(UUID player, Structure structure) {
-        World world = Bukkit.getWorld(structure.getWorld().getName());
+    void removeMember(UUID player, IPlot plot) {
+        World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String regionId = getRegionId(structure);
+        String regionId = getRegionId(plot);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             region.getMembers().removePlayer(player);
@@ -430,7 +479,12 @@ public class SettlerCraftWGService implements IPlotProtector<IPlot>, Service {
 
             tx.success();
         }
+    }
+    
+     
 
+    private void processInvalidConstructionZones() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

@@ -17,7 +17,7 @@
 package com.chingo247.settlercraft.worldguard.restriction;
 
 import com.chingo247.settlercraft.worldguard.protecttion.SettlerCraftWGService;
-import com.chingo247.structurecraft.restriction.StructureRestriction;
+import com.chingo247.structureapi.StructureRestriction;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;

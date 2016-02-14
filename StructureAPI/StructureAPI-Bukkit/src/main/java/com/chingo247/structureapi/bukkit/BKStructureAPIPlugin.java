@@ -22,6 +22,8 @@ import com.chingo247.structureapi.bukkit.listener.PlanListener;
 import com.chingo247.settlercraft.core.platforms.bukkit.BKPermissionRegistry;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
+import com.chingo247.settlercraft.core.util.JarUtil;
+import com.chingo247.settlercraft.core.util.VersionUtil;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureInvalidator;
 import com.chingo247.structureapi.commands.SchematicCommands;
@@ -41,6 +43,7 @@ import com.chingo247.xplatform.platforms.bukkit.BukkitPlatform;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlayer;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlugin;
 import com.chingo247.xplatform.platforms.bukkit.BukkitServer;
+import com.google.common.io.Files;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
@@ -50,6 +53,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -65,9 +70,10 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlugin {
 
+    private static final String RESOURCES_PATH = "com/chingo247/resources/";
     public static final Level LOG_LEVEL = Level.SEVERE;
     public static final String MSG_PREFIX = "[SettlerCraft]: ";
-    
+
     private IEconomyProvider economyProvider;
     private ConfigProvider configProvider;
     private static BKStructureAPIPlugin instance;
@@ -77,26 +83,25 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
     @Override
     public void onEnable() {
         instance = this;
-        if(Bukkit.getPluginManager().getPlugin("SettlerCraft") != null) {
-            Bukkit.getConsoleSender().sendMessage(new String[] {
-                    ChatColor.RED + "[SettlerCraft]: Please remove the old jar of SettlerCraft!",
-                    ChatColor.RED + "[SettlerCraft]: This should be named something like 'SettlerCraft-1.0-RC3.jar'" ,
-                    ChatColor.RED + "[SettlerCraft]: Or something like 'SettlerCraft-1.0-RC4-1.jar'",
-                    ChatColor.RED + "[SettlerCraft]: and needs to be removed!",
-                }
+        if (Bukkit.getPluginManager().getPlugin("SettlerCraft") != null) {
+            Bukkit.getConsoleSender().sendMessage(new String[]{
+                ChatColor.RED + "[SettlerCraft]: Please remove the old jar of SettlerCraft!",
+                ChatColor.RED + "[SettlerCraft]: This should be named something like 'SettlerCraft-1.0-RC3.jar'",
+                ChatColor.RED + "[SettlerCraft]: Or something like 'SettlerCraft-1.0-RC4-1.jar'",
+                ChatColor.RED + "[SettlerCraft]: and needs to be removed!",}
             );
             return;
         }
-        
-        if(Bukkit.getPluginManager().getPlugin("SettlerCraft-Core") == null) {
-           System.out.println(MSG_PREFIX + " SettlerCraft-Core NOT FOUND!!! Disabling...");
+
+        if (Bukkit.getPluginManager().getPlugin("SettlerCraft-Core") == null) {
+            System.out.println(MSG_PREFIX + " SettlerCraft-Core NOT FOUND!!! Disabling...");
             this.setEnabled(false);
-            return; 
+            return;
         }
-        if(Bukkit.getPluginManager().getPlugin("SettlerCraft-MenuAPI") == null) {
-           System.out.println(MSG_PREFIX + " SettlerCraft-MenuAPI NOT FOUND!!! Disabling...");
+        if (Bukkit.getPluginManager().getPlugin("SettlerCraft-MenuAPI") == null) {
+            System.out.println(MSG_PREFIX + " SettlerCraft-MenuAPI NOT FOUND!!! Disabling...");
             this.setEnabled(false);
-            return; 
+            return;
         }
         if (Bukkit.getPluginManager().getPlugin("WorldEdit") == null) {
             System.out.println(MSG_PREFIX + " WorldEdit NOT FOUND!!! Disabling...");
@@ -108,17 +113,18 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
             this.setEnabled(false);
             return;
         }
-        
+
+        createDefaults();
+
         // Get GraphDatabase
         graph = SettlerCraft.getInstance().getNeo4j();
-        
+
         try {
             // Initialize Config
-            configProvider = ConfigProvider.loadOrCreateDefault(new File(getDataFolder(), "config.yml"));
+            configProvider = ConfigProvider.load(new File(getDataFolder(), "config.yml"));
         } catch (IOException ex) {
             Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
 
         // Register plugin & ConfigProvider
         StructureAPI structureAPI = (StructureAPI) StructureAPI.getInstance();
@@ -132,14 +138,13 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
         }
         structureAPI.registerConfigProvider(configProvider);
         structureAPI.registerAWE(new BKAsyncWorldEditIntegration());
-        
-        
+
         economyProvider = SettlerCraft.getInstance().getEconomyProvider();
-        
+
         // Run invalidation!
         StructureInvalidator invalidator = new StructureInvalidator(new BukkitServer(Bukkit.getServer()), SettlerCraft.getInstance().getExecutor(), graph, economyProvider);
         invalidator.invalidate();
-        
+
         // Initialize the StructureAPI
         try {
             structureAPI.initialize();
@@ -148,36 +153,37 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
             System.out.println(MSG_PREFIX + "Disabling SettlerCraft-StructureAPI");
             return;
         }
-        
+
         structureAPI.registerAsyncEditSesionFactoryProvider(new BKAsyncEditSessionFactoryProvider());
-        
+
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new PlanListener(structureAPI, economyProvider), this);
 //        Bukkit.getPluginManager().registerEvents(new PhysicsListener(StructureAPI.getInstance().getPhysicsWatcher()), this);
-        
+
         // Generate Plans 
         File generationDirectory = StructureAPI.getInstance().getGenerationDirectory();
         generationDirectory.mkdirs();
         PlanGenerator.generate(generationDirectory);
-        
+
 //        // Setup HolographicDisplays (if available)
-        
-        if(configProvider.isUseHolograms()) {
+        if (configProvider.isUseHolograms()) {
             StructureHologramManager.getInstance().inititialize(new BukkitPlugin(this));
         }
-        
+
         // Register permissions
         PermissionManager.getInstance().registerPermissionRegistry(new BKPermissionRegistry());
-        
+
         // Setup Commands
         registerCommands();
-        
-        
-        
+        try {
+            FileUtils.deleteDirectory(getTempDir());
+        } catch (IOException ex) {
+            Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-    
+
     private void registerCommands() {
-        
+
         this.commands = new PluginCommandManager(StructureAPI.getInstance().getExecutor(), SettlerCraft.getInstance().getPlatform());
         CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         cmdRegister.register(SchematicCommands.class);
@@ -189,10 +195,10 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
-            if(sender instanceof Player) {
-               this.commands.execute(command.getName(), args, new BukkitPlayer((Player) sender), new BukkitPlayer((Player) sender), StructureAPI.getInstance());
+            if (sender instanceof Player) {
+                this.commands.execute(command.getName(), args, new BukkitPlayer((Player) sender), new BukkitPlayer((Player) sender), StructureAPI.getInstance());
             } else {
-               this.commands.execute(command.getName(), args, new BukkitConsoleSender(sender), new BukkitConsoleSender(sender), StructureAPI.getInstance());
+                this.commands.execute(command.getName(), args, new BukkitConsoleSender(sender), new BukkitConsoleSender(sender), StructureAPI.getInstance());
             }
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + "You don't have permission.");
@@ -211,7 +217,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
         } catch (com.sk89q.minecraft.util.commands.CommandException e) {
             sender.sendMessage(ChatColor.RED + e.getMessage());
         }
- 
+
         return true;
     }
 
@@ -219,12 +225,72 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
     public void onDisable() {
         super.onDisable(); //To change body of generated methods, choose Tools | Templates.
     }
-    
-    
-    
-    
 
-  
+    private File getTempDir() {
+        File temp = new File(getDataFolder(), "temp");
+        temp.mkdirs();
+        return temp;
+    }
+
+    private void createDefaults() {
+        try {
+            checkConfigUpdate();
+            JarUtil.createDefault(new File(getDataFolder(), "menu.xml"), getFile(), RESOURCES_PATH + "menu.xml");
+        } catch (IOException ex) {
+            Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void checkConfigUpdate() throws IOException {
+        File configFile = new File(getDataFolder(), "config.yml");
+        if (configFile.exists()) {
+            File temp = getTempDir();
+            File newConfigFile = new File(temp, "config.yml");
+            newConfigFile.delete();
+            newConfigFile = new File(temp, "config.yml");
+            JarUtil.createDefault(newConfigFile, getFile(), RESOURCES_PATH + "config.yml");
+            ConfigProvider newConfig = ConfigProvider.load(newConfigFile);
+            ConfigProvider currentConfig;
+            try {
+                currentConfig = ConfigProvider.load(configFile);
+            } catch (Exception ex) {
+                throw new RuntimeException("An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
+            }
+            
+            if(currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfig.getVersion()) == -1) {
+                int count = 1;
+                String baseName = FilenameUtils.getBaseName(configFile.getName());
+                File oldFile = new File(getDataFolder(), baseName + "(" + count + ").old.yml");
+                while(oldFile.exists()) {
+                    count++;
+                    oldFile = new File(getDataFolder(), baseName + "(" + count + ").old.yml");
+                }
+                
+                String reason;
+                if(currentConfig.getVersion() == null) {
+                    reason = "No 'version' value found in config";
+                } else {
+                    reason = "Older 'version' value found in config.yml";
+                }
+                
+                Bukkit.getConsoleSender().sendMessage(new String[]{
+                    ChatColor.YELLOW + "[SettlerCraft-StructureAPI]: WARNING: UPDATING CONFIG!",
+                    ChatColor.YELLOW + "[SettlerCraft-StructureAPI]: REASON: " + reason,
+                    ChatColor.YELLOW + "[SettlerCraft-StructureAPI]: Old config will be saved as '" + oldFile.getName() + "' and can be found in the plugin directory"
+                });
+                
+                FileUtils.copyFile(configFile, oldFile);
+                FileUtils.copyFile(newConfigFile, configFile);
+            }
+            this.configProvider = newConfig;
+            
+
+        } else {
+            JarUtil.createDefault(new File(getDataFolder(), "config.yml"), getFile(), RESOURCES_PATH + "config.yml");
+        }
+
+    }
+
     public static BKStructureAPIPlugin getInstance() {
         return instance;
     }
@@ -242,9 +308,5 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
     public APlatform getPlatform() {
         return new BukkitPlatform(Bukkit.getServer());
     }
-    
-    
-
-  
 
 }

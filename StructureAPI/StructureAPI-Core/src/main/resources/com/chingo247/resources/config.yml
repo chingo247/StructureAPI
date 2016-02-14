@@ -1,0 +1,20 @@
+## YAML Template.
+
+## Config version DO NOT EDIT
+version: 2.2.0
+## Structure Section
+structures:
+    allow-substructures: true
+    restricted-to-zones: false
+    allow-structures: true
+    use-holograms: true
+    protected: true
+
+## Construction Zone Section
+constructionzones:
+    protected: true
+
+## Menu Section
+menus:
+    planmenu-enabled: true
+    planshop-enabled: true

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+PlanMenu
+
+Categories for the planmenu will be defined here. 
+Note you can only customize the first 2 rows from top. 
+
+FirstRow: [0*][1 ][2 ][3 ][4 ][5 ][6 ][7 ][8 ]
+SecondRow:[9 ][10][11][12][13][14][15][16][17]
+
+Note slot [1*] is reserved for the 'Default' category, all plans that dont match any specific category 
+which are defined below will automatically be placed under the 'Default' category
+
+Each category has a Material ID of the item to use as icon. 
+Also each category has a Name which will be used as title for the item. Next to a name there are synonyms.
+Synonyms are not required. When a filter is applied the menu will check which plans have a matching category 
+or if the category of the plans have a match with one of the synonyms of a category.
+
+In SHORT:
+<Category> Determines the name of the icon (Visible on the icon!)
+<Synonym> Provides another name for a category (Not visible)
+
+    
+NOTE: 
+Because '&' is a keyword in XML, ' AND ' will be replaced with '&'
+
+TIP:
+A list of material id's can be found on the following website: http://minecraft-ids.grahamedgecombe.com/
+-->
+
+<Menu>
+    <SlotRow>
+        <Slot>
+            <MaterialID>58</MaterialID><!-- Crafting Table -->            
+			<Category>
+				<Name>General</Name>
+				<Synonyms>
+					<Synonym>Common</Synonym>
+				</Synonyms>
+			</Category>
+        </Slot>
+        <Slot>
+            <MaterialID>145</MaterialID><!-- Anvil -->
+            <Category>
+				<Name>Industry</Name>
+				<Synonyms>
+					<Synonym>Industrial</Synonym>
+					<Synonym>Industries</Synonym>
+				</Synonyms>
+			</Category>
+        </Slot>
+        <Slot>
+            <MaterialID>355</MaterialID><!-- Bed -->
+            <Category>
+				<Name>Houses</Name>
+				<Synonyms>
+					<Synonym>Residence</Synonym>
+					<Synonym>Residencial</Synonym>
+					<Synonym>Houses</Synonym>
+					<Synonym>House</Synonym>
+				</Synonyms>
+			</Category>      
+        </Slot>
+        <Slot>
+            <MaterialID>266</MaterialID><!-- Gold Ingot -->
+            <Category>
+				<Name>Economy</Name>
+				<Synonyms>
+					<Synonym>Economical</Synonym>
+					<Synonym>Shops</Synonym>
+					<Synonym>Shop</Synonym>
+					<Synonym>Market</Synonym>
+					<Synonym>Markets</Synonym>
+				</Synonyms>
+			</Category>            
+        </Slot>
+        <Slot>
+            <MaterialID>406</MaterialID><!-- Quartz -->
+            <Category>
+				<Name>Temples</Name>
+				<Synonyms>
+					<Synonym>Temple</Synonym>
+					<Synonym>Church</Synonym>
+					<Synonym>Sacred</Synonym>
+					<Synonym>Holy</Synonym>
+				</Synonyms>
+			</Category>  
+        </Slot>
+        <Slot>
+            <MaterialID>98</MaterialID><!-- Stone Bricks -->
+            <Category>
+				<Name>Fortifications</Name>
+				<Synonyms>
+					<Synonym>Fort</Synonym>
+					<Synonym>Fortification</Synonym>
+					<Synonym>Wall</Synonym>
+					<Synonym>Fortress</Synonym>
+					<Synonym>Fortresses</Synonym>
+					<Synonym>Keep</Synonym>
+					<Synonym>Castle</Synonym>
+					<Synonym>Castles</Synonym>
+					<Synonym>Military</Synonym>
+				</Synonyms>
+			</Category>
+        </Slot>
+        <Slot>
+            <MaterialID>267</MaterialID><!-- Iron Sword -->
+            <Category>
+				<Name>Dungeons AND Arenas</Name><!-- Because '&' is a keyword in XML, ' AND ' will be replaced with '&'-->
+				<Synonyms>
+					<Synonym>Dungeons</Synonym>
+					<Synonym>Dungeon</Synonym>
+					<Synonym>Arena</Synonym>
+					<Synonym>Arenas</Synonym>
+				</Synonyms>
+			</Category>
+        </Slot>
+        <Slot>
+            <MaterialID>2264</MaterialID><!-- Disc -->
+            <Category>
+				<Name>Misc</Name>
+			</Category>
+        </Slot>
+    </SlotRow>
+    <SlotRow>
+        <!-- Room for more categories! (2 ROWS max) -->
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+        <Slot></Slot>
+    </SlotRow>     
+</Menu>

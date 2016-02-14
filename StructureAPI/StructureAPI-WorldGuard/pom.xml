@@ -43,9 +43,8 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>StructureCraft-Core</artifactId>
+            <artifactId>StructureAPI-Core</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <name>StructureAPI-WorldGuard</name>

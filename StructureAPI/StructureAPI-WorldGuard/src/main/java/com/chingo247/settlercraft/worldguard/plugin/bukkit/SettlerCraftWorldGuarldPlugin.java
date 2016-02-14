@@ -18,8 +18,8 @@ package com.chingo247.settlercraft.worldguard.plugin.bukkit;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.worldguard.protecttion.SettlerCraftWGService;
-import com.chingo247.structurecraft.IStructureAPI;
-import com.chingo247.structurecraft.StructureAPI;
+import com.chingo247.structureapi.IStructureAPI;
+import com.chingo247.structureapi.StructureAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.neo4j.graphdb.GraphDatabaseService;

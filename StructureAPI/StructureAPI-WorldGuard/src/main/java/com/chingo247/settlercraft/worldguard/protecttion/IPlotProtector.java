@@ -5,7 +5,7 @@
  */
 package com.chingo247.settlercraft.worldguard.protecttion;
 
-import com.chingo247.structurecraft.model.plot.IPlot;
+import com.chingo247.structureapi.model.plot.IPlot;
 
 /**
  *
