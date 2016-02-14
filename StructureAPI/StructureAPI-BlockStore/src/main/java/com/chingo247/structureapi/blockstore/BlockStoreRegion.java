@@ -78,6 +78,7 @@ public class BlockStoreRegion implements IBlockStoreRegion {
         Preconditions.checkArgument(height > 0, "height has to be > 0");
         Preconditions.checkArgument(length > 0, "length has to be > 0");
 
+        this.dirty = false;
         this.width = width;
         this.height = height;
         this.length = length;

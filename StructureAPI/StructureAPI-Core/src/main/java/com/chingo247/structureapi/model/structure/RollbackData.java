@@ -33,16 +33,15 @@ public class RollbackData implements IRollbackData {
     }
 
     @Override
-    public File getBlockStoreFile() {
+    public File getBlockStoreDirectory() {
         File rollbackDirectory = new File(structure.getDirectory(), ROLLBACK_DIRECTORY);
         rollbackDirectory.mkdirs();
-        
-        return new File(rollbackDirectory, "rollback.blockstore");
+        return rollbackDirectory;
     }
     
     @Override
     public boolean hasBlockStore() {
-        return getBlockStoreFile().exists();
+        return new File(structure.getDirectory(), ROLLBACK_DIRECTORY).exists();
     }
 
    

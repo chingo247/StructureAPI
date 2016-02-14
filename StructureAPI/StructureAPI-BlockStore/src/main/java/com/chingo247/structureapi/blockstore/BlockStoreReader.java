@@ -47,14 +47,14 @@ public class BlockStoreReader implements IBlockStoreReader<BlockStore> {
        BlockStore blockStore = new BlockStore(
                blockstoreDirectory, 
                NBTUtils.getChildTag(metaData, "Width", ShortTag.class).getValue(), 
-               NBTUtils.getChildTag(metaData, "Heigth", ShortTag.class).getValue(), 
+               NBTUtils.getChildTag(metaData, "Height", ShortTag.class).getValue(), 
                NBTUtils.getChildTag(metaData, "Length", ShortTag.class).getValue()
        );
        return blockStore;
     }
     
     public final File getMetaDataFile(File blockstoreDirectory) {
-        return new File(blockstoreDirectory, blockstoreDirectory.getName() + ".meta." + EXTENSION);
+        return new File(blockstoreDirectory, blockstoreDirectory.getName() + ".meta" + EXTENSION);
     }
     
     @Override

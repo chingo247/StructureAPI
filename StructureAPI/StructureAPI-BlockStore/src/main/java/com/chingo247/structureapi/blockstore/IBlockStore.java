@@ -56,7 +56,4 @@ public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion
      */
     IBlockStoreRegion getRegion(int x, int z);
     
-    
-    
-    
 }

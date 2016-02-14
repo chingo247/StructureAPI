@@ -24,8 +24,6 @@ public interface ISafeBlockContainer {
     
     boolean isWritten(int x, int y, int z);
     
-    boolean isDirty();
-    
     void setDirty(boolean dirty);
     
     void setWritten(int x, int y, int z);

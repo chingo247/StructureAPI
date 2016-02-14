@@ -30,7 +30,6 @@ import java.util.Map;
  */
 public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockStoreChunk {
     
-    private boolean dirty;
     private SafeBlockStoreSectionFactory factory;
     
     public SafeBlockStoreChunk(SafeBlockStoreRegion blockStore, Map<String, Tag> chunkTagMap, int x, int z, Vector2D dimension) {
@@ -73,15 +72,7 @@ public class SafeBlockStoreChunk extends BlockStoreChunk implements ISafeBlockSt
     
     
     
-    @Override
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    @Override
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-    }
+   
 
     @Override
     public void setWritten(int x, int y, int z) {

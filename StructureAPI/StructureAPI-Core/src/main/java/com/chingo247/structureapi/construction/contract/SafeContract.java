@@ -18,6 +18,8 @@ package com.chingo247.structureapi.construction.contract;
 
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
 import com.chingo247.structureapi.construction.IContract;
 import com.chingo247.structureapi.construction.IStructureEntry;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
@@ -30,6 +32,7 @@ import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreWriter;
 import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.placement.RotationalPlacement;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
@@ -96,15 +99,16 @@ public class SafeContract extends AContract {
 
         // Get or create rollback data
         IRollbackData data = structure.getRollbackData();
-        SafeBlockStoreRegion blockStore;
+        SafeBlockStore safeBlockStore;
         if (data.hasBlockStore()) {
             try {
-                blockStore = SafeBlockStoreRegion.load(data.getBlockStoreFile());
+                SafeBlockStoreReader reader = new SafeBlockStoreReader();
+                safeBlockStore = reader.read(data.getBlockStoreDirectory());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         } else {
-            blockStore = new SafeBlockStoreRegion(data.getBlockStoreFile(), region.getWidth(), region.getHeight(), region.getLength());
+            safeBlockStore = new SafeBlockStore(data.getBlockStoreDirectory(), region.getWidth(), region.getHeight(), region.getLength());
         }
 
         // Create place areas...
@@ -141,7 +145,7 @@ public class SafeContract extends AContract {
         int countBlock = 0;
 
         while (countBlock < totalBlocks) {
-            entry.addTask(new SafeTask(entry, player, placement, world, blockStore, traversalSafe, MAX_BLOCKS_PER_TASK));
+            entry.addTask(new SafeTask(entry, player, placement, world, safeBlockStore, traversalSafe, MAX_BLOCKS_PER_TASK));
             SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
             entry.addTask(new AWEPlacementTask(
                     asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())
@@ -169,7 +173,7 @@ public class SafeContract extends AContract {
         /**
          * The schematicSaveData object.
          */
-        private SafeBlockStoreRegion safeBlockStore;
+        private SafeBlockStore safeBlockStore;
 
 
         private int maxBlocks;
@@ -186,7 +190,7 @@ public class SafeContract extends AContract {
          * @param safeBlockData The safe block data that will be used to save
          * @param callback
          */
-        public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStoreRegion safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
+        public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStore safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
             super(entry, submitter);
             this.world = world;
             this.traversal = traversal;
@@ -258,7 +262,8 @@ public class SafeContract extends AContract {
                             @Override
                             public void run() {
                                 try {
-                                    safeBlockStore.save();
+                                    SafeBlockStoreWriter writer = new SafeBlockStoreWriter();
+                                    writer.save(safeBlockStore);
                                 } catch (Exception e) {
                                     setFailed(true);
                                     LOG.log(Level.SEVERE, e.getMessage(), e);

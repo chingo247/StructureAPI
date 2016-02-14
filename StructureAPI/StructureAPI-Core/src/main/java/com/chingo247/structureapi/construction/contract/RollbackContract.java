@@ -19,6 +19,9 @@ package com.chingo247.structureapi.construction.contract;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
+import com.chingo247.structureapi.blockstore.IBlockStoreRegion;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
 import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.exeption.StructureException;
@@ -27,7 +30,6 @@ import com.chingo247.structureapi.construction.listener.ConstructionListener;
 import com.chingo247.structureapi.construction.listener.RollbackListener;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
-import com.chingo247.structureapi.construction.producer.RollbackPlacementProducer;
 import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.placement.BlockStoreChunkPlacement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
@@ -43,8 +45,7 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
  * @author Chingo
  */
 public class RollbackContract extends AContract {
-    
-    protected static final BlockPlacementProducer ROLLBACK_PRODUCER = new RollbackPlacementProducer();
+
     protected static final ConstructionListener ROLLBACK__LISTENER = new RollbackListener();
 
     public RollbackContract() {
@@ -57,7 +58,7 @@ public class RollbackContract extends AContract {
 
     @Override
     public IPlacementProducer<IBlockPlacement> getPlacementProducer() {
-        return ROLLBACK_PRODUCER;
+        return null;
     }
 
     @Override
@@ -65,59 +66,45 @@ public class RollbackContract extends AContract {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector structureMin = entry.getStructure().getMin(); // Always place from the min position... 
-        entry.addListener(ROLLBACK__LISTENER);   
-        
-        /**
-         * Perform memory saving operation... by not loading all as blocks at once!
-         */
+        entry.addListener(ROLLBACK__LISTENER);
+
         IStructure structure = entry.getStructure();
-        File blockStoreFile = structure.getRollbackData().getBlockStoreFile();
-        
-        if(!blockStoreFile.exists()) {
+        File blockStoreFile = structure.getRollbackData().getBlockStoreDirectory();
+
+        if (!blockStoreFile.exists()) {
             throw new StructureException("No rollback data available");
         }
-        
+
         try {
-            SafeBlockStoreRegion safeBlockStore = SafeBlockStoreRegion.load(blockStoreFile);
-            Iterator<IBlockStoreChunk> chunkIt = safeBlockStore.iterator();
-            while(chunkIt.hasNext()) {
-                IBlockStoreChunk chunk = chunkIt.next();
-                BlockStoreChunkPlacement placement = new BlockStoreChunkPlacement(chunk);
-                placement.rotate(structure.getDirection().getRotation());
-                
-                placement.setReversed(true);
-                        AWEPlacementTask task = new AWEPlacementTask(
-                        asyncWorldEdit,
-                        entry,
-                        placement,
-                        getPlayer(),
-                        getEditSession(),
-                        structureMin.add(chunk.getX(), 0, chunk.getZ())
-                );
-                task.setOptions(new PlaceOptions());
-                entry.addTask(task);
+            SafeBlockStoreReader reader = new SafeBlockStoreReader();
+            SafeBlockStore blockStore = reader.read(blockStoreFile);
+
+            Iterator<File> regionFileIt = blockStore.regionFileIterator();
+            while (regionFileIt.hasNext()) {
+                File nextRegionFile = regionFileIt.next();
+                IBlockStoreRegion nextRegion = reader.readRegion(blockStore, nextRegionFile);
+
+                Iterator<IBlockStoreChunk> chunkIt = nextRegion.iterator();
+                while (chunkIt.hasNext()) {
+                    IBlockStoreChunk chunk = chunkIt.next();
+                    BlockStoreChunkPlacement placement = new BlockStoreChunkPlacement(chunk);
+                    placement.rotate(structure.getDirection().getRotation());
+                    placement.setReversed(true);
+                    AWEPlacementTask task = new AWEPlacementTask(
+                            asyncWorldEdit,
+                            entry,
+                            placement,
+                            getPlayer(),
+                            getEditSession(),
+                            structureMin.add(chunk.getX(), 0, chunk.getZ())
+                    );
+                    task.setOptions(new PlaceOptions());
+                    entry.addTask(task);
+                }
             }
-            
-//        IPlacement placement = ROLLBACK_PRODUCER.produce(entry.getStructure());
-//        AWEPlacementTask task = new AWEPlacementTask(
-//                        asyncWorldEdit,
-//                        entry,
-//                        placement,
-//                        getPlayer(),
-//                        getEditSession(),
-//                        position
-//                );
-//        task.setOptions(new PlaceOptions());
-             
-//        entry.addTask(task);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
     }
-    
-    
 
-    
-
-   
 }

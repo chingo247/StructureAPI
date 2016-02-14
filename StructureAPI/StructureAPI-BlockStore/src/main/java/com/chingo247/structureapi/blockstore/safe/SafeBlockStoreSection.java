@@ -30,7 +30,6 @@ import java.util.Map;
 public class SafeBlockStoreSection extends BlockStoreSection implements ISafeBlockStoreSection {
     
     private final byte[] written;
-    private boolean dirty;
     
     public SafeBlockStoreSection(ISafeBlockStoreChunk bsc, Map<String, Tag> sectionTagMap, int y, int sectionHeight) {
         super(bsc, sectionTagMap, y, sectionHeight);
@@ -48,15 +47,7 @@ public class SafeBlockStoreSection extends BlockStoreSection implements ISafeBlo
         return written[index] == 1;
     }
 
-    @Override
-    public boolean isDirty() {
-        return dirty;
-    }
-
-    @Override
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-    }
+   
 
     @Override
     public void setWritten(int x, int y, int z) {
@@ -85,7 +76,6 @@ public class SafeBlockStoreSection extends BlockStoreSection implements ISafeBlo
         if(!isWritten(x, y, z)) {
             super.setBlockAt(x, y, z, block); //To change body of generated methods, choose Tools | Templates.
             setWritten(x, y, z);
-            setDirty(true);
         }
     }
     

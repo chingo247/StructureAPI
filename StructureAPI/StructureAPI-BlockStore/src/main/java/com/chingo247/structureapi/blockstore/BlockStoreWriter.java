@@ -54,13 +54,14 @@ public class BlockStoreWriter implements IBlockStoreWriter<BlockStore>{
         saveMetaData(blockstore);
         for(Iterator<IBlockStoreRegion> regionIt = blockstore.getLoadedRegions().iterator(); regionIt.hasNext();) {
             IBlockStoreRegion next = regionIt.next();
+//            System.out.println("SAVE REGION: " + next.getSize()); 
             saveRegion(next, directory);
         }
     }
 
     @Override
     public void saveMetaData(BlockStore blockstore) throws IOException {
-        String metaName = blockstore.getName() + ".meta." + EXTENSION;
+        String metaName = blockstore.getName() + ".meta" + EXTENSION;
         Map<String, Tag> metaRoot = serializeMetaData(blockstore);
         try (NBTOutputStream output = new NBTOutputStream(new GZIPOutputStream(new FileOutputStream(new File(blockstore.getDirectory(), metaName))))) {
             output.writeNamedTag("blockstore.meta", new CompoundTag(metaRoot));
@@ -80,6 +81,7 @@ public class BlockStoreWriter implements IBlockStoreWriter<BlockStore>{
 
     @Override
     public void saveRegion(IBlockStoreRegion region, File directory) throws IOException {
+//        System.out.println("REGION DIRTY ? " + region.isDirty());
         if(region.isDirty()) {
             region.save(directory);
         }

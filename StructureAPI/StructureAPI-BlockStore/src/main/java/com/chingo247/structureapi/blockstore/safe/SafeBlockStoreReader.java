@@ -45,7 +45,7 @@ public class SafeBlockStoreReader extends BlockStoreReader {
         SafeBlockStore blockStore = new SafeBlockStore(
                 blockstoreDirectory,
                 NBTUtils.getChildTag(metaData, "Width", ShortTag.class).getValue(),
-                NBTUtils.getChildTag(metaData, "Heigth", ShortTag.class).getValue(),
+                NBTUtils.getChildTag(metaData, "Height", ShortTag.class).getValue(),
                 NBTUtils.getChildTag(metaData, "Length", ShortTag.class).getValue()
         );
         return blockStore;

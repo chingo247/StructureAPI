@@ -7,6 +7,7 @@ package com.chingo247.structureapi.blockstore;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
@@ -53,6 +54,7 @@ public class BlockStore implements IBlockStore {
         this.length = length;
         this.directory = directory;
         this.name = directory.getName();
+        this.loadedRegions = Maps.newHashMap();
         this.version = VERSION;
         this.chunkSize = CHUNK_SIZE;
     }
@@ -71,7 +73,7 @@ public class BlockStore implements IBlockStore {
     }
 
     public final File getMetaDataFile() {
-        return new File(directory, name + ".meta." + EXTENSION);
+        return new File(directory, name + ".meta" + EXTENSION);
     }
 
     public String getVersion() {

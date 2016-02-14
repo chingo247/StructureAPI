@@ -143,7 +143,9 @@ public class BlockStoreSection implements IBlockStoreSection {
         return size.getBlockX() * sectionHeight * size.getBlockZ();
     }
 
-   
+    public final void setDirty(boolean dirty) {
+        bsc.setDirty(dirty);
+    }
 
     @Override
     public void setBlockAt(int x, int y, int z, BaseBlock block) {
@@ -156,7 +158,7 @@ public class BlockStoreSection implements IBlockStoreSection {
         }
 
         int index = getArrayIndex(x, y, z);
-        bsc.setDirty(true);
+        setDirty(true);
         
 
         this.ids[index] = (byte) block.getType();

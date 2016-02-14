@@ -24,7 +24,7 @@ import java.io.File;
  */
 public interface IRollbackData {
 
-    File getBlockStoreFile();
+    File getBlockStoreDirectory();
 
     boolean hasBlockStore();
     
