@@ -5,10 +5,15 @@
  */
 package com.chingo247.structureapi.towny.listener;
 
-import com.chingo247.structureapi.towny.plugin.SettlerCraftTowny;
+import com.chingo247.structureapi.event.structure.StructureCreateEvent;
+import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.towny.plugin.StructureAPITowny;
 import com.chingo247.structureapi.model.structure.IStructureRepository;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.world.StructureWorldRepository;
+import com.chingo247.structureapi.towny.restriction.TownyRestriction;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.TownClaimEvent;
@@ -23,6 +28,8 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.eventbus.Subscribe;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,53 +60,43 @@ public class TownListener implements Listener {
         this.worldRepository = new StructureWorldRepository(graph);
     }
 
-//    @Subscribe
-//    public void onStructureCreate(StructureCreateEvent createEvent) {
-//        Structure structure = createEvent.getStructure();
-//        if(structure != null) {
-//            World w = Bukkit.getServer().getWorld(structure.getWorld().getUUID());
-//            List<WorldCoord> coords = TownyRestriction.getCoords(w, structure.getCuboidRegion());
-//            
-//            Town t = null;
-//            for(WorldCoord coord :coords) {
-//                TownBlock tb = null;
-//                try {
-//                    tb = coord.getTownBlock();
-//                } catch (NotRegisteredException ex) {
-//                }
-//                
-//                if(tb != null) {
-//                    try {
-//                        t = tb.getTown();
-//                    } catch (NotRegisteredException ex) {
-//                    }
-//                    if(t != null) {
-//                        break;
-//                    }
-//                }
-//            }
-//            
-//            if(t == null) {
-//                return;
-//            }
-//            
-//            try(Transaction tx = graph.beginTx()) {
-//                StructureNode node = new StructureNode(createEvent.getStructure().getNode());
-//                node.getNode().setProperty("TownyTown", t.getName());
-//                tx.success();
-//            }
-//        }
-//    }
-    
-//    private List<StructureNode> findByTownyTownName(String name) {
-//        
-////        String query - "MATCH (s:Structure"
-//        
-//    }
-    
-//    public void onTownRename(RenameTownEvent renameTownEvent) {
-//        String oldName = renameTownEvent.getOldName();
-//    }
+    @Subscribe
+    public void onStructureCreate(StructureCreateEvent createEvent) {
+        IStructure structure = createEvent.getStructure();
+        if(structure != null) {
+            World w = Bukkit.getServer().getWorld(structure.getWorldUUID());
+            List<WorldCoord> coords = TownyRestriction.getCoords(w, structure.getCuboidRegion());
+            Town t = null;
+            for(WorldCoord coord :coords) {
+                TownBlock tb = null;
+                try {
+                    tb = coord.getTownBlock();
+                } catch (NotRegisteredException ex) {
+                }
+                
+                if(tb != null) {
+                    try {
+                        t = tb.getTown();
+                    } catch (NotRegisteredException ex) {
+                    }
+                    if(t != null) {
+                        break;
+                    }
+                }
+            }
+            
+            if(t == null) {
+                return;
+            }
+            
+            try(Transaction tx = graph.beginTx()) {
+                StructureNode node = new StructureNode(createEvent.getStructure().getUnderlyingNode());
+                node.getNode().setProperty("TownyTown", t.getName());
+                tx.success();
+            }
+        }
+    }
+
     @EventHandler
     public void onTownCreate(NewTownEvent townEvent) {
         Town t = null;
@@ -122,7 +119,7 @@ public class TownListener implements Listener {
             try (Transaction tx = graph.beginTx()){
                 WorldCoord coord = tb.getWorldCoord();
 
-                Vector2D pos = SettlerCraftTowny.translate(coord);
+                Vector2D pos = StructureAPITowny.translate(coord);
 
                 Vector min = new BlockVector(pos.getX(), 0, pos.getZ());
                 Vector max = new BlockVector(pos.getX() + blockSize, 128, pos.getZ() + blockSize);
@@ -149,8 +146,6 @@ public class TownListener implements Listener {
         } catch(NotRegisteredException nre) {
         }
         
-        
-        
         Player player = null;
         
         boolean hasStructures = false;
@@ -163,7 +158,7 @@ public class TownListener implements Listener {
                 TownBlock tb = claimEvent.getTownBlock();
                 WorldCoord coord = tb.getWorldCoord();
 
-                Vector2D pos = SettlerCraftTowny.translate(coord);
+                Vector2D pos = StructureAPITowny.translate(coord);
 
                 Vector min = new BlockVector(pos.getX(), 0, pos.getZ());
                 Vector max = new BlockVector(pos.getX() + blockSize, 128, pos.getZ() + blockSize);

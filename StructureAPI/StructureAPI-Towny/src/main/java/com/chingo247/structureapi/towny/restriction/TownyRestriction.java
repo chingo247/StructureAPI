@@ -5,7 +5,7 @@
  */
 package com.chingo247.structureapi.towny.restriction;
 
-import com.chingo247.structureapi.towny.plugin.SettlerCraftTowny;
+import com.chingo247.structureapi.towny.plugin.StructureAPITowny;
 import com.chingo247.structureapi.StructureRestriction;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
@@ -160,14 +160,14 @@ public class TownyRestriction extends StructureRestriction {
         WorldCoord minCoord = WorldCoord.parseWorldCoord(new Location(w, minPoint.getBlockX(), 0, minPoint.getBlockZ()));
 //        WorldCoord maxCoord = WorldCoord.parseWorldCoord(new Location(w, maxPoint.getBlockX(), 0, maxPoint.getBlockZ()));
 
-        Vector2D min = SettlerCraftTowny.translate(minCoord);
+        Vector2D min = StructureAPITowny.translate(minCoord);
 //        Vector2D max = SettlerCraftTowny.translate(maxCoord);
 
         List<WorldCoord> coords = new ArrayList<>();
         for (int x = min.getBlockX(); x < maxPoint.getBlockX(); x += blockSize) {
             for (int z = min.getBlockZ(); z < maxPoint.getBlockZ(); z += blockSize) {
                 WorldCoord wc = WorldCoord.parseWorldCoord(new Location(w, x, 0, z));
-                Vector2D pos = SettlerCraftTowny.translate(wc);
+                Vector2D pos = StructureAPITowny.translate(wc);
 //                System.out.println("Added (" + wc.getX() + ", " + wc.getZ() + ") VECTOR(" + pos.getBlockX() + "," + pos.getBlockZ() + ")");
                 coords.add(wc);
             }

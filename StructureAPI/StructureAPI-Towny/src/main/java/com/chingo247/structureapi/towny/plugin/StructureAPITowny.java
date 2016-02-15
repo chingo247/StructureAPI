@@ -21,7 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
  *
  * @author Chingo
  */
-public class SettlerCraftTowny extends JavaPlugin {
+public class StructureAPITowny extends JavaPlugin {
 
     @Override
     public void onEnable() {

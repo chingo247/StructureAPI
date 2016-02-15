@@ -5,7 +5,7 @@
  */
 package com.chingo247.structureapi.towny.listener;
 
-import com.chingo247.structureapi.towny.plugin.SettlerCraftTowny;
+import com.chingo247.structureapi.towny.plugin.StructureAPITowny;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.TownClaimEvent;
@@ -48,7 +48,7 @@ public class TownyDebugListener implements Listener {
         World w = Bukkit.getWorld(block.getWorld().getName());
 
         int blockSize = TownySettings.getTownBlockSize();
-        Vector2D min = SettlerCraftTowny.translate(block.getWorldCoord());
+        Vector2D min = StructureAPITowny.translate(block.getWorldCoord());
         Vector2D max = min.add(blockSize, blockSize);
 
 
