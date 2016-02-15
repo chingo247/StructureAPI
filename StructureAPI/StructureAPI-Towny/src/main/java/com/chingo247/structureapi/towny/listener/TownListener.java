@@ -42,15 +42,11 @@ import org.neo4j.graphdb.Transaction;
 public class TownListener implements Listener {
 
     private final GraphDatabaseService graph;
-    private final ExecutorService executor;
-    private final StructureWorldRepository worldRepository;
     private final IStructureRepository structureRepository;
 
     public TownListener(GraphDatabaseService graph, ExecutorService executor) {
         this.graph = graph;
-        this.executor = executor;
         this.structureRepository = new StructureRepository(graph);
-        this.worldRepository = new StructureWorldRepository(graph);
     }
 
     @EventHandler
