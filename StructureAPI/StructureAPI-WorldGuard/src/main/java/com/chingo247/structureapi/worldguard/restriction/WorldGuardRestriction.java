@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.settlercraft.worldguard.restriction;
+package com.chingo247.structureapi.worldguard.restriction;
 
-import com.chingo247.settlercraft.worldguard.protecttion.SettlerCraftWGService;
+import com.chingo247.structureapi.worldguard.protection.WorldGuardPlotProtector;
 import com.chingo247.structureapi.StructureRestriction;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
@@ -43,24 +43,22 @@ public class WorldGuardRestriction extends StructureRestriction {
     public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea) {
         LocalPlayer localPlayer = null;
         if (whoPlaces != null) {
-            localPlayer = SettlerCraftWGService.getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));
+            localPlayer = WorldGuardPlotProtector.getInstance().getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));
         }
 
-        RegionManager mgr = SettlerCraftWGService.getRegionManager(Bukkit.getWorld(world.getName()));
-
+        RegionManager mgr = WorldGuardPlotProtector.getInstance().getRegionManager(Bukkit.getWorld(world.getName()));
         Vector p1 = affectedArea.getMinimumPoint();
         Vector p2 = affectedArea.getMaximumPoint();
         ProtectedCuboidRegion dummy = new ProtectedCuboidRegion("DUMMY", new BlockVector(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ()), new BlockVector(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ()));
-        ApplicableRegionSet regions = mgr.getApplicableRegions(dummy);
-        
+        ApplicableRegionSet regionsSet = mgr.getApplicableRegions(dummy);
 
         // Check if this region getOverlapping any other region
-        if (regions.size() > 0) {
+        if (regionsSet.size() > 0) {
             if (localPlayer == null) {
                 return false;
             }
 
-            if (!regions.isOwnerOfAll(localPlayer)) {
+            if (!regionsSet.isOwnerOfAll(localPlayer)) {
                 return false;
             }
         }

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.settlercraft.worldguard.protecttion;
+package com.chingo247.structureapi.worldguard.protection;
 
 import com.chingo247.structureapi.event.structure.StructureCreateEvent;
 import com.chingo247.structureapi.event.structure.StructureRemoveEvent;
@@ -26,8 +26,6 @@ import com.chingo247.structureapi.event.zone.CreateConstructionZoneEvent;
 import com.chingo247.structureapi.event.zone.DeleteConstructionZoneEvent;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
-import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.zone.IConstructionZone;
 import com.google.common.eventbus.Subscribe;
 import java.util.UUID;
@@ -37,97 +35,86 @@ import org.neo4j.graphdb.GraphDatabaseService;
  *
  * @author Chingo
  */
-public class WorldGuardStructureListener {
-    
-    
-    
-    private final SettlerCraftWGService worldGuardHelper;
-    private final GraphDatabaseService graph;
-    private final IStructureRepository structureDAO;
+public class WorldGuardPlotListener {
 
-    public WorldGuardStructureListener(SettlerCraftWGService worldGuardHelper, GraphDatabaseService graph) {
+    private final WorldGuardPlotProtector worldGuardHelper;
+
+    public WorldGuardPlotListener(WorldGuardPlotProtector worldGuardHelper, GraphDatabaseService graph) {
         this.worldGuardHelper = worldGuardHelper;
-        this.graph = graph;
-        this.structureDAO = new StructureRepository(graph);
     }
-    
+
     @Subscribe
     public void onStructureCreate(StructureCreateEvent structureCreateEvent) {
         IStructure structure = structureCreateEvent.getStructure();
         worldGuardHelper.protect(structure);
     }
-    
+
     @Subscribe
     public void onStructureRemove(StructureRemoveEvent structureRemoveEvent) {
         IStructure structure = structureRemoveEvent.getStructure();
         worldGuardHelper.removeProtection(structure);
     }
-    
+
     @Subscribe
     public void onStructureAddOwner(StructureAddOwnerEvent addOwnerEvent) {
         final UUID player = addOwnerEvent.getAddedOwner();
         final OwnerType type = addOwnerEvent.getOwnerType();
         final IStructure structure = addOwnerEvent.getStructure();
-        if(type == OwnerType.MEMBER) {
+        if (type == OwnerType.MEMBER) {
             worldGuardHelper.addMember(player, structure);
         } else {
             worldGuardHelper.removeMember(player, structure);
             worldGuardHelper.addOwner(player, structure);
         }
     }
-    
+
     @Subscribe
     public void onStructureRemoveOwner(StructureRemoveOwnerEvent removeOwnerEvent) {
         final UUID player = removeOwnerEvent.getRemovedOwner();
         final OwnerType type = removeOwnerEvent.getOwnerType();
         final IStructure structure = removeOwnerEvent.getStructure();
-        if(type == OwnerType.MEMBER)  {
+        if (type == OwnerType.MEMBER) {
             worldGuardHelper.removeMember(player, structure);
         } else {
             worldGuardHelper.removeOwner(player, structure);
         }
     }
-    
+
     @Subscribe
     public void onConstructionZoneCreate(CreateConstructionZoneEvent constructionZoneEvent) {
         IConstructionZone zone = constructionZoneEvent.getZone();
         worldGuardHelper.protect(zone);
     }
-    
+
     @Subscribe
     public void onConstructionZoneRemove(DeleteConstructionZoneEvent deleteConstructionZoneEvent) {
         IConstructionZone zone = deleteConstructionZoneEvent.getZone();
         worldGuardHelper.removeProtection(zone);
     }
-    
+
     @Subscribe
-    public void onConstructionZoneAddOwner(ConstructionZoneUpdateOwnerEvent constructionZoneUpdateOwnerEvent ){
+    public void onConstructionZoneAddOwner(ConstructionZoneUpdateOwnerEvent constructionZoneUpdateOwnerEvent) {
         final UUID player = constructionZoneUpdateOwnerEvent.getPlayer();
         final OwnerType type = constructionZoneUpdateOwnerEvent.getOwnerType();
         final IConstructionZone zone = constructionZoneUpdateOwnerEvent.getZone();
-        if(type == OwnerType.MEMBER) {
+        if (type == OwnerType.MEMBER) {
             worldGuardHelper.addMember(player, zone);
         } else {
             worldGuardHelper.removeMember(player, zone);
             worldGuardHelper.addOwner(player, zone);
         }
     }
-    
+
     @Subscribe
     public void onConstructionZoneRemoveOwner(ConstructionZoneRemoveOwnerEvent removeOwnerEvent) {
         final UUID player = removeOwnerEvent.getPlayer();
         final OwnerType type = removeOwnerEvent.getType();
         final IConstructionZone zone = removeOwnerEvent.getZone();
-        if(type == OwnerType.MEMBER)  {
+        if (type == OwnerType.MEMBER) {
             worldGuardHelper.removeMember(player, zone);
         } else {
             worldGuardHelper.removeOwner(player, zone);
         }
     }
-    
-    
-    
-    
-    // TODO ADD CONSTRUCTION ZONES OWNER EVENT LISTENERS!
-    
+
 }

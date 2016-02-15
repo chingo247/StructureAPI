@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.settlercraft.worldguard.plugin.bukkit;
+package com.chingo247.structureapi.worldguard.plugin.bukkit;
 
-import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.worldguard.protecttion.SettlerCraftWGService;
-import com.chingo247.structureapi.IStructureAPI;
-import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.worldguard.protection.WorldGuardPlotProtector;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.neo4j.graphdb.GraphDatabaseService;
 
 /**
  *
  * @author Chingo
  */
-public class SettlerCraftWorldGuarldPlugin extends JavaPlugin {
+public class StructureAPIWorldGuard extends JavaPlugin {
 
     @Override
     public void onEnable() {
@@ -44,16 +40,9 @@ public class SettlerCraftWorldGuarldPlugin extends JavaPlugin {
             return; 
         }
         
-        
         // Enable WorldGuard
-        GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        IStructureAPI structureAPI = StructureAPI.getInstance();
-        
-        
-        
         if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
-            SettlerCraftWGService worldGuardHelper = new SettlerCraftWGService(graph, structureAPI);
-            worldGuardHelper.initialize();
+            WorldGuardPlotProtector.getInstance().initialize();
         } else {
             System.out.println("[SettlerCraft-WorldGuard]: Couldn't find WorldGuard! Disabling SettlerCraft-WorldGuard");
             this.setEnabled(false);

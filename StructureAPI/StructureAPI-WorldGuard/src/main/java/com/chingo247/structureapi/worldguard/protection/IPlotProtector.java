@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.chingo247.settlercraft.worldguard.protecttion;
+package com.chingo247.structureapi.worldguard.protection;
 
 import com.chingo247.structureapi.model.plot.IPlot;
 
@@ -11,31 +11,31 @@ import com.chingo247.structureapi.model.plot.IPlot;
  *
  * @author Chingo
  */
-public interface IPlotProtector<T extends IPlot> {
+public interface IPlotProtector {
     
     /**
      * Name of the plugin/service that will protect the plot
      * @return The name
      */
-    public String getName();
+    String getName();
     
     /**
      * Protects a plot
-     * @param structure 
+     * @param plot 
      */
-    public void protect(T structure);
+    void protect(IPlot plot);
     
     /**
      * Removes protection from a plot, requires an active NEO4J transaction
-     * @param structure 
+     * @param plot 
      */
-    public void removeProtection(T structure);
+    void removeProtection(IPlot plot);
     
     /**
      * Checks whether a plot is protected
-     * @param structure
+     * @param plot
      * @return True if plot was protected
      */
-    public boolean hasProtection(T structure);
+    boolean hasProtection(IPlot plot);
     
 }
