@@ -5,15 +5,10 @@
  */
 package com.chingo247.structureapi.towny.listener;
 
-import com.chingo247.structureapi.event.structure.StructureCreateEvent;
-import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.towny.plugin.StructureAPITowny;
 import com.chingo247.structureapi.model.structure.IStructureRepository;
-import com.chingo247.structureapi.model.structure.Structure;
-import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.world.StructureWorldRepository;
-import com.chingo247.structureapi.towny.restriction.TownyRestriction;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.TownClaimEvent;
@@ -28,8 +23,6 @@ import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.util.eventbus.Subscribe;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,43 +51,6 @@ public class TownListener implements Listener {
         this.executor = executor;
         this.structureRepository = new StructureRepository(graph);
         this.worldRepository = new StructureWorldRepository(graph);
-    }
-
-    @Subscribe
-    public void onStructureCreate(StructureCreateEvent createEvent) {
-        IStructure structure = createEvent.getStructure();
-        if(structure != null) {
-            World w = Bukkit.getServer().getWorld(structure.getWorldUUID());
-            List<WorldCoord> coords = TownyRestriction.getCoords(w, structure.getCuboidRegion());
-            Town t = null;
-            for(WorldCoord coord :coords) {
-                TownBlock tb = null;
-                try {
-                    tb = coord.getTownBlock();
-                } catch (NotRegisteredException ex) {
-                }
-                
-                if(tb != null) {
-                    try {
-                        t = tb.getTown();
-                    } catch (NotRegisteredException ex) {
-                    }
-                    if(t != null) {
-                        break;
-                    }
-                }
-            }
-            
-            if(t == null) {
-                return;
-            }
-            
-            try(Transaction tx = graph.beginTx()) {
-                StructureNode node = new StructureNode(createEvent.getStructure().getUnderlyingNode());
-                node.getNode().setProperty("TownyTown", t.getName());
-                tx.success();
-            }
-        }
     }
 
     @EventHandler
@@ -176,53 +132,5 @@ public class TownListener implements Listener {
             }
             
         }
-        
-        
-        
-        
-        
-                
-            
     }
-  
-//    @EventHandler
-//    public void onTownDelete(TownUnclaimEvent unclaimEvent) {
-//        removeStructuresFromCell(unclaimEvent.getWorldCoord() , ", because plot has been unclaimed!");
-//    }
-//
-//    private void removeStructuresFromCell(WorldCoord t, final String reason) {
-//        int blockSize = TownySettings.getTownBlockSize();
-//        Vector2D vector = SettlerCraftTowny.translate(t);
-//
-//        Vector min = new Vector(vector.getBlockX(), 0, vector.getBlockZ());
-//        Vector max = min.add(blockSize, 256, blockSize);
-//
-//        final CuboidRegion region = new CuboidRegion(min, max);
-//        final World w = Bukkit.getWorld(t.getWorldName());
-//
-//        executor.execute(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                try (Transaction tx = graph.beginTx()) {
-//                    IStructureWorld sw = worldRepository.findByUUID(w.getUID());
-//                    List<StructureNode> sns = sw.getStructuresWithin(region, -1);
-//
-//
-//                    for (StructureNode sn : sns) {
-//                        if (sn.getStatus() != StructureStatus.REMOVED) {
-//                            sn.setStatus(StructureStatus.REMOVED);
-//                            for (StructureOwnerNode owner : sn.getOwners()) {
-//                                Player player = Bukkit.getPlayer(owner.getUUID());
-//                                player.sendMessage("Structure " + sn.getName() + " has been removed, " + reason);
-//                            }
-//                        }
-//                    }
-//
-//                    tx.success();
-//                }
-//            }
-//        });
-//    }
-
 }
