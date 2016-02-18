@@ -17,8 +17,9 @@
 package com.chingo247.structureapi.plan;
 
 import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.plan.flag.Flag;
 import java.io.File;
-import java.io.IOException;
+import java.util.Map;
 
 /**
  *
@@ -26,73 +27,81 @@ import java.io.IOException;
  */
 public interface IStructurePlan {
     
+    
+    
     /**
-     * Gets the id of this StructurePlan. Note that the id of the StructurePlan is based on the relative path of the file which
+     * Gets the id of this StructurePlan. Note that the id of the StructurePlan is a hash based on the relative path of the file which
      * represents this StructurePlan and might differ at the next server startup
      * @return The id of this StructurePlan
      */
-    public String getId();
+    String getId();
     /**
      * Gets the description
      * @return The description of this StructurePlan
      */
-    public String getDescription();
+    String getDescription();
     
     /**
      * Sets the description of this StructurePlan
      * @param description The description to set
      */
-    public void setDescription(String description);
+    void setDescription(String description);
     
     /**
      * Sets the name of this StructurePlan
      * @param name The StructurePlan
      */
-    public void setName(String name);
+    void setName(String name);
     
     /**
      * Gets the name of the StructurePlan
      * @return The name of the StructurePlan
      */
-    public String getName();
+    String getName();
     
     /**
      * Gets the Category
      * @return The category
      */
-    public String getCategory();
+    String getCategory();
     
     /**
      * Set the category of this StructurePlan
      * @param category The category to set
      */
-    public void setCategory(String category);
+    void setCategory(String category);
     
     /**
      * Gets the price of the StructurePlan
      * @return The price of this StructurePlan
      */
-    public double getPrice();
+    double getPrice();
     
     /**
      * Sets the price of the StructurePlan
      * @param price The price of the StructurePlan
      */
-    public void setPrice(double price);
+    void setPrice(double price);
     
     /**
      * Gets the placement
      * @return The placement of this StructurePlan
      */
-    public IPlacement getPlacement();
+    IPlacement getPlacement();
     
     
     /**
      * Gets the File that represents this StructurePlan or null if file doesn't exist...
      * @return The file
      */
-    public File getFile();
+    File getFile();
     
-    public void save() throws Exception;
+    boolean hasFlags();
+    
+    Map<String, Flag<?>> getFlags();
+    
+    void setFlag(Flag<?> flag);
+    
+    void save() throws Exception;
     
 }

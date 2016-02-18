@@ -45,7 +45,7 @@ import org.dom4j.io.SAXReader;
  *
  * @author Chingo
  */
-public class StructurePlanManager implements IStructurePlanProvider{
+public class StructurePlanManager implements IStructurePlanProvider {
 
     
     private final Map<String, IStructurePlan> plans;
@@ -102,10 +102,10 @@ public class StructurePlanManager implements IStructurePlanProvider{
 
     @Override
     public void reload() {
-        loadPlans(true);
+        reload(true);
     }
 
-    public void loadPlans(final boolean verbose) {
+    public void reload(final boolean verbose) {
         synchronized (plans) {
             plans.clear();
             
@@ -159,11 +159,10 @@ public class StructurePlanManager implements IStructurePlanProvider{
         }
     }
 
-
-    @Override
-    public List<IStructurePlan> getPlans(UUID player) {
-        return getPlans(); // Not relevant for this implementation
-    }
+    
+//    public List<IStructurePlan> getPlans(UUID player) {
+//        return getPlans(); // Not relevant for this implementation
+//    }
 
     private class SearchReferencesTask extends RecursiveTask<Map<String, String>> {
 

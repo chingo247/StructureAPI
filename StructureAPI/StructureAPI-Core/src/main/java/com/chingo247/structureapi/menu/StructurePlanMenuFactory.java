@@ -68,6 +68,8 @@ public class StructurePlanMenuFactory {
         
         template.addItem(new StructurePlanItem(platform, id, name, category, price, width, height, length, description));
     }
+    
+    
 
     public CategoryMenu createPlanMenu() {
         CategoryMenu categoryMenu = new DefaultCategoryMenu(SettlerCraft.getInstance().getEconomyProvider(),template.getTitle(), template.getView(), template.getAllItems());

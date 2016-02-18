@@ -17,6 +17,8 @@
 package com.chingo247.structureapi;
 
 import com.chingo247.structureapi.exeption.StructureRestrictionException;
+import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.plan.IStructurePlan;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
@@ -68,9 +70,10 @@ public abstract class StructureRestriction {
      * @param whoPlaces The player who places the structure, value could be null
      * @param world
      * @param affectedArea
+     * @param plan The structure plan that may be used, or null
      * @return should return true if the action is approved
      */
-    public abstract boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea);
+    public abstract boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea, IStructurePlan plan);
     
     /**
      * Used to check if a Structure may be build on a specified location.
@@ -80,8 +83,8 @@ public abstract class StructureRestriction {
      * @throws com.chingo247.structureapi.exception.StructureRestrictionException
      * 
      */
-    public final void check(Player whoPlaces, World world, CuboidRegion affectedArea) throws StructureRestrictionException {
-        if(!evaluate(whoPlaces, world, affectedArea)) {
+    public final void check(Player whoPlaces, World world, CuboidRegion affectedArea, IStructurePlan plan) throws StructureRestrictionException {
+        if(!evaluate(whoPlaces, world, affectedArea, plan)) {
             throw new StructureRestrictionException(message);
         }
     }

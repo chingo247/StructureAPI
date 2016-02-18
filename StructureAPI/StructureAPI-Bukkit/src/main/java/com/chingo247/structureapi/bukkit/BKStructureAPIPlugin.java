@@ -51,6 +51,7 @@ import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
@@ -220,6 +221,16 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
 
         return true;
     }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if(command.getName().equals("plans:give")) {
+            
+        }
+        return null;
+    }
+    
+    
 
     @Override
     public void onDisable() {

@@ -23,7 +23,9 @@ package com.chingo247.structureapi.menu;
 import com.chingo247.menuapi.menu.item.CategoryTradeItem;
 import com.chingo247.menuapi.menu.item.TradeItem;
 import com.chingo247.menuapi.menu.util.ShopUtil;
+import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.xplatform.core.AItemStack;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
@@ -170,7 +172,7 @@ public class StructurePlanItem implements CategoryTradeItem {
             return false;
         }
     }
-
+   
     @Override
     public TradeItem clone() {
         return new StructurePlanItem(platform, id, name, category, price, width, height, length, description);

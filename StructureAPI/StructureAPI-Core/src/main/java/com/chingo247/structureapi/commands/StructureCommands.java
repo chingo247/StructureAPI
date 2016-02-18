@@ -349,7 +349,7 @@ public class StructureCommands {
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
         
         IContract rollbackContract =  new RollbackContract()
-                .setRecursive(true)
+                .setRecursive(false)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setReversedOrder(true)
@@ -410,6 +410,7 @@ public class StructureCommands {
         SafeContract safeContract = new SafeContract(rollbackContract);
         safeContract.setRecursive(true)
                 .setRestrictive(true)
+                .setRecursive(false)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);

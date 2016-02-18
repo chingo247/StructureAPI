@@ -28,6 +28,7 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.menu.StructurePlanItem;
 import com.chingo247.structureapi.plan.PlanGenerator;
 import com.chingo247.structureapi.platform.permission.Permissions;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
@@ -51,7 +52,7 @@ public class StructurePlanCommands {
     @Command(aliases = {"plans:reload"}, usage = "/plans:reload", desc = "Reloads structure plans", max = 0)
     public static void reload(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
         if (!structureAPI.isLoadingPlans()) {
-            structureAPI.getStructurePlanManager().loadPlans(false);
+            structureAPI.getStructurePlanManager().reload(false);
         } else {
             throw new CommandException("Already reloading plans!");
         }
@@ -76,7 +77,7 @@ public class StructurePlanCommands {
         }
         openMenu(structureAPI, (IPlayer) sender, false);
     }
-
+    
     private static void openMenu(IStructureAPI structureAPI, IPlayer player, boolean isFree) throws CommandException {
         if (!isFree && SettlerCraft.getInstance().getEconomyProvider() == null) {
             throw new CommandException("Plan shop is not available (no economy plugin)");

@@ -70,7 +70,7 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
                                 StructureNode structureNode = new StructureNode(entry.getStructure().getUnderlyingNode());
                                 structureNode.setStatus(newStatus);
                                 if (newStatus == ConstructionStatus.REMOVED) {
-                                    refund(entry.getStructure());
+                                    refund(structureNode, true, true);
                                 }
                                 Structure structure = new Structure(structureNode);
                                 entry.update(structure);
@@ -100,8 +100,7 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
         });
     }
 
-    protected void refund(IStructure structure) {
-        StructureNode structureNode = new StructureNode(structure.getUnderlyingNode());
+    protected void refund(StructureNode structureNode, boolean remove, boolean recursive) {
         double price = structureNode.getPrice();
         IEconomyProvider economyProvider = SettlerCraft.getInstance().getEconomyProvider();
         if (economyProvider != null && price > 0) {
@@ -122,6 +121,16 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
             }
             structureNode.setPrice(0);
         }
+        if(remove) {
+            structureNode.setStatus(ConstructionStatus.REMOVED);
+        }
+        if(structureNode.hasSubstructures()) {
+            for(StructureNode sn : structureNode.getSubstructures()) {
+                refund(sn, remove, recursive);
+            }
+        }
+        
+        
     }
 
     protected Iterable<IPlayer> getPlayers(IStructure structure) {

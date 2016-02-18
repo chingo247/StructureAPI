@@ -24,8 +24,9 @@ public class Permissions {
     
     private Permissions() {}
     
-    private static final String PREFIX = "settlercraft.";
+    private static final String PREFIX = "structureapi.";
     
+    public static final String GIVE_PLAN = PREFIX + "plans.give";
     public static final String RELOAD_PLANS = PREFIX + "plans.reload";
     public static final String GENERATE_PLANS = PREFIX + "plans.generate";
     public static final String ROTATE_SCHEMATIC = PREFIX + "schematic.rotate";

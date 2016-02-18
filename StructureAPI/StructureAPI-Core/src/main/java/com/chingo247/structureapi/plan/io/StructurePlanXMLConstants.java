@@ -32,6 +32,7 @@ public class StructurePlanXMLConstants {
     public static final String STRUCTURE_PLAN_DESCRIPTION_ELEMENT = "Description";
     public static final String STRUCTURE_PLAN_ID_ELEMENT = "Id";
     public static final String STRUCTURE_PLAN_RELATIVE_PATH_ELEMENT = "RelativePath";
-    
+    public static final String STRUCTURE_PLAN_FLAGS_ELEMENT = "Flags";
+    public static final String STRUCTURE_PLAN_FLAG_ELEMENT = "Flag";
     
 }

@@ -17,21 +17,28 @@
 package com.chingo247.structureapi.plan;
 
 import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.plan.flag.Flag;
 import com.chingo247.structureapi.plan.io.export.StructurePlanExporter;
 import com.chingo247.structureapi.plan.io.export.UnsupportedPlacementException;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class defines StructurePlans that exist of only one placement
  * @author Chingo
  */
-public class DefaultStructurePlan extends AbstractStructurePlan{
+public class DefaultStructurePlan extends AbstractStructurePlan {
     
     private final IPlacement placement;
 
     public DefaultStructurePlan(String id, File planFile, IPlacement placement) {
-        super(id, planFile);
+        this(id, planFile, placement, new HashMap<String, Flag<?>>());
+    }
+    
+    public DefaultStructurePlan(String id, File planFile, IPlacement placement, Map<String,Flag<?>> flags) {
+        super(id, planFile, flags);
         this.placement = placement;
     }
 

@@ -18,7 +18,11 @@
 package com.chingo247.structureapi.plan;
 
 import com.chingo247.settlercraft.core.util.XXHasher;
+import com.chingo247.structureapi.plan.flag.Flag;
+import com.google.common.base.Preconditions;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -31,23 +35,50 @@ public abstract class AbstractStructurePlan implements IStructurePlan {
     private double price;
     private final String hash;
     private final File file;
+    private Map<String,Flag<?>> flags;
     
     protected AbstractStructurePlan(File planFile) {
         this(String.valueOf(new XXHasher().hash32String(planFile.getAbsolutePath())), planFile);
+        
     }
+    
 
     protected AbstractStructurePlan(String id, File planFile) {
+        this(id, planFile, new HashMap<String, Flag<?>>());
+    }
+    
+    protected AbstractStructurePlan(String id, File planFile, Map<String, Flag<?>> flags) {
+        Preconditions.checkNotNull(flags, "Flags may not be null!");
         this.file = planFile;
         this.hash = String.valueOf(new XXHasher().hash32String(planFile.getAbsolutePath()));
         this.price = 0.0d;
         this.category = "Default";
         this.id = id;
+        this.flags = flags;
     }
     
     @Override
     public final String getId() {
         return id;
     }
+    
+    @Override
+    public boolean hasFlags() {
+        return this.flags != null && !this.flags.isEmpty();
+    }
+
+    @Override
+    public Map<String, Flag<?>> getFlags() {
+        return new HashMap<>(flags);
+    }
+
+    @Override
+    public void setFlag(Flag<?> flag) {
+        this.flags.put(flag.getName(), flag);
+    }
+    
+    
+    
     
     @Override
     public String getDescription() {

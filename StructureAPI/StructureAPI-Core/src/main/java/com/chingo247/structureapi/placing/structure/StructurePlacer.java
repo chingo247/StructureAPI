@@ -126,10 +126,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         return this;
     }
 
-    @Override
-    public IStructurePlaceResult place(CuboidRegion structureRegion) throws IOException, UnsupportedPlacementException {
-        return place(structureRegion, structureRegion.getMinimumPoint(), Direction.EAST, null);
-    }
+  
 
     @Override
     public IStructurePlaceResult place(final IPlacement placement, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException {
@@ -141,7 +138,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
             public void onCreate(IStructure structure) throws IOException, UnsupportedPlacementException {
                 copyResources(structure, placement);
             }
-        });
+        }, null);
         return result;
     }
 
@@ -154,15 +151,13 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
             public void onCreate(IStructure structure) throws IOException {
                 copyResources(structure, plan);
             }
-        });
+        }, plan);
         return placeResult;
     }
 
-    private IStructurePlaceResult place(CuboidRegion region, Vector position, Direction direction, ICallback callback) throws IOException, UnsupportedPlacementException {
+    private IStructurePlaceResult place(CuboidRegion region, Vector position, Direction direction, ICallback callback, IStructurePlan plan) throws IOException, UnsupportedPlacementException {
         StructurePlaceResult placeResult = new StructurePlaceResult();
-
         ILocation spawn = world.getSpawn();
-        
 
         try {
             
@@ -186,7 +181,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 for(StructureRestriction restriction : structureAPI.getRestrictions()) {
                     Player player = SettlerCraft.getInstance().getPlayer(placer);
                     World w = SettlerCraft.getInstance().getWorld(world.getUUID());
-                    restriction.check(player, w, region);
+                    restriction.check(player, w, region, plan);
                 }
             }
 

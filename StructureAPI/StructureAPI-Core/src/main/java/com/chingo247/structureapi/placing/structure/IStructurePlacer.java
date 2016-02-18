@@ -48,8 +48,6 @@ public interface IStructurePlacer {
     
     IStructurePlacer setParent(IStructure parent);
     
-    IStructurePlaceResult place(CuboidRegion structureRegion) throws IOException, UnsupportedPlacementException;
-    
     IStructurePlaceResult place(IPlacement placement, Vector position, Direction direction) throws IOException, UnsupportedPlacementException;
     
     IStructurePlaceResult place(IStructurePlan plan, Vector position, Direction direction) throws IOException, UnsupportedPlacementException;

@@ -37,17 +37,19 @@ public interface IStructurePlanProvider {
     void reload();
     
     /**
+     * Reloads all the plans
+     */
+    void reload(boolean verbose);
+    
+    /**
      * Gets all the structure plans
      * @return The structure plans
      */
     List<IStructurePlan> getPlans();
     
-    /**
-     * Gets all the structure plans for a player with the corresponding UUID
-     * @param player The UUID of the player
-     * @return 
-     */
-    List<IStructurePlan> getPlans(UUID player);
+    
+    
+    
     
     /**
      * Returns the plan with the corresponding id or null

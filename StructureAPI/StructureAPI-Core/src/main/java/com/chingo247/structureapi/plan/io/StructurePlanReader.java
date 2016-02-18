@@ -30,6 +30,7 @@ import com.chingo247.structureapi.plan.DefaultStructurePlan;
 import com.chingo247.structureapi.plan.DefaultSubstructuresPlan;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.placement.PlacementAPI;
+import com.chingo247.structureapi.plan.flag.Flag;
 import com.google.common.base.Preconditions;
 import java.io.File;
 import java.util.ArrayList;
@@ -130,6 +131,7 @@ public class StructurePlanReader {
                 double price = planDocument.getPrice();
                 String description = planDocument.getDescription();
                 String category = planDocument.getCategory();
+                Map<String, Flag<?>> flags = planDocument.getFlags();
 
                 PlacementElement placementElement = planDocument.getPlacementElement();
                 PlacementProcessor placementProcessor = new PlacementProcessor(structurePlanFile.getParentFile(), placementElement);
@@ -143,6 +145,7 @@ public class StructurePlanReader {
                     plan.setDescription(description);
                     plan.setCategory(category);
 
+                    
                     // Get and Set subplaceables
                     List<SubStructureElement> substructureElements = planDocument.getSubStructureElements();
                     List<StructurePlanProcessor> spps = null;
