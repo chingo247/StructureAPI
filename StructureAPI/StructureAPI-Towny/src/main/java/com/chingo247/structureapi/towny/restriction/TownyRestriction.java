@@ -7,6 +7,9 @@ package com.chingo247.structureapi.towny.restriction;
 
 import com.chingo247.structureapi.towny.plugin.StructureAPITowny;
 import com.chingo247.structureapi.StructureRestriction;
+import com.chingo247.structureapi.plan.IStructurePlan;
+import com.chingo247.structureapi.plan.flag.Flag;
+import com.chingo247.structureapi.towny.flags.TownyFlags;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -37,7 +40,7 @@ public class TownyRestriction extends StructureRestriction {
     }
     
     @Override
-    public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea) {
+    public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea, IStructurePlan plan) {
         List<WorldCoord> coords = getCoords(Bukkit.getWorld(world.getName()), affectedArea);
 
         Resident whoPlacesResident = getResidentFor(whoPlaces);
@@ -67,10 +70,23 @@ public class TownyRestriction extends StructureRestriction {
                 }
                
             } else {
+                
+                
 
                 // If not a mayor you are not allowed to place outside of towns
                 if (whoPlacesResident == null || !whoPlacesResident.isMayor()) {
+                    // unlesss 'wildernis' flag is set
+                    if(plan.hasFlags()) {
+                        Flag<?> flag = plan.getFlag(TownyFlags.TOWNY_ALLOWED_WILDERNIS.getName());
+                        if(flag != null && flag.getValue(Boolean.class)) {
+                            return true;
+                        }
+                    }
+                    
                     setMessage("You are not a mayor and are not allowed to place outside of towns");
+                    
+                    
+                    
                     return false;
                 }
             }

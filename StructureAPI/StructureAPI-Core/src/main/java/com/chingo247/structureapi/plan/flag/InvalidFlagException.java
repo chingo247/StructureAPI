@@ -20,30 +20,6 @@ package com.chingo247.structureapi.plan.flag;
  *
  * @author Chingo
  */
-public class Flag<T> implements IFlag<T> {
-    
-    private String name;
-    private T value;
-
-    public Flag(String name, T value) {
-        this.name = name;
-        this.value = value;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public T getValue() {
-        return value;
-    }
-    
-    public <K> K getValue(Class<K> clazz) {
-        return clazz.cast(value);
-    }
-    
-    public void setValue(T t) {
-        this.value = t;
-    }
+public class InvalidFlagException extends RuntimeException {
     
 }

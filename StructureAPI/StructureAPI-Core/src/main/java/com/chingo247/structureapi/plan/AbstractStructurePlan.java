@@ -66,6 +66,10 @@ public abstract class AbstractStructurePlan implements IStructurePlan {
     public boolean hasFlags() {
         return this.flags != null && !this.flags.isEmpty();
     }
+    
+    public Flag<?> getFlag(String flag) {
+        return flags.get(flag);
+    }
 
     @Override
     public Map<String, Flag<?>> getFlags() {

@@ -98,6 +98,8 @@ public interface IStructurePlan {
     
     boolean hasFlags();
     
+    Flag<?> getFlag(String flag);
+    
     Map<String, Flag<?>> getFlags();
     
     void setFlag(Flag<?> flag);
