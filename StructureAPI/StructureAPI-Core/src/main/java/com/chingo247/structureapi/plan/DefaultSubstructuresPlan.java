@@ -76,7 +76,7 @@ public final class DefaultSubstructuresPlan extends AbstractStructurePlan implem
     }
 
     @Override
-    public DefaultSubstructuresPlan getParent() {
+    public ISubstructurePlan getParent() {
         return parent;
     }
 

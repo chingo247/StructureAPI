@@ -17,7 +17,9 @@
 package com.chingo247.structureapi.platform;
 
 import com.chingo247.settlercraft.core.util.yaml.YAMLFormat;
+import com.chingo247.settlercraft.core.util.yaml.YAMLNode;
 import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
+import com.chingo247.structureapi.exeption.StructureAPIException;
 import java.io.File;
 import java.io.IOException;
 
@@ -35,6 +37,8 @@ public class ConfigProvider {
     private boolean protectConstructionZones = false;
     private boolean allowStructures = false;
     private boolean restrictedToZones = false;
+    private boolean demolishIsRollback = false;
+    
     private String version;
     
     private final File f;
@@ -47,6 +51,14 @@ public class ConfigProvider {
         this.version = version;
     }
 
+    public void setDemolishIsRollback(boolean demolishIsRollback) {
+        this.demolishIsRollback = demolishIsRollback;
+    }
+
+    public boolean isDemolishIsRollback() {
+        return demolishIsRollback;
+    }
+    
     public String getVersion() {
         return version;
     }
@@ -65,14 +77,6 @@ public class ConfigProvider {
 
     public boolean isRestrictedToZones() {
         return restrictedToZones;
-    }
-    
-    public void setAllowStructures(boolean allowStructures) {
-        this.allowStructures = allowStructures;
-    }
-
-    public boolean allowsStructures() {
-        return allowStructures;
     }
     
     public boolean isMenuEnabled() {
@@ -115,7 +119,7 @@ public class ConfigProvider {
         this.protectStructures = protectStructures;
     }
     
-    public static ConfigProvider load(File f) throws IOException {
+    public static ConfigProvider load(File f) throws IOException, StructureAPIException {
         if(!f.exists()) {
             f.createNewFile();
         }
@@ -125,15 +129,50 @@ public class ConfigProvider {
         
         ConfigProvider config = new ConfigProvider(f);
         config.setVersion(yamlp.getString("version", null));
-        config.setAllowsSubstructures(yamlp.getBoolean("structures.allow-substructures", true));
-        config.setRestrictedToZones(yamlp.getBoolean("structures.restricted-to-zones", false));
-        config.setAllowStructures(yamlp.getBoolean("structures.allow-structures", true));
-        config.setUseHolograms(yamlp.getBoolean("structures.use-holograms", true));
-        config.setProtectStructures(yamlp.getBoolean("structures.protected", true));
-        config.setProtectConstructionZones(yamlp.getBoolean("constructionzones.protected", true));
-        config.setMenuEnabled(yamlp.getBoolean("menus.planmenu-enabled", true));
-        config.setShopEnabled(yamlp.getBoolean("menus.planshop-enabled", true));
+        config.setAllowsSubstructures(getValue(yamlp, "structures.allow-substructures", Boolean.class));
+        config.setRestrictedToZones(getValue(yamlp, "structures.restricted-to-zones", Boolean.class));
+        config.setUseHolograms(getValue(yamlp, "structures.use-holograms", Boolean.class));
+        config.setProtectStructures(getValue(yamlp, "structures.protected", Boolean.class));
+        config.setProtectConstructionZones(getValue(yamlp, "constructionzones.protected", Boolean.class));
+        config.setMenuEnabled(getValue(yamlp, "menus.planmenu-enabled", Boolean.class));
+        config.setShopEnabled(getValue(yamlp, "menus.planshop-enabled", Boolean.class));
+        config.setDemolishIsRollback(getValue(yamlp, "structures.demolish-is-rollback", Boolean.class));
+        
+        
         return config;
+        
+    }
+    
+    public static String getVersion(File config) throws IOException {
+        YAMLProcessor yamlp = new YAMLProcessor(config, true, YAMLFormat.EXTENDED);
+        yamlp.load();
+        return yamlp.getString("version", null);
+    }
+    
+    private static <T> T getValue(YAMLProcessor processor, String path, Class<T> expectedValue) throws StructureAPIException {
+        
+        Object value = processor.getProperty(path);
+        if(value != null) {
+            try {
+                return expectedValue.cast(value);
+            } catch(ClassCastException ex) {
+                
+                if(expectedValue.getClass().isAssignableFrom(Boolean.class)) {
+                   throw new StructureAPIException("Invalid value in config path '"+path+"': Expected 'true' or 'false' "+path+"'");
+                }
+                if(expectedValue.getClass().isAssignableFrom(Integer.class)) {
+                   throw new StructureAPIException("Invalid value in config path '"+path+"': Expected a round number' "+path+"'");
+                }
+                if(expectedValue.getClass().isAssignableFrom(Double.class)) {
+                   throw new StructureAPIException("Invalid value in config path: Expected a round number at '"+path+"'");
+                }
+                throw new StructureAPIException("Invalid value in config at: '"+path+"'");
+                
+            }
+        } else {
+            throw new StructureAPIException("Missing '" + path + "' in config!");
+        }
+        
         
     }
     

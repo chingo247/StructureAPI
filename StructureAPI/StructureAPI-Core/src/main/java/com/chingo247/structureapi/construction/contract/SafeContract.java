@@ -74,8 +74,13 @@ public class SafeContract extends AContract {
 
     private IContract contract;
 
+    /**
+     * Constructor
+     * @param contract The contract, may NOT inherit from RollbackContract
+     */
     public SafeContract(IContract contract) {
         Preconditions.checkNotNull(contract, "contract may not be null");
+        Preconditions.checkArgument(! (contract instanceof RollbackContract), "RollbackContract is not allowed!");
         this.contract = contract;
     }
 

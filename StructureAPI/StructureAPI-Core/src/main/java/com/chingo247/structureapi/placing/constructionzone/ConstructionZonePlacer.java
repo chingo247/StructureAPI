@@ -6,6 +6,7 @@
 package com.chingo247.structureapi.placing.constructionzone;
 
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.event.zone.CreateConstructionZoneEvent;
 import com.chingo247.structureapi.exeption.ConstructionZoneException;
 import com.chingo247.structureapi.model.AccessType;
 import com.chingo247.structureapi.model.owner.OwnerType;
@@ -155,6 +156,12 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
             placeResult.setError(ex.getMessage());
             placeResult.setZone(null); // ensure null
         }
+        
+        if(placeResult.succes()) {
+            StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new CreateConstructionZoneEvent(placeResult.getPlacedConstructionZone()));
+        }
+        
+        
         return placeResult;
     }
 

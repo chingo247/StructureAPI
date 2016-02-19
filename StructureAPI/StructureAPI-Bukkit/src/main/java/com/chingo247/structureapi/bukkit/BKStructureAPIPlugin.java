@@ -121,8 +121,15 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
         graph = SettlerCraft.getInstance().getNeo4j();
 
         try {
-            // Initialize Config
-            configProvider = ConfigProvider.load(new File(getDataFolder(), "config.yml"));
+            try {
+                // Initialize Config
+                configProvider = ConfigProvider.load(new File(getDataFolder(), "config.yml"));
+            } catch (StructureAPIException ex) {
+                System.out.println("[StructureAPI] " + ex.getMessage());
+                this.setEnabled(false);
+                System.out.println("[StructureAPI]: Disabling SettlerCraft-StructureAPI");
+                return;
+            }
         } catch (IOException ex) {
             Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -133,7 +140,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
             structureAPI.registerStructureAPIPlugin(this);
         } catch (StructureAPIException ex) {
             this.setEnabled(false);
-            System.out.println("[SettlerCraft]: Disabling SettlerCraft-StructureAPI");
+            
             Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
@@ -260,7 +267,9 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
             newConfigFile.delete();
             newConfigFile = new File(temp, "config.yml");
             JarUtil.createDefault(newConfigFile, getFile(), RESOURCES_PATH + "config.yml");
-            ConfigProvider newConfig = ConfigProvider.load(newConfigFile);
+            
+            String newConfigVersion = ConfigProvider.getVersion(newConfigFile);
+            
             ConfigProvider currentConfig;
             try {
                 currentConfig = ConfigProvider.load(configFile);
@@ -268,7 +277,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
                 throw new RuntimeException("An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
             }
             
-            if(currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfig.getVersion()) == -1) {
+            if(currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfigVersion) == -1) {
                 int count = 1;
                 String baseName = FilenameUtils.getBaseName(configFile.getName());
                 File oldFile = new File(getDataFolder(), baseName + "(" + count + ").old.yml");
@@ -293,9 +302,6 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
                 FileUtils.copyFile(configFile, oldFile);
                 FileUtils.copyFile(newConfigFile, configFile);
             }
-            this.configProvider = newConfig;
-            
-
         } else {
             JarUtil.createDefault(new File(getDataFolder(), "config.yml"), getFile(), RESOURCES_PATH + "config.yml");
         }

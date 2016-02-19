@@ -98,10 +98,23 @@ public interface IStructurePlan {
     
     boolean hasFlags();
     
+    /**
+     * Gets a flag
+     * @param flag The name of the flag to get
+     * @return The flag
+     */
     Flag<?> getFlag(String flag);
     
+    /**
+     * Gets a copy of the flags map
+     * @return The flags map
+     */
     Map<String, Flag<?>> getFlags();
     
+    /**
+     * Sets a flag
+     * @param flag The flag to set 
+     */
     void setFlag(Flag<?> flag);
     
     void save() throws Exception;

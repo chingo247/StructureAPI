@@ -70,6 +70,7 @@ public abstract class AbstractStructurePlan implements IStructurePlan {
     public Flag<?> getFlag(String flag) {
         return flags.get(flag);
     }
+    
 
     @Override
     public Map<String, Flag<?>> getFlags() {

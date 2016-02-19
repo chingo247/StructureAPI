@@ -34,8 +34,10 @@ import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.IStructureAPI;
+import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.IContract;
 import com.chingo247.structureapi.construction.contract.BuildContract;
+import com.chingo247.structureapi.construction.contract.DemolitionContract;
 import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
 import com.chingo247.structureapi.model.settler.SettlerNode;
@@ -406,15 +408,22 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        RollbackContract rollbackContract =  new RollbackContract();
-        SafeContract safeContract = new SafeContract(rollbackContract);
-        safeContract.setRecursive(true)
+        
+        IContract contract;
+        if(StructureAPI.getInstance().getConfig().isDemolishIsRollback() && structure.getRollbackData().hasBlockStore()) {
+            contract = new RollbackContract();
+        } else {
+            contract = new SafeContract(new DemolitionContract());
+            
+        }
+        
+        contract.setRecursive(true)
                 .setRestrictive(true)
                 .setRecursive(false)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, safeContract);
+        structureAPI.getConstructionExecutor().submit(structure, contract);
 
     }
     

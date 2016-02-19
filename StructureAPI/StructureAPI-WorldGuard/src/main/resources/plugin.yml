@@ -1,6 +1,6 @@
 name: StructureAPI-WorldGuard
 main: com.chingo247.structureapi.worldguard.plugin.bukkit.StructureAPIWorldGuard
-version: 2.1.0
+version: 2.2.0
 author: Chingo247
 description: WorldGuard support for SettlerCraft-StructureAPI
 depend: [SettlerCraft-StructureAPI, WorldGuard]

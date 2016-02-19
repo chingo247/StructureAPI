@@ -22,6 +22,7 @@ import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureScheduler;
 import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.event.structure.StructureRemoveEvent;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
@@ -71,6 +72,7 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
                                 structureNode.setStatus(newStatus);
                                 if (newStatus == ConstructionStatus.REMOVED) {
                                     refund(structureNode, true, true);
+                                    
                                 }
                                 Structure structure = new Structure(structureNode);
                                 entry.update(structure);
@@ -91,6 +93,11 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
                             p.sendMessage(messages);
                         }
 
+                    }
+                    
+                    
+                    if(newStatus == ConstructionStatus.REMOVED) {
+                        StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureRemoveEvent(entry.getStructure()));
                     }
 
                 } catch (Exception ex) {

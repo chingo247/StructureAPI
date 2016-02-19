@@ -18,6 +18,7 @@ package com.chingo247.structureapi.worldguard.restriction;
 
 import com.chingo247.structureapi.worldguard.protection.WorldGuardPlotProtector;
 import com.chingo247.structureapi.StructureRestriction;
+import com.chingo247.structureapi.plan.IStructurePlan;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
@@ -40,7 +41,7 @@ public class WorldGuardRestriction extends StructureRestriction {
     }
 
     @Override
-    public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea) {
+    public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea, IStructurePlan plan) {
         LocalPlayer localPlayer = null;
         if (whoPlaces != null) {
             localPlayer = WorldGuardPlotProtector.getInstance().getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));

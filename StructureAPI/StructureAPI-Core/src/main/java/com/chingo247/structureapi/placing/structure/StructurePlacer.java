@@ -300,7 +300,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 }
                 
                 placeResult.setStructure(structure);
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureCreateEvent(structure));
+                
                 tx.success();
             } catch (StructureException | UnsupportedPlacementException ex) {
                 if (tx != null) {
@@ -313,7 +313,9 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 }
                 monitor.leave();
             }
-
+            if(placeResult.succes()) {
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureCreateEvent(placeResult.getPlacedStructure()));
+            }
         } catch (StructureRestrictionException | StructureException ex) {
             placeResult.setError(ex.getMessage());
         } 

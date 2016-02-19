@@ -162,10 +162,8 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         try (Transaction tx = graph.beginTx()) {
             if(plot instanceof IStructure) {
-                System.out.println("Protecting structure!");
                 regionId = STRUCTURE_PREFIX + String.valueOf(((IStructure) plot).getId());
             } else if (plot instanceof IConstructionZone) {
-                System.out.println("Protecting construction zone!");
                 regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IConstructionZone) plot).getId());
             } else {
                 regionId = UUID.randomUUID().toString();
@@ -277,13 +275,13 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         }
         
         Map<String,Object> params = Maps.newHashMap();
-        params.put("regionId", getRegionId(plot));
+        params.put("regionId", region);
         
         String query = "MATCH (wg:" + LABEL.name() + " { "+REGION_PROPERTY+": {regionId} }) "
                      + "RETURN wg";
         
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        Result r = graph.execute(query);
+        Result r = graph.execute(query, params);
         while(r.hasNext()) {
             Node regionNode = (Node) r.next().get("wg");
             for(Relationship rel : regionNode.getRelationships()) {

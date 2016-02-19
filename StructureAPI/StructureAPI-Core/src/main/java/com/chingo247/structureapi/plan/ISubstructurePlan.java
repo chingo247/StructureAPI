@@ -65,11 +65,6 @@ public interface ISubstructurePlan extends IStructurePlan {
     public Collection<? extends IPlacement> getSubPlacements();
     
     
-    /**
-     * 
-     * @param <T>
-     * @return 
-     */
-    public <T extends ISubstructurePlan> T getParent();
+    public ISubstructurePlan getParent();
     
 }
