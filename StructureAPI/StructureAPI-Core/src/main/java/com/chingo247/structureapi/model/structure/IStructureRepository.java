@@ -34,7 +34,7 @@ public interface IStructureRepository {
     
     Collection<StructureNode> findByOwner(UUID settlerUUID);
     
-    Collection<StructureNode> findWorldDeletedAfter(UUID worldUUID, long date);
+    Collection<StructureNode> findStructuresDeletedAfter(UUID worldUUID, long date);
     
     Collection<StructureNode> findCreatedAfter(UUID worldUUID, long date);
     

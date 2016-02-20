@@ -30,7 +30,7 @@ import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.settlercraft.core.exception.SettlerCraftException;
 import com.chingo247.structureapi.menu.StructurePlanMenuFactory;
 import com.chingo247.structureapi.menu.StructurePlanMenuReader;
-import com.chingo247.settlercraft.core.model.world.WorldNode;
+import com.chingo247.settlercraft.core.model.world.SCWorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.structureapi.construction.Contractor;
 import com.chingo247.structureapi.plan.IStructurePlan;
@@ -378,7 +378,7 @@ public class StructureAPI implements IStructureAPI {
         return asyncWorldEditIntegration.isQueueLocked(player);
     }
 
-    final File getDirectoryForStructure(WorldNode worldNode, Structure structureNode) {
+    final File getDirectoryForStructure(SCWorldNode worldNode, Structure structureNode) {
         File structuresDirectory = getStructuresDirectory(worldNode.getName());
         File structureDir = new File(structuresDirectory, String.valueOf(structureNode.getId()));
         return structureDir;

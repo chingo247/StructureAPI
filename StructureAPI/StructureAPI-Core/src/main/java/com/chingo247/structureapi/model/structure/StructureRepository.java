@@ -6,7 +6,7 @@
 package com.chingo247.structureapi.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.settlercraft.core.model.world.WorldNode;
+import com.chingo247.settlercraft.core.model.world.SCWorldNode;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.plot.PlotNode;
 import com.chingo247.structureapi.model.settler.SettlerNode;
@@ -116,14 +116,14 @@ public class StructureRepository implements IStructureRepository {
     }
 
     @Override
-    public Collection<StructureNode> findWorldDeletedAfter(UUID worldUUID, long date) {
+    public Collection<StructureNode> findStructuresDeletedAfter(UUID worldUUID, long date) {
         List<StructureNode> structures = com.google.common.collect.Lists.newArrayList();
 
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
         params.put("date", date);
 
-        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+        String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " > {date}"
@@ -151,7 +151,7 @@ public class StructureRepository implements IStructureRepository {
         params.put("worldId", worldUUID.toString());
         params.put("date", date);
 
-        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+        String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.CREATED_AT_PROPERTY + " > {date}"
@@ -177,7 +177,7 @@ public class StructureRepository implements IStructureRepository {
 
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
-        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+        String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " RETURN s";
@@ -234,7 +234,7 @@ public class StructureRepository implements IStructureRepository {
         }
 
         String query
-                = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " IS NULL"
@@ -265,7 +265,7 @@ public class StructureRepository implements IStructureRepository {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
         String query
-                = "MATCH ( world: " + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH ( world: " + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " IS NULL"
@@ -317,7 +317,7 @@ public class StructureRepository implements IStructureRepository {
     public int countStructuresWithinWorld(UUID worldUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldUUID", worldUUID.toString());
-        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldUUID} })"
+        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldUUID} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(structure:" + StructureNode.LABEL + ")"
                 + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()

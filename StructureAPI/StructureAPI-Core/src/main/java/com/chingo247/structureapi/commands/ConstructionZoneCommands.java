@@ -22,7 +22,7 @@ import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
 import com.chingo247.structureapi.event.zone.ConstructionZoneRemoveOwnerEvent;
 import com.chingo247.structureapi.event.zone.ConstructionZoneUpdateOwnerEvent;
-import com.chingo247.structureapi.event.zone.DeleteConstructionZoneEvent;
+import com.chingo247.structureapi.event.zone.ConstructionZoneEventDelete;
 import com.chingo247.structureapi.model.owner.IOwnership;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
@@ -33,6 +33,7 @@ import com.chingo247.structureapi.model.zone.ConstructionZoneRepository;
 import com.chingo247.structureapi.model.zone.IConstructionZone;
 import com.chingo247.structureapi.model.zone.IConstructionZoneRepository;
 import com.chingo247.structureapi.IStructureAPI;
+import com.chingo247.structureapi.model.AccessType;
 import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.model.zone.ConstructionZone;
 import com.chingo247.structureapi.placing.constructionzone.IConstructionZonePlaceResult;
@@ -129,7 +130,9 @@ public class ConstructionZoneCommands {
             region = new CuboidRegion(new BlockVector(minX, minY, minZ), new BlockVector(maxX, maxY, maxZ));
         }
         
-        IConstructionZonePlaceResult result = placer.place(region);
+        IConstructionZonePlaceResult result = placer
+                .setAccess(AccessType.PRIVATE)
+                .place(region);
         if(result.succes()) {
             sender.sendMessage("Succesfully created construction zone");
         } else {
@@ -256,7 +259,7 @@ public class ConstructionZoneCommands {
             }
             tx.success();
             sender.sendMessage("Deleted construction-zone #" + id);
-            structureAPI.getEventDispatcher().dispatchEvent(new DeleteConstructionZoneEvent(new ConstructionZone(zone)));
+            structureAPI.getEventDispatcher().dispatchEvent(new ConstructionZoneEventDelete(new ConstructionZone(zone)));
         }
         
         

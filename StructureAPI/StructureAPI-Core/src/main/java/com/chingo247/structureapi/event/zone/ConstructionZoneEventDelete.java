@@ -14,38 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.event.async;
+package com.chingo247.structureapi.event.zone;
 
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.zone.IConstructionZone;
 
 /**
  *
  * @author Chingo
  */
-public class StructureJobEvent  {
-    
-    private final int jobId;
-    private final IStructure structure;
+public class ConstructionZoneEventDelete extends ConstructionZoneEvent {
 
-    public StructureJobEvent(IStructure structure, int jobid) {
-        this.jobId = jobid;
-        this.structure = structure;
-    }
-
-    public final IStructure getStructure() {
-        return structure;
-    }
-
-    
-    
-
-    /**
-     * Gets the JobId (AsyncWorldEdit's jobId
-     * @return The jobId
-     */
-    public final int getJobId() {
-        return jobId;
+    public ConstructionZoneEventDelete(IConstructionZone zone) {
+        super(zone);
     }
     
 }

@@ -22,8 +22,8 @@ import com.chingo247.structureapi.event.structure.owner.StructureAddOwnerEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureRemoveOwnerEvent;
 import com.chingo247.structureapi.event.zone.ConstructionZoneRemoveOwnerEvent;
 import com.chingo247.structureapi.event.zone.ConstructionZoneUpdateOwnerEvent;
-import com.chingo247.structureapi.event.zone.CreateConstructionZoneEvent;
-import com.chingo247.structureapi.event.zone.DeleteConstructionZoneEvent;
+import com.chingo247.structureapi.event.zone.ConstructionZoneCreateEvent;
+import com.chingo247.structureapi.event.zone.ConstructionZoneEventDelete;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.model.zone.IConstructionZone;
@@ -81,13 +81,13 @@ public class WorldGuardPlotListener {
     }
 
     @Subscribe
-    public void onConstructionZoneCreate(CreateConstructionZoneEvent constructionZoneEvent) {
+    public void onConstructionZoneCreate(ConstructionZoneCreateEvent constructionZoneEvent) {
         IConstructionZone zone = constructionZoneEvent.getZone();
         worldGuardHelper.protect(zone);
     }
 
     @Subscribe
-    public void onConstructionZoneRemove(DeleteConstructionZoneEvent deleteConstructionZoneEvent) {
+    public void onConstructionZoneRemove(ConstructionZoneEventDelete deleteConstructionZoneEvent) {
         IConstructionZone zone = deleteConstructionZoneEvent.getZone();
         worldGuardHelper.removeProtection(zone);
     }

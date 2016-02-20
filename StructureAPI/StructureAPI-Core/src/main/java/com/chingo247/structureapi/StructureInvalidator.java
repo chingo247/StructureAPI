@@ -20,7 +20,7 @@ import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
-import com.chingo247.settlercraft.core.model.world.WorldNode;
+import com.chingo247.settlercraft.core.model.world.SCWorldNode;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.util.XXHasher;
 import com.chingo247.structureapi.model.RelTypes;
@@ -79,7 +79,7 @@ public class StructureInvalidator {
 
         try (Transaction tx = graph.beginTx()) {
             for (IWorld world : server.getWorlds()) {
-                WorldNode w = structureWorldRepository.findByUUID(world.getUUID());
+                SCWorldNode w = structureWorldRepository.findByUUID(world.getUUID());
                 if (w != null) {
                     Node n = w.getNode();
                     if (n.hasProperty(LOCK_DATA)) {
@@ -132,7 +132,7 @@ public class StructureInvalidator {
             params.put("worldId", world.getUUID().toString());
             params.put("date", date);
 
-            String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+            String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                     + " WITH world "
                     + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                     + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " > {date}"
@@ -187,7 +187,7 @@ public class StructureInvalidator {
             params.put("worldId", world.getUUID().toString());
             params.put("date", date);
 
-            String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+            String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                     + " WITH world "
                     + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                     + " WHERE s." + StructureNode.CREATED_AT_PROPERTY + " > {date}"

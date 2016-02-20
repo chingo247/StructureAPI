@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.model.plot;
 
-import com.chingo247.settlercraft.core.model.world.WorldNode;
+import com.chingo247.settlercraft.core.model.world.SCWorldNode;
 import com.chingo247.structureapi.model.RelTypes;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
@@ -48,14 +48,14 @@ public class PlotNode {
         this.underlyingNode = node;
     }
     
-    public WorldNode getWorldNode() {
+    public SCWorldNode getWorldNode() {
         if(!underlyingNode.hasRelationship(RelTypes.WITHIN, Direction.OUTGOING)) {
             return null;
         }
         Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
         for(Relationship rel : rels) {
-            if(rel.getOtherNode(underlyingNode).hasLabel(WorldNode.label())) {
-                WorldNode worldNode = new WorldNode(rel.getOtherNode(underlyingNode));
+            if(rel.getOtherNode(underlyingNode).hasLabel(SCWorldNode.label())) {
+                SCWorldNode worldNode = new SCWorldNode(rel.getOtherNode(underlyingNode));
                 return worldNode;
             }
         }
@@ -69,8 +69,8 @@ public class PlotNode {
     public UUID getWorldUUID() {
         Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
         for(Relationship rel : rels) {
-            if(rel.getOtherNode(underlyingNode).hasLabel(WorldNode.label())) {
-                WorldNode worldNode = new WorldNode(rel.getOtherNode(underlyingNode));
+            if(rel.getOtherNode(underlyingNode).hasLabel(SCWorldNode.label())) {
+                SCWorldNode worldNode = new SCWorldNode(rel.getOtherNode(underlyingNode));
                 return worldNode.getUUID();
             }
         }
@@ -146,8 +146,8 @@ public class PlotNode {
     public String getWorldName() {
         Iterable<Relationship> rels = underlyingNode.getRelationships(RelTypes.WITHIN, Direction.OUTGOING);
         for(Relationship rel : rels) {
-            if(rel.getOtherNode(underlyingNode).hasLabel(WorldNode.label())) {
-                WorldNode worldNode = new WorldNode(rel.getOtherNode(underlyingNode));
+            if(rel.getOtherNode(underlyingNode).hasLabel(SCWorldNode.label())) {
+                SCWorldNode worldNode = new SCWorldNode(rel.getOtherNode(underlyingNode));
                 return worldNode.getName();
             }
         }

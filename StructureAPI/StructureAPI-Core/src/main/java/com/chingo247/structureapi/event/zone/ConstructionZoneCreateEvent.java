@@ -22,9 +22,9 @@ import com.chingo247.structureapi.model.zone.IConstructionZone;
  *
  * @author Chingo
  */
-public class CreateConstructionZoneEvent extends ConstructionZoneEvent {
+public class ConstructionZoneCreateEvent extends ConstructionZoneEvent {
 
-    public CreateConstructionZoneEvent(IConstructionZone zone) {
+    public ConstructionZoneCreateEvent(IConstructionZone zone) {
         super(zone);
     }
     

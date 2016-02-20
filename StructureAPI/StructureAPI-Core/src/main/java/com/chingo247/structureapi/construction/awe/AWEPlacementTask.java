@@ -20,7 +20,6 @@ import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.task.ITaskStartedListener;
 import com.chingo247.structureapi.construction.task.StructurePlacingTask;
 import com.chingo247.structureapi.event.task.StructureTaskStartEvent;
-import com.chingo247.structureapi.event.async.StructureJobAddedEvent;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.placement.IPlacement;
 import com.sk89q.worldedit.EditSession;
@@ -30,6 +29,7 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
 import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
 import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.event.task.StructureTaskQueuedEvent;
 
 /**
  * AWE Placement task, places a placement by using AsyncWorldEdit. Note this
@@ -95,7 +95,7 @@ public class AWEPlacementTask extends StructurePlacingTask {
             public void onJobAdded(AWEJobEntry job) {
                 setJobId(job.getJobId());
                 AWEJobManager.getInstance().register(t);
-                StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureJobAddedEvent(getConstructionEntry().getStructure(), jobId, playerEntry));
+                StructureAPI.getInstance().getEventDispatcher().dispatchEvent(new StructureTaskQueuedEvent(AWEPlacementTask.this));
             }
 
             @Override

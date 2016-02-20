@@ -19,7 +19,6 @@ package com.chingo247.structureapi.event.structure.owner;
 import com.chingo247.structureapi.event.structure.StructureEvent;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.structure.Structure;
-import com.chingo247.structureapi.model.structure.StructureNode;
 import java.util.UUID;
 
 /**

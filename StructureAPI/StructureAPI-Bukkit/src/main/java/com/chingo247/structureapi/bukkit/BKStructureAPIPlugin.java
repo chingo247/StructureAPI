@@ -26,6 +26,7 @@ import com.chingo247.settlercraft.core.util.JarUtil;
 import com.chingo247.settlercraft.core.util.VersionUtil;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureInvalidator;
+import com.chingo247.structureapi.commands.ConstructionZoneCommands;
 import com.chingo247.structureapi.commands.SchematicCommands;
 import com.chingo247.structureapi.commands.SettlerCommands;
 import com.chingo247.structureapi.commands.StructureCommands;
@@ -197,6 +198,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
         cmdRegister.register(SchematicCommands.class);
         cmdRegister.register(StructureCommands.class);
         cmdRegister.register(SettlerCommands.class);
+        cmdRegister.register(ConstructionZoneCommands.class);
         cmdRegister.register(StructurePlanCommands.class);
     }
 

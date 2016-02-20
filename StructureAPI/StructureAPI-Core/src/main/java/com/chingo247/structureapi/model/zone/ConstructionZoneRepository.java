@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.model.zone;
 
 import com.chingo247.structureapi.model.AccessType;
-import com.chingo247.settlercraft.core.model.world.WorldNode;
+import com.chingo247.settlercraft.core.model.world.SCWorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.plot.PlotNode;
@@ -94,7 +94,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
         String query
-                = "MATCH ( world: " + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH ( world: " + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "
@@ -127,7 +127,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         Vector max = searchArea.getMaximumPoint();
 
         String query
-                = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "
