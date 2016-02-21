@@ -20,6 +20,7 @@ import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.menuapi.menu.CategoryMenu;
 import com.chingo247.settlercraft.core.SettlerCraft;
+import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IPlayer;
 import com.sk89q.minecraft.util.commands.Command;
@@ -75,6 +76,11 @@ public class StructurePlanCommands {
         if (!structureAPI.getConfig().isShopEnabled()) {
             throw new CommandException("Plan shop is not enabled");
         }
+        IEconomyProvider economyProvider = SettlerCraft.getInstance().getEconomyProvider();
+        if(economyProvider == null || !economyProvider.isEnabled()) {
+            throw new CommandException("No active economy plugin or economy plugin failed to register");
+        }
+        
         openMenu(structureAPI, (IPlayer) sender, false);
     }
     

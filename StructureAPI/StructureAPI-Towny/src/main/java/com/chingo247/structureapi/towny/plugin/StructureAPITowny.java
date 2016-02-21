@@ -9,6 +9,7 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.structureapi.towny.listener.TownListener;
 import com.chingo247.structureapi.towny.restriction.TownyRestriction;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.towny.listener.TownyDebugListener;
 import com.palmergames.bukkit.config.ConfigNodes;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.object.Coord;
@@ -42,7 +43,7 @@ public class StructureAPITowny extends JavaPlugin {
 
         SettlerCraft settlerCraft = SettlerCraft.getInstance();
 
-//        Bukkit.getPluginManager().registerEvents(new TownyDebugListener(), this);
+        Bukkit.getPluginManager().registerEvents(new TownyDebugListener(), this);
         Bukkit.getPluginManager().registerEvents(new TownListener(settlerCraft.getNeo4j(), settlerCraft.getExecutor()), this);
 
         if (TownySettings.getBoolean(ConfigNodes.NWS_PLOT_MANAGEMENT_REVERT_ENABLE)) {
