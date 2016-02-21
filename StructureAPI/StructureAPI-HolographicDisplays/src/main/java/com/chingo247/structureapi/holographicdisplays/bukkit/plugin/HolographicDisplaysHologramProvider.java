@@ -17,8 +17,8 @@
 package com.chingo247.structureapi.holographicdisplays.bukkit.plugin;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.structurecraft.platform.services.holograms.Hologram;
-import com.chingo247.structurecraft.platform.services.holograms.HologramsProvider;
+import com.chingo247.structureapi.platform.services.holograms.Hologram;
+import com.chingo247.structureapi.platform.services.holograms.HologramsProvider;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.world.World;

@@ -238,6 +238,12 @@ public class BlockStore implements IBlockStore {
                 throw new RuntimeException(ex);
             }
         }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Not supported");
+        }
+        
     }
 
 }
