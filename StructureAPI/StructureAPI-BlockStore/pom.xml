@@ -8,4 +8,14 @@
     </parent>
     <artifactId>StructureAPI-BlockStore</artifactId>
     <packaging>jar</packaging>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit-core</artifactId>
+            <version>6.0.2-3370</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
 </project>

@@ -6,6 +6,7 @@
 package com.chingo247.structureapi.blockstore;
 
 import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -47,6 +48,8 @@ public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion
      */
     int getChunkSize();
     
+    
+    
     /**
      * Gets the region for the given x and z coordinates.
      * Never returns null
@@ -55,5 +58,7 @@ public interface IBlockStore extends IBlockContainer, Iterable<IBlockStoreRegion
      * @return The region
      */
     IBlockStoreRegion getRegion(int x, int z);
+    
+    List<IBlockStoreRegion> getLoadedRegions();
     
 }

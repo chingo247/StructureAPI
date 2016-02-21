@@ -41,8 +41,7 @@ public class BlockStoreSection implements IBlockStoreSection {
     private byte[] data;
     private byte[] addId;
     private IBlockStoreChunk bsc;
-    
-    
+
     private boolean empty;
 
     protected BlockStoreSection(IBlockStoreChunk bsc, Map<String, Tag> sectionTagMap, int y, int sectionHeight) {
@@ -70,31 +69,6 @@ public class BlockStoreSection implements IBlockStoreSection {
         bsc.setTileEntityData(x, this.y + y, z, tag);
     }
 
-    private int getBlockId(int x, int y, int z) {
-        int index = getArrayIndex(x, y, z);
-        if ((index >> 1) >= addId.length) {
-            return getBlockIdA(x, y, z) & 0xFF;
-        }
-        return (getBlockIdA(x, y, z) & 0xFF) + (getBlockIdB(x, y, z) << 8);
-    }
-
-    private byte getBlockIdA(int x, int y, int z) {
-        int index = getArrayIndex(x, y, z);
-        return ids[index];
-    }
-
-    private int getBlockIdB(int x, int y, int z) {
-        return getNibble4(addId, getArrayIndex(x, y, z));
-    }
-
-    private int getData(int x, int y, int z) {
-        return getNibble4(data, getArrayIndex(x, y, z));
-    }
-
-    private int getNibble4(byte[] arr, int index) {
-        return index % 2 == 0 ? arr[index / 2] & 0x0F : (arr[index / 2] >> 4) & 0x0F;
-    }
-
     protected final int getArrayIndex(int x, int y, int z) {
         Vector2D size = bsc.getDimension();
         return (y * size.getBlockX() * size.getBlockZ()) + (z * size.getBlockX()) + x;
@@ -120,6 +94,25 @@ public class BlockStoreSection implements IBlockStoreSection {
         return getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ());
     }
 
+    public int getBlockId(int x, int y, int z) {
+        int index = getArrayIndex(x, y, z);
+        int id;
+        if ((index >> 1) >= addId.length) {
+            id = ids[index] & 0xFF;
+        } else {
+            if ((index & 1) == 0) {
+                id = (short) (((addId[index >> 1] & 0x0F) << 8) + (ids[index] & 0xFF));
+            } else {
+                id = (short) (((addId[index >> 1] & 0xF0) << 4) + (ids[index] & 0xFF));
+            }
+        }
+        return id;
+    }
+
+    public int getData(int x, int y, int z) {
+        return data[getArrayIndex(x, y, z)];
+    }
+
     @Override
     public BaseBlock getBlockAt(int x, int y, int z) {
         if (empty) {
@@ -127,15 +120,15 @@ public class BlockStoreSection implements IBlockStoreSection {
         }
         int id = getBlockId(x, y, z);
 
-        int data = getData(x, y, z);
+        int blockData = getData(x, y, z);
         CompoundTag tag = getTileEntityData(x, y, z);
 
-        if (id < 0 || data < 0) {
-            System.out.println("id: " + id + " data: " + data);
+        if (id < 0 || blockData < 0) {
+            System.out.println("id: " + id + " data: " + blockData);
             return null;
         }
 
-        return new BaseBlock(id, data, tag);
+        return new BaseBlock(id, blockData, tag);
     }
 
     public int numBlocks() {
@@ -159,7 +152,6 @@ public class BlockStoreSection implements IBlockStoreSection {
 
         int index = getArrayIndex(x, y, z);
         setDirty(true);
-        
 
         this.ids[index] = (byte) block.getType();
         this.data[index] = (byte) block.getData();
@@ -187,16 +179,16 @@ public class BlockStoreSection implements IBlockStoreSection {
     @Override
     public Map<String, Tag> serialize() {
         Map<String, Tag> rootMap = Maps.newHashMap();
-        
-        if(!isEmpty()) {
-            if(sectionHeight != BlockStoreRegion.DEFAULT_SIZE) {
-                rootMap.put("Height", new ShortTag((short)sectionHeight));
+
+        if (!isEmpty()) {
+            if (sectionHeight != BlockStoreRegion.DEFAULT_SIZE) {
+                rootMap.put("Height", new ShortTag((short) sectionHeight));
             }
-        
+
             rootMap.put("Blocks", new ByteArrayTag(ids));
             rootMap.put("Data", new ByteArrayTag(data));
-            
-            if(addId != null) {
+
+            if (addId != null) {
                 rootMap.put("AddId", new ByteArrayTag(addId));
             }
         }
