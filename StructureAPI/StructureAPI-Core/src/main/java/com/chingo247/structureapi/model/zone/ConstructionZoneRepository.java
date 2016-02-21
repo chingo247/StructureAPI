@@ -21,7 +21,6 @@ import com.chingo247.settlercraft.core.model.world.SCWorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.plot.PlotNode;
-import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.xplatform.core.ILocation;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.BlockVector;
@@ -67,7 +66,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         params.put("id", id);
 
         String query
-                = " MATCH (s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {id} })"
+                = " MATCH (s:" + ConstructionZoneNode.LABEL + " { " + ConstructionZoneNode.ID_PROPERTY + ": {id} })"
                 + " RETURN s as zone";
 
         Result result = graph.execute(query, params);
@@ -98,7 +97,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "
-                + " AND s." + ConstructionZoneNode.MAX_X_PROPERTY + " >= " + position.getBlockX() + " AND s." + ConstructionZoneNode.MIN_X_PROPERTY + " <= " + position.getBlockX()
+                + " s." + ConstructionZoneNode.MAX_X_PROPERTY + " >= " + position.getBlockX() + " AND s." + ConstructionZoneNode.MIN_X_PROPERTY + " <= " + position.getBlockX()
                 + " AND s." + ConstructionZoneNode.MAX_Y_PROPERTY + " >= " + position.getBlockY() + " AND s." + ConstructionZoneNode.MIN_Y_PROPERTY + " <= " + position.getBlockY()
                 + " AND s." + ConstructionZoneNode.MAX_Z_PROPERTY + " >= " + position.getBlockZ() + " AND s." + ConstructionZoneNode.MIN_Z_PROPERTY + " <= " + position.getBlockZ()
                 + " RETURN s as zone"
@@ -155,15 +154,15 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
     public Iterable<ConstructionZoneNode> findAll() {
         return NodeHelper.makeIterable(graph.findNodes(ConstructionZoneNode.label()), ConstructionZoneNode.class);
     }
-
+    
     @Override
-    public ConstructionZoneNode add(CuboidRegion region) {
+    public ConstructionZoneNode add(CuboidRegion region, AccessType accessType) {
         Vector min = region.getMinimumPoint();
         Vector max = region.getMaximumPoint();
         Node n = graph.createNode(PlotNode.plotLabel(), ConstructionZoneNode.label());
         n.setProperty(ConstructionZoneNode.ID_PROPERTY, nextId());
         ConstructionZoneNode zone = new ConstructionZoneNode(n);
-        zone.setAccessType(AccessType.PRIVATE);
+        zone.setAccessType(accessType);
         zone.setMinX(min.getBlockX());
         zone.setMinY(min.getBlockY());
         zone.setMinZ(min.getBlockZ());
@@ -171,6 +170,11 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         zone.setMaxY(max.getBlockY());
         zone.setMaxZ(max.getBlockZ());
         return zone;
+    }
+
+    @Override
+    public ConstructionZoneNode add(CuboidRegion region) {
+        return add(region, AccessType.PRIVATE);
     }
 
     @Override

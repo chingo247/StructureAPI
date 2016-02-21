@@ -152,10 +152,10 @@ public class StructureAPI implements IStructureAPI {
         return new ArrayList<>(restrictions);
     }
 
-    @Override
-    public IConstructionZonePlacerFactory getConstructionZonePlacerFactory() {
-        return constructionZonePlacerFactory;
-    }
+//    @Override
+//    public IConstructionZonePlacerFactory getConstructionZonePlacerFactory() {
+//        return constructionZonePlacerFactory;
+//    }
 
     @Override
     public GraphDatabaseService getGraphDatabase() {

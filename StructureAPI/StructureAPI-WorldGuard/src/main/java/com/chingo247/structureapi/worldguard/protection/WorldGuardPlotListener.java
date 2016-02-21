@@ -39,9 +39,9 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class WorldGuardPlotListener {
 
-    private final WorldGuardHelper worldGuardHelper;
+    private final WorldGuardProtection worldGuardHelper;
 
-    public WorldGuardPlotListener(WorldGuardHelper worldGuardHelper, GraphDatabaseService graph) {
+    public WorldGuardPlotListener(WorldGuardProtection worldGuardHelper, GraphDatabaseService graph) {
         this.worldGuardHelper = worldGuardHelper;
     }
 
@@ -49,77 +49,101 @@ public class WorldGuardPlotListener {
     public void onStructureCreate(StructureCreateEvent structureCreateEvent) {
         IStructure structure = structureCreateEvent.getStructure();
         ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
-        if(configProvider.isProtectStructures()) {
-             worldGuardHelper.protect(structure);
+        if (configProvider.isProtectStructures()) {
+            worldGuardHelper.protect(structure);
         }
     }
 
     @Subscribe
     public void onStructureRemove(StructureRemoveEvent structureRemoveEvent) {
         IStructure structure = structureRemoveEvent.getStructure();
-        worldGuardHelper.removeProtection(structure);
+        worldGuardHelper.removeProtection(structure, false);
     }
 
     @Subscribe
     public void onStructureAddOwner(StructureAddOwnerEvent addOwnerEvent) {
-        final UUID player = addOwnerEvent.getAddedOwner();
-        final OwnerType type = addOwnerEvent.getOwnerType();
-        final IStructure structure = addOwnerEvent.getStructure();
-        if (type == OwnerType.MEMBER) {
-            worldGuardHelper.addMember(player, structure);
-        } else {
-            worldGuardHelper.removeMember(player, structure);
-            worldGuardHelper.addOwner(player, structure);
+        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+
+        if (configProvider.isProtectStructures()) {
+            final UUID player = addOwnerEvent.getAddedOwner();
+            final OwnerType type = addOwnerEvent.getOwnerType();
+            final IStructure structure = addOwnerEvent.getStructure();
+            if (type == OwnerType.MEMBER) {
+                worldGuardHelper.addMember(player, structure);
+            } else {
+                worldGuardHelper.removeMember(player, structure);
+                worldGuardHelper.addOwner(player, structure);
+            }
         }
     }
 
     @Subscribe
     public void onStructureRemoveOwner(StructureRemoveOwnerEvent removeOwnerEvent) {
-        final UUID player = removeOwnerEvent.getRemovedOwner();
-        final OwnerType type = removeOwnerEvent.getOwnerType();
-        final IStructure structure = removeOwnerEvent.getStructure();
-        if (type == OwnerType.MEMBER) {
-            worldGuardHelper.removeMember(player, structure);
-        } else {
-            worldGuardHelper.removeOwner(player, structure);
+        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+
+        if (configProvider.isProtectStructures()) {
+            final UUID player = removeOwnerEvent.getRemovedOwner();
+            final OwnerType type = removeOwnerEvent.getOwnerType();
+            final IStructure structure = removeOwnerEvent.getStructure();
+            if (type == OwnerType.MEMBER) {
+                worldGuardHelper.removeMember(player, structure);
+            } else {
+                worldGuardHelper.removeOwner(player, structure);
+            }
         }
     }
 
-    @Subscribe
-    public void onConstructionZoneCreate(ConstructionZoneCreateEvent constructionZoneEvent) {
-        IConstructionZone zone = constructionZoneEvent.getZone();
-        worldGuardHelper.protect(zone);
-    }
-
-    @Subscribe
-    public void onConstructionZoneRemove(ConstructionZoneEventDelete deleteConstructionZoneEvent) {
-        IConstructionZone zone = deleteConstructionZoneEvent.getZone();
-        worldGuardHelper.removeProtection(zone);
-    }
-
-    @Subscribe
-    public void onConstructionZoneAddOwner(ConstructionZoneUpdateOwnerEvent constructionZoneUpdateOwnerEvent) {
-        final UUID player = constructionZoneUpdateOwnerEvent.getPlayer();
-        final OwnerType type = constructionZoneUpdateOwnerEvent.getOwnerType();
-        final IConstructionZone zone = constructionZoneUpdateOwnerEvent.getZone();
-        if (type == OwnerType.MEMBER) {
-            worldGuardHelper.addMember(player, zone);
-        } else {
-            worldGuardHelper.removeMember(player, zone);
-            worldGuardHelper.addOwner(player, zone);
-        }
-    }
-
-    @Subscribe
-    public void onConstructionZoneRemoveOwner(ConstructionZoneRemoveOwnerEvent removeOwnerEvent) {
-        final UUID player = removeOwnerEvent.getPlayer();
-        final OwnerType type = removeOwnerEvent.getType();
-        final IConstructionZone zone = removeOwnerEvent.getZone();
-        if (type == OwnerType.MEMBER) {
-            worldGuardHelper.removeMember(player, zone);
-        } else {
-            worldGuardHelper.removeOwner(player, zone);
-        }
-    }
+//    @Subscribe
+//    public void onConstructionZoneCreate(ConstructionZoneCreateEvent constructionZoneEvent) {
+//        IConstructionZone zone = constructionZoneEvent.getZone();
+//        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+//        if (configProvider.isProtectConstructionZones()) {
+//            worldGuardHelper.protect(zone);
+//        }
+//    }
+//
+//    @Subscribe
+//    public void onConstructionZoneRemove(ConstructionZoneEventDelete deleteConstructionZoneEvent) {
+//        IConstructionZone zone = deleteConstructionZoneEvent.getZone();
+//        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+//        if (configProvider.isProtectConstructionZones()) {
+//            worldGuardHelper.removeProtection(zone, false);
+//        }
+//    }
+//
+//    @Subscribe
+//    public void onConstructionZoneAddOwner(ConstructionZoneUpdateOwnerEvent constructionZoneUpdateOwnerEvent) {
+//        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+//
+//        if (configProvider.isProtectConstructionZones()) {
+//            final UUID player = constructionZoneUpdateOwnerEvent.getPlayer();
+//            final OwnerType type = constructionZoneUpdateOwnerEvent.getOwnerType();
+//            final IConstructionZone zone = constructionZoneUpdateOwnerEvent.getZone();
+//            if (type == OwnerType.MEMBER) {
+//                worldGuardHelper.addMember(player, zone);
+//            } else {
+//                worldGuardHelper.removeMember(player, zone);
+//                worldGuardHelper.addOwner(player, zone);
+//            }
+//        }
+//
+//        
+//    }
+//
+//    @Subscribe
+//    public void onConstructionZoneRemoveOwner(ConstructionZoneRemoveOwnerEvent removeOwnerEvent) {
+//        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+//        if (configProvider.isProtectConstructionZones()) {
+//            final UUID player = removeOwnerEvent.getPlayer();
+//            final OwnerType type = removeOwnerEvent.getType();
+//            final IConstructionZone zone = removeOwnerEvent.getZone();
+//            if (type == OwnerType.MEMBER) {
+//                worldGuardHelper.removeMember(player, zone);
+//            } else {
+//                worldGuardHelper.removeOwner(player, zone);
+//            }
+//        }
+//
+//    }
 
 }

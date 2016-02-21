@@ -14,10 +14,6 @@ structures:
     # NOTE rollback will only occur if a rollback file was made during construction of the structure
     demolish-is-rollback: true
 
-## Construction Zone Section
-constructionzones:
-    protected: true
-
 ## Menu Section
 menus:
     planmenu-enabled: true

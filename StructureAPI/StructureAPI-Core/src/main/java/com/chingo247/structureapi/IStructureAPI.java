@@ -62,7 +62,7 @@ public interface IStructureAPI {
     
     IStructurePlacerFactory getStructurePlacerFactory();
     
-    IConstructionZonePlacerFactory getConstructionZonePlacerFactory();
+//    IConstructionZonePlacerFactory getConstructionZonePlacerFactory();
     
     IAsyncWorldEditIntegration getAsyncWorldEditIntegration();
     

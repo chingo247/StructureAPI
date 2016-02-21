@@ -34,7 +34,6 @@ public class ConstructionZoneNode extends PlotNode {
     public static final String ACCESS_TYPE_PROPERTY = "ACCESS_TYPE"; // 
     public static final String WORLD_GUARD_REGION = "WGRegion";
     public static final String ID_PROPERTY = "ID";
-    private OwnerDomainNode ownerDomain;
     
     public static Label label() {
         return DynamicLabel.label(LABEL);
@@ -45,7 +44,7 @@ public class ConstructionZoneNode extends PlotNode {
     }
 
     public OwnerDomainNode getOwnerDomain() {
-        return ownerDomain;
+        return new OwnerDomainNode(underlyingNode);
     }
     
     public Long getId() {

@@ -16,6 +16,7 @@
  */
 package com.chingo247.structureapi.model.zone;
 
+import com.chingo247.structureapi.model.AccessType;
 import com.chingo247.xplatform.core.ILocation;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -42,6 +43,8 @@ public interface IConstructionZoneRepository {
     Iterable<? extends ConstructionZoneNode> findAll();
     
     ConstructionZoneNode add(CuboidRegion region);
+    
+    ConstructionZoneNode add(CuboidRegion region, AccessType accessType);
     
     void delete(long id);
     

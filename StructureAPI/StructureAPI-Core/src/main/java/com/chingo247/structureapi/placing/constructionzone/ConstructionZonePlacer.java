@@ -99,8 +99,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 }
                 
                 // Create the zone
-                ConstructionZoneNode zone = new ConstructionZoneNode(constructionZoneRepository.add(region).getNode());
-                zone.setAccessType(accessType);
+                ConstructionZoneNode zone = new ConstructionZoneNode(constructionZoneRepository.add(region, accessType).getNode());
                 
                 // Add zone to world
                 IStructureWorldRepository structureWorldRepository = new StructureWorldRepository(graph);
@@ -139,6 +138,9 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
                 placeResult.setZone(new ConstructionZone(zone));
 
                 tx.success();
+            } catch (ConstructionZoneException | ConstructionZoneRestrictionException ex) {
+                placeResult.setError(ex.getMessage());
+                placeResult.setZone(null); // ensure null
             } catch (Exception ex) {
                 if (tx != null) {
                     tx.failure();
@@ -152,7 +154,7 @@ public class ConstructionZonePlacer extends AbstractPlacer<IConstructionZonePlac
             }
 
 
-        } catch (ConstructionZoneException ex) {
+        } catch (ConstructionZoneException  ex) {
             placeResult.setError(ex.getMessage());
             placeResult.setZone(null); // ensure null
         }

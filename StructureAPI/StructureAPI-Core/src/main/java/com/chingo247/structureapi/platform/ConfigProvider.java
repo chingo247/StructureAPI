@@ -133,7 +133,7 @@ public class ConfigProvider {
         config.setRestrictedToZones(getValue(yamlp, "structures.restricted-to-zones", Boolean.class));
         config.setUseHolograms(getValue(yamlp, "structures.use-holograms", Boolean.class));
         config.setProtectStructures(getValue(yamlp, "structures.protected", Boolean.class));
-        config.setProtectConstructionZones(getValue(yamlp, "constructionzones.protected", Boolean.class));
+//        config.setProtectConstructionZones(getValue(yamlp, "constructionzones.protected", Boolean.class));
         config.setMenuEnabled(getValue(yamlp, "menus.planmenu-enabled", Boolean.class));
         config.setShopEnabled(getValue(yamlp, "menus.planshop-enabled", Boolean.class));
         config.setDemolishIsRollback(getValue(yamlp, "structures.demolish-is-rollback", Boolean.class));

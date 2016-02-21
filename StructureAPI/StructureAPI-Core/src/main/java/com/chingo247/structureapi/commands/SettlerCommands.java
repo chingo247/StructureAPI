@@ -20,7 +20,6 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
-import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
@@ -29,14 +28,9 @@ import com.chingo247.structureapi.model.settler.SettlerRepositiory;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.platform.permission.Permissions;
 import com.chingo247.xplatform.core.IColors;
-import com.chingo247.xplatform.core.ILocation;
 import com.chingo247.xplatform.core.IPlayer;
-import com.chingo247.xplatform.core.IWorld;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -48,7 +42,7 @@ public class SettlerCommands {
 
     @CommandPermissions(Permissions.SETTLER_ME)
     @CommandExtras(async = true, senderType = CommandSenderType.PLAYER)
-    @Command(aliases = {"settler:me"}, usage = "/settler:me", desc = "Display your settler id", max = 0)
+    @Command(aliases = {"settler:me", "settler:whoami"}, usage = "/settler:me", desc = "Display your settler id", max = 0)
     public static void me(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
         final IPlayer player = (IPlayer) sender;
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();

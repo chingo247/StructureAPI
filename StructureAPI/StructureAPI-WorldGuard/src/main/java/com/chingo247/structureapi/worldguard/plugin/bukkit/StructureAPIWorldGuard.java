@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.worldguard.plugin.bukkit;
 
-import com.chingo247.structureapi.worldguard.protection.WorldGuardHelper;
+import com.chingo247.structureapi.worldguard.protection.WorldGuardProtection;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,7 +42,7 @@ public class StructureAPIWorldGuard extends JavaPlugin {
         
         // Enable WorldGuard
         if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
-            WorldGuardHelper.getInstance().initialize();
+            WorldGuardProtection.getInstance().initialize();
         } else {
             System.out.println("[SettlerCraft-WorldGuard]: Couldn't find WorldGuard! Disabling SettlerCraft-WorldGuard");
             this.setEnabled(false);
