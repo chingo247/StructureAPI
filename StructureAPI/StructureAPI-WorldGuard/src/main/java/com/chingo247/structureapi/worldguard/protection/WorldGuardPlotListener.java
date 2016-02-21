@@ -16,6 +16,7 @@
  */
 package com.chingo247.structureapi.worldguard.protection;
 
+import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.event.structure.StructureCreateEvent;
 import com.chingo247.structureapi.event.structure.StructureRemoveEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureAddOwnerEvent;
@@ -27,6 +28,7 @@ import com.chingo247.structureapi.event.zone.ConstructionZoneEventDelete;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.platform.ConfigProvider;
 import com.google.common.eventbus.Subscribe;
 import java.util.UUID;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -37,16 +39,19 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class WorldGuardPlotListener {
 
-    private final WorldGuardPlotProtector worldGuardHelper;
+    private final WorldGuardHelper worldGuardHelper;
 
-    public WorldGuardPlotListener(WorldGuardPlotProtector worldGuardHelper, GraphDatabaseService graph) {
+    public WorldGuardPlotListener(WorldGuardHelper worldGuardHelper, GraphDatabaseService graph) {
         this.worldGuardHelper = worldGuardHelper;
     }
 
     @Subscribe
     public void onStructureCreate(StructureCreateEvent structureCreateEvent) {
         IStructure structure = structureCreateEvent.getStructure();
-        worldGuardHelper.protect(structure);
+        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+        if(configProvider.isProtectStructures()) {
+             worldGuardHelper.protect(structure);
+        }
     }
 
     @Subscribe

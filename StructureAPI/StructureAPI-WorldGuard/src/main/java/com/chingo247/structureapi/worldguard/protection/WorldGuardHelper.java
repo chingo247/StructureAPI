@@ -57,7 +57,9 @@ import java.util.Iterator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
+import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -69,7 +71,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-public class WorldGuardPlotProtector implements IPlotProtector {
+public class WorldGuardHelper implements IPlotProtector {
 
     private static final Label LABEL = DynamicLabel.label("WORLDGUARD_REGION");
     private static final String PREFIX = "SC_";
@@ -77,37 +79,32 @@ public class WorldGuardPlotProtector implements IPlotProtector {
     private static final String CONSTRUCTION_ZONE_PREFIX = PREFIX + "CZ_REG_";
     private static final String REGION_PROPERTY = "region";
     private static final String MSG_PREFIX = "[SettlerCraft-WorldGuard]: ";
-    
-    private static WorldGuardPlotProtector instance;
-    
-    private WorldGuardPlotProtector() {
+
+    private static WorldGuardHelper instance;
+
+    private WorldGuardHelper() {
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        try(Transaction tx = graph.beginTx()) {
+        try (Transaction tx = graph.beginTx()) {
             Neo4jHelper.createUniqueIndexIfNotExist(graph, LABEL, REGION_PROPERTY);
             tx.success();
         }
     }
-    
-    public static WorldGuardPlotProtector getInstance() {
-        if(instance == null) {
-            instance = new WorldGuardPlotProtector();
+
+    public static WorldGuardHelper getInstance() {
+        if (instance == null) {
+            instance = new WorldGuardHelper();
         }
         return instance;
     }
 
     /**
      * Protects a Structure with WorldGuard. Note this will have no effect if
-     * The config does not have the property 'structure.protected' to 'true'
      *
      * @param plot The structure to protect
      */
     @Override
     public synchronized void protect(IPlot plot) {
-        ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
-        if(!configProvider.isProtectStructures() && (plot instanceof IStructure)) {
-            return;
-        }
-        
+
         World world = Bukkit.getWorld(plot.getWorldName());
         CuboidRegion dimension = plot.getCuboidRegion();
         RegionManager mgr = getRegionManager(world);
@@ -131,7 +128,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
             OwnerDomainNode ownerDomain = new OwnerDomainNode(plot.getUnderlyingNode());
 
             for (Ownership owner : ownerDomain.getOwnerships()) {
-                
+
                 // Set privilages by type
                 BaseSettlerNode ownerNode = owner.getOwner();
                 OwnerType type = owner.getOwnerType();
@@ -151,6 +148,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
                 tx.failure();
             }
             Node worldGuardNode = graph.createNode(LABEL);
+            worldGuardNode.setProperty(REGION_PROPERTY, id);
             plot.getUnderlyingNode().createRelationshipTo(worldGuardNode, RelTypes.PROTECTED_BY);
             tx.success();
 
@@ -159,17 +157,16 @@ public class WorldGuardPlotProtector implements IPlotProtector {
 
     private String getRegionId(IPlot plot) {
         String regionId;
-        GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        try (Transaction tx = graph.beginTx()) {
-            if(plot instanceof IStructure) {
-                regionId = STRUCTURE_PREFIX + String.valueOf(((IStructure) plot).getId());
-            } else if (plot instanceof IConstructionZone) {
-                regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IConstructionZone) plot).getId());
-            } else {
-                regionId = UUID.randomUUID().toString();
-            }
-            tx.success();
+        if (plot instanceof IStructure) {
+            regionId = STRUCTURE_PREFIX + String.valueOf(((IStructure) plot).getId());
+        } else if (plot instanceof IConstructionZone) {
+            regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IConstructionZone) plot).getId());
+        } else {
+            regionId = UUID.randomUUID().toString();
         }
+        
+        System.out.println("GET REGION ID: " + regionId);
+        
         return regionId;
     }
 
@@ -179,7 +176,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         try (Transaction tx = graph.beginTx()) {
             // (a)-[:PROTECTED_BY]->(w:WORLDGUARD_REGION {region: a.WGRegion})
 
-            String query = "MATCH(s:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(:WORLDGUARD_REGION) "
+            String query = "MATCH(s:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]->(:WORLDGUARD_REGION) "
                     + "WHERE r IS NULL "
                     + "AND NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId() + " "
                     + "RETURN s";
@@ -204,7 +201,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
 
             @Override
             public void run() {
-                for(Iterator<Structure> sit = structures.iterator(); sit.hasNext();) {
+                for (Iterator<Structure> sit = structures.iterator(); sit.hasNext();) {
                     Structure s = sit.next();
                     protect(s);
                     System.out.println(MSG_PREFIX + "Protected structure #" + s.getId() + " with 'WorldGuard'");
@@ -214,14 +211,14 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         });
 
     }
-    
+
     private void processConstructionZonesWithoutRegion() {
         final List<ConstructionZone> zones = Lists.newArrayList();
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         try (Transaction tx = graph.beginTx()) {
             // (a)-[:PROTECTED_BY]->(w:WORLDGUARD_REGION {region: a.WGRegion})
 
-            String query = "MATCH(s:" + ConstructionZoneNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(:WORLDGUARD_REGION) "
+            String query = "MATCH(s:" + ConstructionZoneNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]->(:WORLDGUARD_REGION) "
                     + "WHERE r IS NULL "
                     + "RETURN s";
 
@@ -245,7 +242,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
 
             @Override
             public void run() {
-                for(Iterator<ConstructionZone> czit = zones.iterator(); czit.hasNext();) {
+                for (Iterator<ConstructionZone> czit = zones.iterator(); czit.hasNext();) {
                     ConstructionZone zone = czit.next();
                     protect(zone);
                     czit.remove();
@@ -270,34 +267,46 @@ public class WorldGuardPlotProtector implements IPlotProtector {
             try {
                 mgr.save();
             } catch (StorageException ex) {
-                Logger.getLogger(WorldGuardPlotProtector.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(WorldGuardHelper.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        Map<String,Object> params = Maps.newHashMap();
+
+        Map<String, Object> params = Maps.newHashMap();
         params.put("regionId", region);
-        
-        String query = "MATCH (wg:" + LABEL.name() + " { "+REGION_PROPERTY+": {regionId} }) "
-                     + "RETURN wg";
-        
+
+        String query = "MATCH (wg:" + LABEL.name() + " { " + REGION_PROPERTY + ": {regionId} }) "
+                + "RETURN wg";
+
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         Result r = graph.execute(query, params);
-        while(r.hasNext()) {
+        
+        
+        
+        while (r.hasNext()) {
             Node regionNode = (Node) r.next().get("wg");
-            for(Relationship rel : regionNode.getRelationships()) {
+            System.out.println("REMOVE REGION ID" + regionNode.getProperty(REGION_PROPERTY));
+            for (Relationship rel : regionNode.getRelationships()) {
                 rel.delete();
             }
             regionNode.delete();
         }
-        
+
     }
 
     @Override
     public boolean hasProtection(IPlot plot) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
-        String region = getRegionId(plot);
-        return mgr.hasRegion(region);
+        Relationship rel = plot.getUnderlyingNode().getSingleRelationship(RelTypes.PROTECTED_BY, Direction.OUTGOING);
+        if (rel != null) {
+            Node node = rel.getOtherNode(plot.getUnderlyingNode());
+            if (node.hasProperty(REGION_PROPERTY)) {
+                String region = (String) node.getProperty(REGION_PROPERTY);
+                return mgr.hasRegion(region);
+            } 
+        }
+
+        return false;
     }
 
     public void initialize() {
@@ -320,7 +329,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
                 try {
                     mgr.save();
                 } catch (StorageException ex) {
-                    Logger.getLogger(WorldGuardPlotProtector.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(WorldGuardHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -331,15 +340,19 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         RegionManager mgr = getRegionManager(world);
         String regionId = getRegionId(plot);
         ProtectedRegion region = mgr.getRegion(regionId);
+        System.out.println("ADD OWNER REGION: " + regionId);
         if (region != null) {
+            System.out.println("GET REGION: " + regionId);
             if (!region.getOwners().contains(player)) {
                 region.getOwners().addPlayer(player);
                 try {
                     mgr.save();
                 } catch (StorageException ex) {
-                    Logger.getLogger(WorldGuardPlotProtector.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(WorldGuardHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        } else {
+            System.out.println("REGION WAS NULL!");
         }
     }
 
@@ -348,13 +361,17 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         RegionManager mgr = getRegionManager(world);
         String regionId = getRegionId(plot);
         ProtectedRegion region = mgr.getRegion(regionId);
+        
+         System.out.println("REMOVE OWNER REGION: " + regionId);
         if (region != null) {
             region.getOwners().removePlayer(player);
             try {
                 mgr.save();
             } catch (StorageException ex) {
-                Logger.getLogger(WorldGuardPlotProtector.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(WorldGuardHelper.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } else {
+            
         }
     }
 
@@ -368,7 +385,7 @@ public class WorldGuardPlotProtector implements IPlotProtector {
             try {
                 mgr.save();
             } catch (StorageException ex) {
-                Logger.getLogger(WorldGuardPlotProtector.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(WorldGuardHelper.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -451,7 +468,6 @@ public class WorldGuardPlotProtector implements IPlotProtector {
         }
         return true;
     }
-    
 
     private void processInvalidStructures() {
 
@@ -474,7 +490,5 @@ public class WorldGuardPlotProtector implements IPlotProtector {
             tx.success();
         }
     }
-    
-    
 
 }

@@ -618,7 +618,7 @@ public class StructureCommands {
             }
 
             IPlayer ply;
-            if (playerArg.startsWith("#")) {
+            if (!playerArg.startsWith("#")) {
                 if (!isUniquePlayerName(playerArg, structureAPI)) {
                     throw new CommandException("Player name '" + playerArg + "' is not unique \n"
                             + "Use player id instead of name \n"
@@ -634,12 +634,14 @@ public class StructureCommands {
                 }
             } else {
                 Long id = null;
+                String idString = null;
                 try {
-                    id = Long.parseLong(playerArg);
+                    idString = playerArg.substring(1);
+                    id = Long.parseLong(idString);
                     BaseSettlerNode sn = settlerRepository.findById(id);
                     if (sn == null) {
                         tx.success();
-                        throw new CommandException("Couldn't find a player for id'" + playerArg + "'");
+                        throw new CommandException("Couldn't find a player for id'" + idString + "'");
                     }
                     ply = structureAPI.getPlatform().getPlayer(sn.getUniqueId());
 
@@ -653,7 +655,7 @@ public class StructureCommands {
                     } else {
                         error += "/stt:masters ";
                     }
-                    error += method + "#[settler-id] \nbut got '" + playerArg + "' after #";
+                    error += method + "#[settler-id] \nbut got '" + idString + "' after #";
                     throw new CommandException(error);
                 }
             }
@@ -662,17 +664,19 @@ public class StructureCommands {
             if (method.equalsIgnoreCase("add")) {
                 BaseSettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
-                IOwnership ownershipToAdd = ownerDomain.getOwnership(settler.getUniqueId());
+                IOwnership ownershipToUpdate = ownerDomain.getOwnership(settler.getUniqueId());
 
-                if (ownershipToAdd == null) {
+                if (ownershipToUpdate == null) {
                     ownerDomain.setOwnership(settler, type);
                     structureAPI.getEventDispatcher().dispatchEvent(new StructureAddOwnerEvent(uuid, new Structure(structureNode), type));
                     sender.sendMessage("Successfully added '" + colors.green() + ply.getName() + colors.reset() + "' to #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName() + colors.reset() + " as " + colors.yellow() + type.name());
+                    ply.sendMessage("Your ownership of #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName() + colors.reset() + " has been updated to " + colors.yellow() + type.name());
                 } else {
                     ownerDomain.setOwnership(settler, type);
                     structureAPI.getEventDispatcher().dispatchEvent(new StructureAddOwnerEvent(uuid, new Structure(structureNode), type));
                     sender.sendMessage("Updated ownership of '" + colors.green() + ply.getName() + colors.reset() + "' to " + colors.yellow() + type.name() + colors.reset() + " for structure ",
                             "#" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName());
+                    ply.sendMessage("Your ownership of #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName() + colors.reset() + " has been updated to " + colors.yellow() + type.name());
                 }
             } else { // remove
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
@@ -680,6 +684,7 @@ public class StructureCommands {
                     throw new CommandException(ply.getName() + " does not own this structure...");
                 }
                 structureAPI.getEventDispatcher().dispatchEvent(new StructureRemoveOwnerEvent(uuid, new Structure(structureNode), type));
+                ply.sendMessage("You are no longer a " + colors.yellow() + type.name() + colors.reset() + "of #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName());
                 sender.sendMessage("Successfully removed '" + colors.green() + ply.getName() + colors.reset() + "' from #" + colors.gold() + structureNode.getId() + " " + colors.blue() + structureNode.getName() + " as " + colors.yellow() + type.name());
             }
             tx.success();
