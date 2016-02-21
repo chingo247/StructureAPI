@@ -16,13 +16,7 @@
  */
 package com.chingo247.structureapi.updates;
 
-import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
-import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -64,7 +58,7 @@ public class StructureAPIModelUpdater implements IStructureAPIUpdate{
                 // Update add label 'PLOT' to Structure
                 graph.execute("MATCH (s:Structure) SET s:STRUCTURE:PLOT REMOVE s:Structure");
                 // Add property 'plotType' to structure
-                graph.execute("MATCH (s:STRUCTURE) SET s.plotType = 'Structure'");
+                graph.execute("MATCH (s:STRUCTURE) WHERE s.plotType IS NULL SET s.plotType = 'Structure'");
                 // Update 'World' to 'WORLD'
                 graph.execute("MATCH (w:World) SET w:WORLD REMOVE w:World");
                 // Update 'within' to 'WITHIN'
@@ -74,7 +68,7 @@ public class StructureAPIModelUpdater implements IStructureAPIUpdate{
                 // Update 'hasHologram' to 'HAS_HOLOGRAM'
                 graph.execute("MATCH (a:STRUCTURE_HOLOGRAM)<-[r:hasHologram]-(b:STRUCTURE) CREATE (a)<-[:HAS_HOLOGRAM]-(b) DELETE r");
                 // Update 'ownedBy' to 'OWNED_BY'
-                graph.execute("MATCH (a)<-[r:OwnedBy]-(b:STRUCTURE) CREATE (a)<-[:OWNED_BY]-(b) DELETE r");
+                graph.execute("MATCH (a)<-[r:OwnedBy]-(b:STRUCTURE) CREATE (a)<-[:OWNED_BY {Type: r.Type}]-(b) DELETE r");
                 
                 graph.execute("MATCH (a:STRUCTURE) "
                         +     "WHERE NOT a.WGRegion IS NULL AND NOT (a)-[:PROTECTED_BY]->(:WORLDGUARD_REGION)"

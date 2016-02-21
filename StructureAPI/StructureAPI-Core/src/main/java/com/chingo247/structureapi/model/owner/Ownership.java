@@ -51,9 +51,13 @@ public class Ownership implements IOwnership {
 
     @Override
     public OwnerType getOwnerType() {
-        Integer typeProp = (Integer) rel.getProperty("Type");
-        OwnerType t = OwnerType.match(typeProp);
-        return t;
+        if(rel.hasProperty("Type")) {
+            Integer typeProp = (Integer) rel.getProperty("Type");
+            OwnerType t = OwnerType.match(typeProp);
+            return t;
+        } else {
+            return null;
+        }
     }
 
     @Override

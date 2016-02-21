@@ -40,8 +40,10 @@ import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.contract.DemolitionContract;
 import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
+import com.chingo247.structureapi.model.owner.StructureOwnership;
 import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.platform.permission.Permissions;
+import com.chingo247.structureapi.util.StringUtil;
 import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.ILocation;
@@ -142,10 +144,10 @@ public class StructureCommands {
         line += colors.reset() + "Location: " + colors.yellow() + "X: " + colors.reset() + position.getX()
                 + " " + colors.yellow() + "Y: " + colors.reset() + position.getY()
                 + " " + colors.yellow() + "Z: " + colors.reset() + position.getZ() + "\n";
-        
+
         CuboidRegion region = structure.getCuboidRegion();
-        
-        line += colors.reset() + "Width: " + colors.yellow() + region.getWidth() + colors.reset() 
+
+        line += colors.reset() + "Width: " + colors.yellow() + region.getWidth() + colors.reset()
                 + " Height: " + colors.yellow() + region.getHeight() + colors.reset()
                 + " Length: " + colors.yellow() + region.getLength() + colors.reset() + "\n";
 
@@ -288,16 +290,15 @@ public class StructureCommands {
             structure = new Structure(sn);
             tx.success();
         }
-        
-        if(structure.getStatus() == ConstructionStatus.REMOVED) {
+
+        if (structure.getStatus() == ConstructionStatus.REMOVED) {
             throw new CommandException("Can't BUILD a REMOVED structure!");
         }
-        
-//        LOG.log(Level.INFO, "build in {0} ms", (System.currentTimeMillis() - start));
 
+//        LOG.log(Level.INFO, "build in {0} ms", (System.currentTimeMillis() - start));
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
-        
+
         BuildContract buildContract = new BuildContract();
         SafeContract safeContract = new SafeContract(buildContract);
         safeContract.setRecursive(true)
@@ -306,7 +307,7 @@ public class StructureCommands {
                 .setPlayer(uuid);
         structureAPI.getConstructionExecutor().submit(structure, safeContract);
     }
-    
+
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:rollback", "stt:rollback"}, desc = "Restores the area back to before the structure was placed", min = 1, max = 1, flags = "f")
@@ -338,26 +339,26 @@ public class StructureCommands {
             tx.success();
         }
 //        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
-        
-        if(structure.getStatus() == ConstructionStatus.REMOVED) {
+
+        if (structure.getStatus() == ConstructionStatus.REMOVED) {
             throw new CommandException("Can't ROLLBACK a REMOVED structure!");
         }
 
-        if(!structure.getRollbackData().hasBlockStore()) {
+        if (!structure.getRollbackData().hasBlockStore()) {
             throw new CommandException("Rollback not available for this structure");
         }
-        
+
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
-        
-        IContract rollbackContract =  new RollbackContract()
+
+        IContract rollbackContract = new RollbackContract()
                 .setRecursive(false)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
         structureAPI.getConstructionExecutor().submit(structure, rollbackContract);
-        
+
     }
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
@@ -395,28 +396,24 @@ public class StructureCommands {
 
             tx.success();
         }
-        
-        
-        if(structure.getStatus() == ConstructionStatus.REMOVED) {
+
+        if (structure.getStatus() == ConstructionStatus.REMOVED) {
             throw new CommandException("Can't DEMOLISH a REMOVED structure!");
         }
-        
-        
-//        LOG.log(Level.INFO, "demolish in {0} ms", (System.currentTimeMillis() - start));
 
+//        LOG.log(Level.INFO, "demolish in {0} ms", (System.currentTimeMillis() - start));
         // Use force?
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        
         IContract contract;
-        if(StructureAPI.getInstance().getConfig().isDemolishIsRollback() && structure.getRollbackData().hasBlockStore()) {
+        if (StructureAPI.getInstance().getConfig().isDemolishIsRollback() && structure.getRollbackData().hasBlockStore()) {
             contract = new RollbackContract();
         } else {
             contract = new SafeContract(new DemolitionContract());
-            
+
         }
-        
+
         contract.setRecursive(true)
                 .setRestrictive(true)
                 .setRecursive(false)
@@ -426,8 +423,6 @@ public class StructureCommands {
         structureAPI.getConstructionExecutor().submit(structure, contract);
 
     }
-    
-    
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
     @CommandExtras(async = true)
@@ -472,7 +467,7 @@ public class StructureCommands {
         // Stop current action
         String structureInfo = colors.reset() + ": #" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
         sender.sendMessage(colors.red() + "STOPPING" + structureInfo);
-        
+
         structureAPI.getConstructionExecutor().purge(structure);
 
     }
@@ -569,7 +564,7 @@ public class StructureCommands {
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         IColors colors = structureAPI.getPlatform().getChatColors();
         ISettlerRepository settlerRepository = new SettlerRepositiory(graph);
-        
+
         // Set help message
         String help;
         if (type == OwnerType.MASTER) {
@@ -579,7 +574,7 @@ public class StructureCommands {
         } else {
             help = "/structure:members [structureId] <add|remove> [playerName| #settler-id]";
         }
-        
+
         // Check argument lengths
         if (args.argsLength() < 3) {
             throw new CommandException("Too few arguments" + "\n" + help);
@@ -596,6 +591,11 @@ public class StructureCommands {
 
         try (Transaction tx = graph.beginTx()) {
             StructureNode structureNode = getStructure(args, tx);
+
+            if (structureNode.getStatus() == ConstructionStatus.REMOVED) {
+                throw new CommandException("Unable to perform command on a REMOVED structure");
+            }
+
             if (!isOP(sender)) {
                 IPlayer player = (IPlayer) sender;
                 IOwnership ownership = structureNode.getOwnerDomain().getOwnership(player.getUniqueId());
@@ -605,7 +605,7 @@ public class StructureCommands {
                     throw new CommandException("You don't own this structure");
                 }
 
-                if (ownership.getOwnerType().getTypeId() < type.getTypeId()) {
+                if (ownership.getOwnerType() != null && ownership.getOwnerType().getTypeId() < type.getTypeId()) {
                     tx.success();
                     throw new CommandException("You don't have enough privileges to " + method + " players of type '" + type.name() + "'");
                 }
@@ -648,9 +648,9 @@ public class StructureCommands {
                 } catch (NumberFormatException nfe) {
                     tx.success();
                     String error = "Expected ";
-                    if(type == OwnerType.MEMBER) {
+                    if (type == OwnerType.MEMBER) {
                         error += "/stt:members ";
-                    } else if(type == OwnerType.OWNER) {
+                    } else if (type == OwnerType.OWNER) {
                         error += "/stt:owners ";
                     } else {
                         error += "/stt:masters ";
@@ -690,19 +690,19 @@ public class StructureCommands {
             tx.success();
         }
     }
-    
+
     private static void ownerships(ICommandSender sender, CommandContext args, IStructureAPI structureAPI, OwnerType requestedType) throws CommandException {
         if (args.argsLength() == 1) {
             showOwnerships(sender, args, structureAPI, requestedType);
         } else {
             updateOwnership(sender, args, structureAPI, requestedType);
         }
-        
+
     }
 
     @CommandPermissions(Permissions.STRUCTURE_LIST)
     @CommandExtras(async = true)
-    @Command(aliases = {"structure:list", "stt:list"}, desc = "")
+    @Command(aliases = {"structure:list", "stt:list"}, usage = "stt:list <member|owner|master>", desc = "Displays a list of structure your are owner of")
     public static void list(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         final ISettlerRepository structureOwnerRepository = new SettlerRepositiory(graph);
@@ -759,7 +759,7 @@ public class StructureCommands {
             long totalStructures = structureOwner.getStructureCount();
 //            LOG.log(Level.INFO, "list count in {0} ms", (System.currentTimeMillis() - countStart));
             long totalPages = Math.round(Math.ceil(totalStructures / (MAX_LINES - 1)));
-            List<StructureNode> structures = structureOwner.getStructures(skip, limit);
+            List<StructureOwnership> structures = structureOwner.getStructures(skip, limit);
             if (p > totalPages || p < 0) {
                 tx.success();
                 throw new CommandException("Page " + p + " out of " + totalPages + "...");
@@ -768,15 +768,14 @@ public class StructureCommands {
             int lineNumber = 0;
             message[0] = "-----------(Page: " + p + "/" + totalPages + ", Structures: " + totalStructures + ")---------------";
             lineNumber++;
-            for (StructureNode structureNode : structures) {
-//                
-
+            for (StructureOwnership ownership : structures) {
                 String line;
-                double price = structureNode.getPrice();
+                StructureNode structure = ownership.getStructure();
+                double price = structure.getPrice();
                 if (price > 0.0d) {
-                    line = String.format("#%-1s%-10d%-3s%-40s%-15s%-1s%-5s", colors.gold(), structureNode.getId(), colors.blue(), structureNode.getName(), getStatusString(structureNode, colors), colors.yellow(), ShopUtil.valueString(price));
+                    line = String.format("#%-1s%-10d%-3s%-20s%-15s%-1s%-5s%-10s", colors.gold(), structure.getId(), colors.blue(), StringUtil.wrapString(structure.getName(), 20) + " ", getStatusString(structure, colors), colors.yellow(), ShopUtil.valueString(price), ownership.getOwnerType() != null ? colors.yellow() + ownership.getOwnerType() : "");
                 } else {
-                    line = String.format("#%-1s%-10d%-3s%-40s%-15s", colors.gold(), structureNode.getId(), colors.blue(), structureNode.getName(), getStatusString(structureNode, colors));
+                    line = String.format("#%-1s%-10d%-3s%-20s%-15s%-10s", colors.gold(), structure.getId(), colors.blue(), StringUtil.wrapString(structure.getName(), 20) + " ", getStatusString(structure, colors), ownership.getOwnerType() != null ? colors.yellow() + ownership.getOwnerType() : "");
                 }
 
                 message[lineNumber] = line;
