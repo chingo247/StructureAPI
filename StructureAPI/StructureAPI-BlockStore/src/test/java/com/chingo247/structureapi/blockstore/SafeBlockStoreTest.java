@@ -23,6 +23,9 @@
  */
 package com.chingo247.structureapi.blockstore;
 
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreWriter;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import java.io.File;
 import java.io.IOException;
@@ -37,16 +40,16 @@ import org.junit.Test;
  *
  * @author Chingo
  */
-public class BlockStoreTest {
+public class SafeBlockStoreTest {
 
-    private BlockStore smallBlockStore;
-    private BlockStore largeBlockStore;
+    private SafeBlockStore smallBlockStore;
+    private SafeBlockStore largeBlockStore;
     private static final String TEST_BASE = "temp_testing";
-    private static final String SMALL_PATH = TEST_BASE + "/blockstore/small";
-    private static final String LARGE_PATH = TEST_BASE + "/blockstore/large";
+    private static final String SMALL_PATH = TEST_BASE + "/safeblockstore/small";
+    private static final String LARGE_PATH = TEST_BASE + "/safeblockstore/large";
     
 
-    public BlockStoreTest() {
+    public SafeBlockStoreTest() {
     }
 
     @BeforeClass
@@ -73,8 +76,8 @@ public class BlockStoreTest {
         smallFile.mkdirs();
         largeFile.mkdirs();
 
-        smallBlockStore = new BlockStore(smallFile, 10, 10, 10);
-        largeBlockStore = new BlockStore(largeFile, 2048, 100, 2048);
+        smallBlockStore = new SafeBlockStore(smallFile, 10, 10, 10);
+        largeBlockStore = new SafeBlockStore(largeFile, 2048, 100, 2048);
     }
 
     private static void clear(File directory) {
@@ -115,6 +118,44 @@ public class BlockStoreTest {
         }
 
     }
+    
+    @Test
+    public void testAlreadySetBlocks() {
+        int mat = 8;
+        int data = 2;
+        
+        int otherMat = 9;
+        int otherData = 2;
+
+        for (int x = 0; x < smallBlockStore.getWidth(); x++) {
+            for (int z = 0; z < smallBlockStore.getLength(); z++) {
+                for (int y = 0; y < smallBlockStore.getHeight(); y++) {
+                    smallBlockStore.setBlockAt(x, y, z, new BaseBlock(mat, data));
+                }
+            }
+        }
+        
+        for (int x = 0; x < smallBlockStore.getWidth(); x++) {
+            for (int z = 0; z < smallBlockStore.getLength(); z++) {
+                for (int y = 0; y < smallBlockStore.getHeight(); y++) {
+                    smallBlockStore.setBlockAt(x, y, z, new BaseBlock(otherMat, otherData));
+                }
+            }
+        }
+        
+        for (int x = 0; x < smallBlockStore.getWidth(); x++) {
+            for (int z = 0; z < smallBlockStore.getLength(); z++) {
+                for (int y = 0; y < smallBlockStore.getHeight(); y++) {
+                    BaseBlock b = smallBlockStore.getBlockAt(x, y, z);
+                    Assert.assertNotNull(b);
+                    Assert.assertTrue(b.getId() == mat);
+                    Assert.assertTrue(b.getData() ==  data);
+                }
+            }
+        }
+
+    }
+    
 
     @Test(expected = IndexOutOfBoundsException.class)
     public void testSetBlocksOutOfBounds() {
@@ -169,7 +210,7 @@ public class BlockStoreTest {
             }
         }
 
-        BlockStoreWriter writer = new BlockStoreWriter();
+        SafeBlockStoreWriter writer = new SafeBlockStoreWriter();
         try {
             writer.save(smallBlockStore);
         } catch (IOException ex) {
@@ -177,7 +218,7 @@ public class BlockStoreTest {
         }
 
         try {
-            BlockStore blockstore = new BlockStoreReader().read(new File(SMALL_PATH));
+            BlockStore blockstore = new SafeBlockStoreReader().read(new File(SMALL_PATH));
             Assert.assertTrue(smallBlockStore.getName().equals(blockstore.getName()));
             Assert.assertTrue(smallBlockStore.getVersion().equals(blockstore.getVersion()));
             Assert.assertTrue(smallBlockStore.getWidth() == blockstore.getWidth());
