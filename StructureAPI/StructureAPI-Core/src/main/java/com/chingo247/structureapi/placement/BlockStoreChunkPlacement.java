@@ -18,10 +18,7 @@ package com.chingo247.structureapi.placement;
 
 import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
-import com.chingo247.structureapi.placement.options.BlockMask;
-import com.chingo247.structureapi.placement.options.BlockPredicate;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.chingo247.structureapi.util.WorldUtil;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;

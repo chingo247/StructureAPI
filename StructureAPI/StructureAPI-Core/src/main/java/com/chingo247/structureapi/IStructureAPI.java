@@ -43,14 +43,34 @@ import com.chingo247.structureapi.watchers.PhysicsWatch;
  */
 public interface IStructureAPI {
     
+    /**
+     * Gets the physics watcher
+     * @return The physics watcher
+     */
     PhysicsWatch getPhysicsWatcher();
     
+    /**
+     * Gets the graph database
+     * @return The graph database
+     */
     GraphDatabaseService getGraphDatabase();
     
+    /**
+     * Gets the event dispatcher
+     * @return The event dispatcher
+     */
     IEventDispatcher getEventDispatcher();
     
+    /**
+     * Gets the async eventbus
+     * @return The async eventbus
+     */
     EventBus getAsyncEventBus();
     
+    /**
+     * Gets the eventbus
+     * @return The eventbus 
+     */
     EventBus getEventBus();
     
     /**
@@ -60,10 +80,18 @@ public interface IStructureAPI {
      */
     IContractor getConstructionExecutor();
     
+    /**
+     * Gets the StructurePlacerFactory
+     * @return The StructurePlacerFactory
+     */
     IStructurePlacerFactory getStructurePlacerFactory();
     
 //    IConstructionZonePlacerFactory getConstructionZonePlacerFactory();
     
+    /**
+     * Gets the AsyncWordEditIntegration
+     * @return The asyncworldeidt integration
+     */
     IAsyncWorldEditIntegration getAsyncWorldEditIntegration();
     
     /**
@@ -171,10 +199,22 @@ public interface IStructureAPI {
      */
     void checkRestrictions(UUID player, String world, CuboidRegion region) throws StructureRestrictionException;
 
+    /**
+     * Adds a restriction, restrictions are checked before placing a structure
+     * @param structureRestriction The structure restriction to add
+     */
     void addRestriction(StructureRestriction structureRestriction);
     
+    /**
+     * Removed a StructureRestriction
+     * @param structureRestriction The restriction to remove
+     */
     void removeRestriction(StructureRestriction structureRestriction);
     
+    /**
+     * Gets current restrictions that are applied before structure placement
+     * @return The restrictions
+     */
     Iterable<StructureRestriction> getRestrictions();
     
     /**
@@ -185,17 +225,24 @@ public interface IStructureAPI {
      */
     SchematicPlacement loadSchematic(File schematicFile) throws IOException;
 
-    IWorldConfig loadOrGetConfig(String world);
+//    IWorldConfig loadOrGetConfig(String world);
 
     /**
      * Gets an AsyncEditSessionFactory
-     *
      * @return The AsyncEditSessionFactor
      */
     AsyncEditSessionFactory getSessionFactory();
     
+    /**
+     * Gets the ExecutorSerice (ThreadPool) which StructureAPI uses
+     * @return The ExecutorService
+     */
     ExecutorService getExecutor();
 
+    /**
+     * Gets the StructureAPI plugin
+     * @return The plugin
+     */
     IStructureAPIPlugin getPlugin();
     
 }

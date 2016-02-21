@@ -75,7 +75,10 @@ import org.neo4j.graphdb.Transaction;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 import com.chingo247.structureapi.construction.IContractor;
 import com.chingo247.structureapi.updates.StructureAPIModelUpdater;
+import com.chingo247.structureapi.util.WorldEditHelper;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.world.World;
 
 /**
  *
@@ -396,17 +399,22 @@ public class StructureAPI implements IStructureAPI {
 
     @Override
     public void checkRestrictions(UUID player, String world, CuboidRegion region) throws StructureRestrictionException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Player ply = WorldEditHelper.getPlayer(player);
+        World w = WorldEditHelper.getWorld(world);
+        for(StructureRestriction restriction : restrictions) {
+            restriction.check(ply, w, region, null);
+        }
     }
 
+    @Override
     public ExecutorService getExecutor() {
         return executor;
     }
 
-    @Override
-    public IWorldConfig loadOrGetConfig(String world) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+//    @Override
+//    public IWorldConfig loadOrGetConfig(String world) {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
 
     @Override
     public IStructureAPIPlugin getPlugin() {
