@@ -15,17 +15,16 @@ import com.chingo247.xplatform.core.IWorld;
  *
  * @author Chingo
  */
-class StructurePlacerFactory implements IStructurePlacerFactory {
+public class StructurePlacerFactory implements IStructurePlacerFactory {
 
-    private StructureAPI structureAPI;
+    private APlatform platform;
 
-    StructurePlacerFactory(StructureAPI structureAPI) {
-        this.structureAPI = structureAPI;
+    public StructurePlacerFactory(APlatform platform) {
+        this.platform = platform;
     }
 
     @Override
     public IStructurePlacer createPlacer(String worldName) {
-        APlatform platform = structureAPI.getPlatform();
         IWorld world = platform.getServer().getWorld(worldName);
         if (world == null) {
             throw new IllegalArgumentException("World with name '" + worldName + "' does not exist");

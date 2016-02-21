@@ -28,8 +28,6 @@ import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
 /**
  *
  * @author Chingo
- * @param <T> Options
- * @param <P> The placement
  */
 public abstract class AbstractAWEPlacement implements IPlacement {
     

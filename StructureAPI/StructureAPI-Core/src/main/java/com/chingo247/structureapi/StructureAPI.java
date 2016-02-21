@@ -265,7 +265,7 @@ public class StructureAPI implements IStructureAPI {
             reload();
             
             this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
-            this.structurePlacerFactory = new StructurePlacerFactory(this);
+            this.structurePlacerFactory = new StructurePlacerFactory(this.getPlatform());
             this.constructionExecutor = Contractor.getInstance();
             this.initialized = true;
         }
