@@ -29,7 +29,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.menu.StructurePlanItem;
 import com.chingo247.structureapi.plan.PlanGenerator;
 import com.chingo247.structureapi.platform.permission.Permissions;
 import com.sk89q.minecraft.util.commands.CommandPermissions;

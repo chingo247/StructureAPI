@@ -20,7 +20,7 @@ import com.chingo247.xplatform.core.AItemStack;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlatform;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structureapi.IStructureAPI;
-import static com.chingo247.structureapi.menu.StructurePlanItem.isStructurePlan;
+import static com.chingo247.structureapi.menus.plans.StructurePlanItem.isStructurePlan;
 import com.chingo247.structureapi.placing.PlayerPlacePlanAction;
 import com.chingo247.structureapi.placing.PlayerPlanPlacer;
 import com.google.common.base.Preconditions;

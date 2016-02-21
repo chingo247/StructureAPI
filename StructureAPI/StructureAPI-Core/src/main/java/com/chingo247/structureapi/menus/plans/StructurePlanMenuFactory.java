@@ -16,7 +16,7 @@
  */
 
 
-package com.chingo247.structureapi.menu;
+package com.chingo247.structureapi.menus.plans;
 
 import com.chingo247.menuapi.menu.CategoryMenu;
 import com.chingo247.menuapi.menu.DefaultCategoryMenu;
