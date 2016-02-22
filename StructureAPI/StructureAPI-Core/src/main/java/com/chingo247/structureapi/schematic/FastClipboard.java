@@ -85,7 +85,7 @@ public class FastClipboard {
 
     public BaseBlock getBlock(int x, int y, int z) {
         int index = (y * width * length) + z * width + x;
-        BaseBlock b = new BaseBlock(blockIds[index], data[index]);
+        BaseBlock b = new BaseBlock(blockIds[index], (short) data[index]);
 
         Map<String, Tag> tileMap = tileEntities.get(new BlockVector(x, y, z));
         if (tileMap != null) {
@@ -184,19 +184,6 @@ public class FastClipboard {
             
         }
 
-        // read data
-        byte[] blockData = new byte[data.length];
-        for (int index = 0; index < data.length; index++) {
-            if ((index >> 1) >= addId.length) { // No corresponding AddBlocks index
-                blockData[index] = (data[index]);
-            } else {
-                if ((index & 1) == 0) {
-                    blockData[index] = (byte) (((addId[index >> 1] & 0x0F) << 8) + (blockData[index]));
-                } else {
-                    blockData[index] = (byte) (((addId[index >> 1] & 0xF0) << 4) + (blockData[index]));
-                }
-            }
-        }
 
         // Need to pull out tile entities
         List<Tag> tileEntities = getChildTag(schematic, "TileEntities", ListTag.class)
@@ -248,7 +235,7 @@ public class FastClipboard {
             yAxisOffset = yAxisTag.getValue();
         }
         
-        return new FastClipboard(yAxisOffset, width, height, length, blockids, blockData, tileEntitiesMap);
+        return new FastClipboard(yAxisOffset, width, height, length, blockids, data, tileEntitiesMap);
     }
     
     
