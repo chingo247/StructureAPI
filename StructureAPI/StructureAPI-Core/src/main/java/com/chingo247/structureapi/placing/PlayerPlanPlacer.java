@@ -206,7 +206,7 @@ public class PlayerPlanPlacer {
                                             .setPlayer(playerUUID)
                                             .setRestrictive(true)
                                             .setRecursive(true);
-                                    structureAPI.getConstructionExecutor().submit(structure, safeContract);
+                                    structureAPI.getContractor().submit(structure, safeContract);
                                     
                                 } else {
                                     player.sendMessage(color.red() + "Your AWE queue is locked at the moment, try '/stt:build " + structure.getId() + "' when your queue is unlocked");

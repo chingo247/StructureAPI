@@ -30,10 +30,7 @@ import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
-import com.chingo247.structureapi.model.zone.ConstructionZone;
-import com.chingo247.structureapi.model.zone.ConstructionZoneNode;
 import com.chingo247.structureapi.model.zone.IConstructionZone;
-import com.chingo247.structureapi.platform.ConfigProvider;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -57,9 +54,7 @@ import java.util.Iterator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -176,6 +171,7 @@ public class WorldGuardProtection {
 
             String query = "MATCH(s:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]->(:WORLDGUARD_REGION) "
                     + "WHERE r IS NULL "
+                    + "AND NOT s.protectionExpired = true "
                     + "AND NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId() + " "
                     + "RETURN s";
 
@@ -251,7 +247,7 @@ public class WorldGuardProtection {
 //    }
 
  
-    public void removeProtection(IPlot plot, boolean inTransaction) {
+    public void removeProtection(IPlot plot, boolean inTransaction, boolean expire) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
         String region = getRegionId(plot);
@@ -281,6 +277,11 @@ public class WorldGuardProtection {
                     }
                     regionNode.delete();
                 }
+                
+                if(expire) {
+                    plot.getUnderlyingNode().setProperty("protectionExpired", true);
+                }
+                
                 tx.success();
             }
         } else {
@@ -291,6 +292,9 @@ public class WorldGuardProtection {
                         rel.delete();
                     }
                     regionNode.delete();
+                }
+                if(expire) {
+                    plot.getUnderlyingNode().setProperty("protectionExpired", true);
                 }
         }
     }
@@ -470,7 +474,7 @@ public class WorldGuardProtection {
             while (r.hasNext()) {
                 Node n = (Node) r.next().get("structure");
                 Structure structure = new Structure(n);
-                removeProtection(structure, true);
+                removeProtection(structure, true, false);
                 System.out.println("[SettlerCraft-WorldGuard]: Removed protection from structure #" + structure.getId() + " because it was removed");
             }
 

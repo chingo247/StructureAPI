@@ -46,7 +46,6 @@ import com.chingo247.structureapi.schematic.Schematic;
 import com.chingo247.structureapi.schematic.SchematicManager;
 import com.chingo247.structureapi.platform.ConfigProvider;
 import com.chingo247.structureapi.placing.structure.IStructurePlacerFactory;
-import com.chingo247.structureapi.platform.IStructureAPIPlugin;
 import com.chingo247.structureapi.exeption.StructureRestrictionException;
 import com.chingo247.xplatform.core.IColors;
 import com.google.common.base.Preconditions;
@@ -77,6 +76,7 @@ import com.chingo247.structureapi.construction.IContractor;
 import com.chingo247.structureapi.updates.StructureAPIModelUpdater;
 import com.chingo247.structureapi.util.WorldEditHelper;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
+import com.chingo247.xplatform.core.IPlugin;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.world.World;
 
@@ -103,7 +103,7 @@ public class StructureAPI implements IStructureAPI {
     private IConstructionZonePlacerFactory constructionZonePlacerFactory;
     private IContractor constructionExecutor;
    
-    private IStructureAPIPlugin plugin;
+    private IPlugin plugin;
     private ConfigProvider config;
     private StructurePlanMenuFactory planMenuFactory;
     
@@ -311,7 +311,7 @@ public class StructureAPI implements IStructureAPI {
     }
 
     @Override
-    public IContractor getConstructionExecutor() {
+    public IContractor getContractor() {
         return constructionExecutor;
     }
 
@@ -344,7 +344,7 @@ public class StructureAPI implements IStructureAPI {
         return planMenuFactory.createPlanMenu();
     }
 
-    public void registerStructureAPIPlugin(IStructureAPIPlugin plugin) throws StructureAPIException {
+    public void registerStructureAPIPlugin(IPlugin plugin) throws StructureAPIException {
         if (this.plugin != null) {
             throw new StructureAPIException("Already registered a Plugin for the StructureAPI, NOTE that this method should only be used by StructureAPI Plugin itself!");
         }
@@ -417,7 +417,7 @@ public class StructureAPI implements IStructureAPI {
 //    }
 
     @Override
-    public IStructureAPIPlugin getPlugin() {
+    public IPlugin getPlugin() {
         return plugin;
     }
 
@@ -440,7 +440,7 @@ public class StructureAPI implements IStructureAPI {
         @AllowConcurrentEvents
         public void onStructurePlansLoaded(StructurePlansLoadedEvent event) {
             planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
-            MenuAPI.getInstance().closeMenusWithTag(StructurePlanMenuFactory.PLAN_MENU_TAG);
+            MenuAPI.getInstance().closeMenusWithTag(StructurePlanMenuFactory.PLAN_MENU_TAG, "Server is reloading plans...");
             planMenuFactory.clearAll();
             for (IStructurePlan plan : StructurePlanManager.getInstance().getPlans()) {
                 planMenuFactory.load(plan);

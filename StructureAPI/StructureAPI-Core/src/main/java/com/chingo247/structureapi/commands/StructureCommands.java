@@ -305,7 +305,7 @@ public class StructureCommands {
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, safeContract);
+        structureAPI.getContractor().submit(structure, safeContract);
     }
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
@@ -357,7 +357,7 @@ public class StructureCommands {
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, rollbackContract);
+        structureAPI.getContractor().submit(structure, rollbackContract);
 
     }
 
@@ -420,7 +420,7 @@ public class StructureCommands {
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, contract);
+        structureAPI.getContractor().submit(structure, contract);
 
     }
 
@@ -468,7 +468,7 @@ public class StructureCommands {
         String structureInfo = colors.reset() + ": #" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
         sender.sendMessage(colors.red() + "STOPPING" + structureInfo);
 
-        structureAPI.getConstructionExecutor().purge(structure);
+        structureAPI.getContractor().purge(structure);
 
     }
 

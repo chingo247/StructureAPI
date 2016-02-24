@@ -57,7 +57,7 @@ public class WorldGuardPlotListener {
     @Subscribe
     public void onStructureRemove(StructureRemoveEvent structureRemoveEvent) {
         IStructure structure = structureRemoveEvent.getStructure();
-        worldGuardHelper.removeProtection(structure, false);
+        worldGuardHelper.removeProtection(structure, false, false);
     }
 
     @Subscribe

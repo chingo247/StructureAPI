@@ -31,16 +31,15 @@ import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreWriter;
 import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.placement.RotationalPlacement;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
 import com.chingo247.structureapi.placement.options.BlockMask;
 import com.chingo247.structureapi.placement.options.BlockPredicate;
-import com.chingo247.structureapi.platform.IStructureAPIPlugin;
 import com.chingo247.structureapi.util.WorldUtil;
 import com.chingo247.structureapi.util.iterator.CuboidIterator;
+import com.chingo247.xplatform.core.IPlugin;
 import com.chingo247.xplatform.core.IScheduler;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.BlockVector;
@@ -50,7 +49,6 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -206,7 +204,7 @@ public class SafeContract extends AContract {
 
         @Override
         protected void execute() {
-            final IStructureAPIPlugin plugin = StructureAPI.getInstance().getPlugin();
+            final IPlugin plugin = StructureAPI.getInstance().getPlugin();
             final IScheduler scheduler = plugin.getScheduler();
             final Vector position = getConstructionEntry().getStructure().getMin();
 

@@ -34,17 +34,16 @@ import com.chingo247.structureapi.commands.StructurePlanCommands;
 import com.chingo247.structureapi.exeption.StructureAPIException;
 import com.chingo247.structureapi.plan.PlanGenerator;
 import com.chingo247.structureapi.platform.ConfigProvider;
-import com.chingo247.structureapi.platform.IStructureAPIPlugin;
 import com.chingo247.structureapi.platform.permission.PermissionManager;
 import com.chingo247.structureapi.platform.services.holograms.StructureHologramManager;
 import com.chingo247.xplatform.core.APlatform;
+import com.chingo247.xplatform.core.IPlugin;
 import com.chingo247.xplatform.core.IScheduler;
 import com.chingo247.xplatform.platforms.bukkit.BukkitConsoleSender;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlatform;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlayer;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlugin;
 import com.chingo247.xplatform.platforms.bukkit.BukkitServer;
-import com.google.common.io.Files;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
@@ -70,7 +69,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
  *
  * @author Chingo
  */
-public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlugin {
+public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
 
     private static final String RESOURCES_PATH = "com/chingo247/resources/";
     public static final Level LOG_LEVEL = Level.SEVERE;
@@ -192,7 +191,6 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
     }
 
     private void registerCommands() {
-
         this.commands = new PluginCommandManager(StructureAPI.getInstance().getExecutor(), SettlerCraft.getInstance().getPlatform());
         CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         cmdRegister.register(SchematicCommands.class);
@@ -231,15 +229,6 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IStructureAPIPlu
         return true;
     }
 
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if(command.getName().equals("plans:give")) {
-            
-        }
-        return null;
-    }
-    
-    
 
     @Override
     public void onDisable() {
