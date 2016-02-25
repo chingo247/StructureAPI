@@ -24,7 +24,7 @@ import org.neo4j.graphdb.Relationship;
  * Defines a relation between a Structure and an (Structure)Owner. All operations in this class require an active transaction.
  * @author Chingo
  */
-public class Ownership implements IOwnership {
+public class Ownership {
     
     private final SettlerNode owner;
     private final Relationship rel;
@@ -34,22 +34,18 @@ public class Ownership implements IOwnership {
         this.rel = relation;
     }
     
-    @Override
     public Node getOtherNode() {
         return rel.getOtherNode(owner.getNode());
     }
 
-    @Override
     public void setOwnerType(OwnerType ownerType) {
         rel.setProperty("Type", ownerType.getTypeId()); 
     }
 
-    @Override
     public SettlerNode getOwner() {
         return owner;
     }
 
-    @Override
     public OwnerType getOwnerType() {
         if(rel.hasProperty("Type")) {
             Integer typeProp = (Integer) rel.getProperty("Type");
@@ -60,7 +56,6 @@ public class Ownership implements IOwnership {
         }
     }
 
-    @Override
     public Relationship getRelation() {
         return rel;
     }

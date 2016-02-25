@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.watchers;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  *
@@ -26,7 +26,7 @@ public class StructureBlockWatcher extends Watcher {
 
     public boolean watch(ICancellableBlockEvent blockEvent) {
         synchronized (mutex) {
-            for (IStructure structure : registered.values()) {
+            for (Structure structure : registered.values()) {
                 if (structure.getCuboidRegion().contains(blockEvent.getPosition())) {
                     blockEvent.cancel();
                     return true;

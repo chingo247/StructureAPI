@@ -5,15 +5,17 @@
  */
 package com.chingo247.structureapi.placing.constructionzone;
 
-import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.model.zone.ConstructionZone;
+import com.chingo247.structureapi.placing.IPlaceResult;
+
 
 /**
  *
  * @author Chingo
  */
-class ConstructionZonePlaceResult implements IConstructionZonePlaceResult {
+class ConstructionZonePlaceResult implements IPlaceResult<ConstructionZone> {
     
-    private IConstructionZone constructionZone;
+    private ConstructionZone constructionZone;
     private String error = null;
     
 
@@ -21,13 +23,13 @@ class ConstructionZonePlaceResult implements IConstructionZonePlaceResult {
         this.error = message;
     }
     
-    void setZone(IConstructionZone zone) {
+    void setZone(ConstructionZone zone) {
         this.constructionZone = zone;
     }
     
     
     @Override
-    public IConstructionZone getPlacedConstructionZone() {
+    public ConstructionZone getPlaced() {
         return constructionZone;
     }
 

@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.event.structure;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 
 /**
@@ -25,13 +25,13 @@ import com.chingo247.structureapi.model.structure.IStructure;
  */
 public class StructureEvent {
     
-    private final IStructure structure;
+    private final Structure structure;
 
-    public StructureEvent(IStructure structure) {
+    public StructureEvent(Structure structure) {
         this.structure = structure;
     }
 
-    public IStructure getStructure() {
+    public Structure getStructure() {
         return structure;
     }
     

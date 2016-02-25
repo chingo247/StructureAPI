@@ -18,13 +18,10 @@ package com.chingo247.structureapi;
 
 import com.chingo247.structureapi.exeption.StructureRestrictionException;
 import com.chingo247.menuapi.menu.CategoryMenu;
-import com.chingo247.settlercraft.core.event.IEventDispatcher;
+import com.chingo247.settlercraft.core.event.EventDispatcher;
 import com.chingo247.structureapi.placement.block.SchematicPlacement;
-import com.chingo247.structureapi.placing.constructionzone.IConstructionZonePlacerFactory;
 import com.chingo247.structureapi.plan.StructurePlanManager;
 import com.chingo247.structureapi.platform.ConfigProvider;
-import com.chingo247.structureapi.placing.structure.IStructurePlacerFactory;
-import com.chingo247.structureapi.platform.IStructureAPIPlugin;
 import com.chingo247.xplatform.core.APlatform;
 import com.google.common.eventbus.EventBus;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -36,6 +33,7 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 import com.chingo247.structureapi.construction.IContractor;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
+import com.chingo247.xplatform.core.IPlugin;
 
 /**
  *
@@ -59,7 +57,7 @@ public interface IStructureAPI {
      * Gets the event dispatcher
      * @return The event dispatcher
      */
-    IEventDispatcher getEventDispatcher();
+    EventDispatcher getEventDispatcher();
     
     /**
      * Gets the async eventbus
@@ -78,13 +76,13 @@ public interface IStructureAPI {
      *
      * @return The ConstructionManager
      */
-    IContractor getConstructionExecutor();
+    IContractor getContractor();
     
     /**
      * Gets the StructurePlacerFactory
      * @return The StructurePlacerFactory
      */
-    IStructurePlacerFactory getStructurePlacerFactory();
+    StructurePlacerFactory getStructurePlacerFactory();
     
 //    IConstructionZonePlacerFactory getConstructionZonePlacerFactory();
     
@@ -243,6 +241,6 @@ public interface IStructureAPI {
      * Gets the StructureAPI plugin
      * @return The plugin
      */
-    IStructureAPIPlugin getPlugin();
+    IPlugin getPlugin();
     
 }

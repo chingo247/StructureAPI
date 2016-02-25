@@ -18,29 +18,27 @@ package com.chingo247.structureapi.construction.contract;
 
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
-import com.chingo247.structureapi.construction.IContract;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.blockstore.safe.SafeBlockStore;
+import com.chingo247.blockstore.safe.SafeBlockStoreReader;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.construction.listener.ConstructionListener;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.model.structure.IRollbackData;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreWriter;
+import com.chingo247.blockstore.safe.SafeBlockStoreWriter;
 import com.chingo247.structureapi.construction.task.StructureTask;
+import com.chingo247.structureapi.model.structure.RollbackData;
 import com.chingo247.structureapi.placement.RotationalPlacement;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
 import com.chingo247.structureapi.placement.options.BlockMask;
 import com.chingo247.structureapi.placement.options.BlockPredicate;
-import com.chingo247.structureapi.platform.IStructureAPIPlugin;
 import com.chingo247.structureapi.util.WorldUtil;
 import com.chingo247.structureapi.util.iterator.CuboidIterator;
+import com.chingo247.xplatform.core.IPlugin;
 import com.chingo247.xplatform.core.IScheduler;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.BlockVector;
@@ -50,7 +48,6 @@ import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.PriorityQueue;
@@ -64,7 +61,7 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
  *
  * @author Chingo
  */
-public class SafeContract extends AContract {
+public class SafeContract extends Contract {
 
     private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger(SafeContract.class.getName());
 
@@ -72,13 +69,13 @@ public class SafeContract extends AContract {
     private static final int CHUNK_HEIGHT = 256;
     private static final int MAX_BLOCKS_PER_TASK = CHUNK_SIZE * CHUNK_SIZE * CHUNK_HEIGHT;
 
-    private IContract contract;
+    private Contract contract;
 
     /**
      * Constructor
      * @param contract The contract, may NOT inherit from RollbackContract
      */
-    public SafeContract(IContract contract) {
+    public SafeContract(Contract contract) {
         Preconditions.checkNotNull(contract, "contract may not be null");
         Preconditions.checkArgument(! (contract instanceof RollbackContract), "RollbackContract is not allowed!");
         this.contract = contract;
@@ -95,15 +92,15 @@ public class SafeContract extends AContract {
     }
 
     @Override
-    public void apply(IStructureEntry entry) throws StructureException {
-        IStructure structure = entry.getStructure();
+    public void apply(StructureEntry entry) throws StructureException {
+        Structure structure = entry.getStructure();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         IBlockPlacement placement = getPlacementProducer().produce(structure);
 
         CuboidRegion region = structure.getCuboidRegion();
 
         // Get or create rollback data
-        IRollbackData data = structure.getRollbackData();
+        RollbackData data = structure.getRollbackData();
         SafeBlockStore safeBlockStore;
         if (data.hasBlockStore()) {
             try {
@@ -117,7 +114,7 @@ public class SafeContract extends AContract {
         }
 
         // Create place areas...
-        IContract entryContract = entry.getContract();
+        Contract entryContract = entry.getContract();
         UUID player = entryContract.getPlayer();
         World world = entryContract.getEditSession().getWorld();
         EditSession editSession = entryContract.getEditSession();
@@ -195,7 +192,7 @@ public class SafeContract extends AContract {
          * @param safeBlockData The safe block data that will be used to save
          * @param callback
          */
-        public SafeTask(IStructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStore safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
+        public SafeTask(StructureEntry entry, UUID submitter, IBlockPlacement placement, World world, SafeBlockStore safeBlockStore, Iterator<Vector> traversal, int maxBlocks) {
             super(entry, submitter);
             this.world = world;
             this.traversal = traversal;
@@ -206,7 +203,7 @@ public class SafeContract extends AContract {
 
         @Override
         protected void execute() {
-            final IStructureAPIPlugin plugin = StructureAPI.getInstance().getPlugin();
+            final IPlugin plugin = StructureAPI.getInstance().getPlugin();
             final IScheduler scheduler = plugin.getScheduler();
             final Vector position = getConstructionEntry().getStructure().getMin();
 

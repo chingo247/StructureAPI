@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.IPlacement;
 
 /**
@@ -26,6 +26,6 @@ import com.chingo247.structureapi.placement.IPlacement;
  */
 public interface IPlacementProducer<T extends IPlacement> {
      
-    T produce(IStructure structure) throws StructureException;
+    T produce(Structure structure) throws StructureException;
     
 }

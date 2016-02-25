@@ -25,15 +25,11 @@ import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
-import com.chingo247.structureapi.model.plot.IPlot;
+import com.chingo247.structureapi.model.Spatial;
+import com.chingo247.structureapi.model.plot.Plot;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
-import com.chingo247.structureapi.model.structure.IStructure;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
-import com.chingo247.structureapi.model.zone.ConstructionZone;
-import com.chingo247.structureapi.model.zone.ConstructionZoneNode;
-import com.chingo247.structureapi.model.zone.IConstructionZone;
-import com.chingo247.structureapi.platform.ConfigProvider;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -57,9 +53,7 @@ import java.util.Iterator;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
@@ -102,7 +96,7 @@ public class WorldGuardProtection {
      *
      * @param plot The structure to protect
      */
-    public synchronized void protect(IPlot plot) {
+    public synchronized void protect(Plot plot) {
 
         World world = Bukkit.getWorld(plot.getWorldName());
         CuboidRegion dimension = plot.getCuboidRegion();
@@ -154,12 +148,12 @@ public class WorldGuardProtection {
         }
     }
 
-    private String getRegionId(IPlot plot) {
+    private String getRegionId(Spatial plot) {
         String regionId;
-        if (plot instanceof IStructure) {
-            regionId = STRUCTURE_PREFIX + String.valueOf(((IStructure) plot).getId());
-        } else if (plot instanceof IConstructionZone) {
-            regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IConstructionZone) plot).getId());
+        if (plot instanceof Structure) {
+            regionId = STRUCTURE_PREFIX + String.valueOf(((Structure) plot).getId());
+//        } else if (plot instanceof IConstructionZone) {
+//            regionId = CONSTRUCTION_ZONE_PREFIX + String.valueOf(((IConstructionZone) plot).getId());
         } else {
             regionId = UUID.randomUUID().toString();
         }
@@ -176,6 +170,7 @@ public class WorldGuardProtection {
 
             String query = "MATCH(s:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]->(:WORLDGUARD_REGION) "
                     + "WHERE r IS NULL "
+                    + "AND NOT s.protectionExpired = true "
                     + "AND NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId() + " "
                     + "RETURN s";
 
@@ -251,7 +246,7 @@ public class WorldGuardProtection {
 //    }
 
  
-    public void removeProtection(IPlot plot, boolean inTransaction) {
+    public void removeProtection(Plot plot, boolean inTransaction, boolean expire) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
         String region = getRegionId(plot);
@@ -281,6 +276,11 @@ public class WorldGuardProtection {
                     }
                     regionNode.delete();
                 }
+                
+                if(expire) {
+                    plot.getUnderlyingNode().setProperty("protectionExpired", true);
+                }
+                
                 tx.success();
             }
         } else {
@@ -291,6 +291,9 @@ public class WorldGuardProtection {
                         rel.delete();
                     }
                     regionNode.delete();
+                }
+                if(expire) {
+                    plot.getUnderlyingNode().setProperty("protectionExpired", true);
                 }
         }
     }
@@ -304,7 +307,7 @@ public class WorldGuardProtection {
 //        processConstructionZonesWithoutRegion();
     }
 
-    boolean addMember(UUID player, IPlot plot) {
+    boolean addMember(UUID player, Spatial plot) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
         String regionId = getRegionId(plot);
@@ -323,7 +326,7 @@ public class WorldGuardProtection {
         return true;
     }
 
-    boolean addOwner(UUID player, IPlot plot) {
+    boolean addOwner(UUID player, Spatial plot) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
         String regionId = getRegionId(plot);
@@ -342,7 +345,7 @@ public class WorldGuardProtection {
         return true;
     }
 
-    boolean removeOwner(UUID player, IPlot plot) {
+    boolean removeOwner(UUID player, Spatial plot) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
         String regionId = getRegionId(plot);
@@ -360,7 +363,7 @@ public class WorldGuardProtection {
         return false;
     }
 
-    boolean removeMember(UUID player, IPlot plot) {
+    boolean removeMember(UUID player, Spatial plot) {
         World world = Bukkit.getWorld(plot.getWorldName());
         RegionManager mgr = getRegionManager(world);
         String regionId = getRegionId(plot);
@@ -470,7 +473,7 @@ public class WorldGuardProtection {
             while (r.hasNext()) {
                 Node n = (Node) r.next().get("structure");
                 Structure structure = new Structure(n);
-                removeProtection(structure, true);
+                removeProtection(structure, true, false);
                 System.out.println("[SettlerCraft-WorldGuard]: Removed protection from structure #" + structure.getId() + " because it was removed");
             }
 

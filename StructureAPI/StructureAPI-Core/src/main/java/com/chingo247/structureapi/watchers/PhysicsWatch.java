@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.watchers;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  *
@@ -43,14 +43,14 @@ public class PhysicsWatch {
     public PhysicsWatch() {
     }
     
-    public void register(IStructure structure) {
+    public void register(Structure structure) {
 //        System.out.println("Register: " + structure.getId() + " " + structure.getName());
         for(BlockWatcher watcher : watchers) {
             watcher.register(structure);
         }
     }
     
-    public void unregister(IStructure structure) {
+    public void unregister(Structure structure) {
 //         System.out.println("Unregister: " + structure.getId() + " " + structure.getName());
         for(BlockWatcher watcher : watchers) {
             watcher.unregister(structure);
@@ -97,7 +97,7 @@ public class PhysicsWatch {
 
         public boolean watch(ICancellableBlockEvent blockEvent) {
             synchronized (mutex) {
-                for (IStructure structure : registered.values()) {
+                for (Structure structure : registered.values()) {
                     if (structure.getWorldName().equals(blockEvent.getWorld()) && structure.getCuboidRegion().contains(blockEvent.getPosition())) {
                         return true;
                     }

@@ -18,15 +18,12 @@ package com.chingo247.structureapi.commands;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
-import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.plan.StructurePlanManager;
 import com.chingo247.structureapi.IStructureAPI;
-import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.exeption.StructurePlanException;
 import com.chingo247.structureapi.placement.IPlacement;
 import com.chingo247.structureapi.placement.block.SchematicPlacement;
@@ -44,13 +41,10 @@ import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldedit.entity.Player;
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.math.NumberUtils;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
 
@@ -67,7 +61,7 @@ public class SchematicCommands {
     @Command(aliases = {"schematic:rotate"}, usage = "/schematic:rotate [structure-id][degrees]",desc = "Rotates a schematic of a structure, only affects future structures with the same schematic", min = 2, max = 2)
     public static void schematicRotate(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws CommandException {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final IStructureRepository structureRepository = new StructureRepository(graph);
+        final StructureRepository structureRepository = new StructureRepository(graph);
         final IColors COLOR = SettlerCraft.getInstance().getPlatform().getChatColors();
         final String usage = "/schematic:rotate [structure-id][degrees]";
         

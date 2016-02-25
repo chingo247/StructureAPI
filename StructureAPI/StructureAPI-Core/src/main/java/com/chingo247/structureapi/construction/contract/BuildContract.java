@@ -23,7 +23,7 @@ import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.placement.IPlacement;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.listener.BuildListener;
 import com.chingo247.structureapi.construction.producer.BuildPlacementProducer;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
@@ -35,7 +35,7 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
  *
  * @author Chingo
  */
-public class BuildContract extends AContract {
+public class BuildContract extends Contract {
     
     protected static final BlockPlacementProducer BUILD_PRODUCER = new BuildPlacementProducer();
     protected static final BuildListener BUILD_LISTENER = new BuildListener();
@@ -60,7 +60,7 @@ public class BuildContract extends AContract {
     
 
     @Override
-    public void apply(IStructureEntry entry) throws StructureException {
+    public void apply(StructureEntry entry) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = entry.getStructure().getMin(); // Always place from the min position... 

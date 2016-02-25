@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.construction.task;
 
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.event.task.StructureTaskCancelledEvent;
 import com.chingo247.structureapi.event.task.StructureTaskCompleteEvent;
@@ -32,12 +32,12 @@ import java.util.UUID;
  */
 public abstract class StructureTask {
 
-    private IStructureEntry structureEntry;
+    private StructureEntry structureEntry;
     private final UUID submitter, uuid;
     private boolean cancelled = false, failed = false, finished = false, started = false;
     private List<ITaskStartedListener> listeners;
 
-    public StructureTask(IStructureEntry constructionEntry, UUID submitter) {
+    public StructureTask(StructureEntry constructionEntry, UUID submitter) {
         Preconditions.checkNotNull(constructionEntry, "ConstructionEntry may not be null");
         Preconditions.checkNotNull(submitter, "Submitter may not be null");
         this.structureEntry = constructionEntry;
@@ -59,7 +59,7 @@ public abstract class StructureTask {
         return submitter;
     }
 
-    public final IStructureEntry getConstructionEntry() {
+    public final StructureEntry getConstructionEntry() {
         return structureEntry;
     }
 

@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.model.zone;
 
 import com.chingo247.structureapi.model.AccessType;
-import com.chingo247.settlercraft.core.model.world.SCWorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.NodeHelper;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.plot.PlotNode;
@@ -40,7 +40,7 @@ import org.neo4j.graphdb.Result;
  *
  * @author ching
  */
-public class ConstructionZoneRepository implements IConstructionZoneRepository {
+public class ConstructionZoneRepository {
 
     private final GraphDatabaseService graph;
 
@@ -59,7 +59,6 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         return id;
     }
 
-    @Override
     public ConstructionZoneNode findById(long id) {
         ConstructionZoneNode zone = null;
         Map<String, Object> params = Maps.newHashMap();
@@ -79,7 +78,6 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         return zone;
     }
 
-    @Override
     public ConstructionZoneNode findOnPosition(ILocation location) {
         return findOnPosition(
                 location.getWorld().getUUID(),
@@ -87,13 +85,12 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         );
     }
 
-    @Override
     public ConstructionZoneNode findOnPosition(UUID worldUUID, Vector position) {
         ConstructionZoneNode constructionZone = null;
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
         String query
-                = "MATCH ( world: " + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH ( world: " + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "
@@ -112,7 +109,6 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         return constructionZone;
     }
 
-    @Override
     public Collection<ConstructionZoneNode> findWithin(UUID worldUUID, CuboidRegion searchArea, int limit) {
         List<ConstructionZoneNode> zones = new ArrayList<>();
 
@@ -126,7 +122,7 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         Vector max = searchArea.getMaximumPoint();
 
         String query
-                = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + ConstructionZoneNode.LABEL + ")"
                 + " WHERE "
@@ -150,12 +146,10 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         return zones;
     }
 
-    @Override
     public Iterable<ConstructionZoneNode> findAll() {
         return NodeHelper.makeIterable(graph.findNodes(ConstructionZoneNode.label()), ConstructionZoneNode.class);
     }
     
-    @Override
     public ConstructionZoneNode add(CuboidRegion region, AccessType accessType) {
         Vector min = region.getMinimumPoint();
         Vector max = region.getMaximumPoint();
@@ -172,12 +166,10 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         return zone;
     }
 
-    @Override
     public ConstructionZoneNode add(CuboidRegion region) {
         return add(region, AccessType.PRIVATE);
     }
 
-    @Override
     public void delete(long id) {
         ConstructionZoneNode zone = findById(id);
         if (zone != null) {
@@ -185,7 +177,6 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         }
     }
 
-    @Override
     public void delete(ConstructionZoneNode zone) {
         Node n = zone.getNode();
         for(Relationship rel : n.getRelationships()) {
@@ -194,7 +185,6 @@ public class ConstructionZoneRepository implements IConstructionZoneRepository {
         n.delete();
     }
 
-    @Override
     public boolean hasWithin(UUID worldUUID, CuboidRegion searchArea) {
         return !findWithin(worldUUID, searchArea, 1).isEmpty();
     }

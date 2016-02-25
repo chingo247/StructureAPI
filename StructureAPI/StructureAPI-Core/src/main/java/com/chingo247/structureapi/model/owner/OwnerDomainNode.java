@@ -16,8 +16,8 @@
  */
 package com.chingo247.structureapi.model.owner;
 
+import com.chingo247.settlercraft.core.model.settler.BaseSettler;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
-import com.chingo247.settlercraft.core.model.settler.IBaseSettler;
 import com.chingo247.structureapi.model.Relations;
 import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.google.common.collect.Lists;
@@ -93,7 +93,7 @@ public class OwnerDomainNode {
     
     
     
-    public boolean removeOwnership(IBaseSettler settler) {
+    public boolean removeOwnership(BaseSettler settler) {
         return removeOwnership(settler.getUniqueId());
     }
     

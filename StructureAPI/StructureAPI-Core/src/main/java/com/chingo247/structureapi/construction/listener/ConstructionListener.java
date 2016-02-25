@@ -21,7 +21,7 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureScheduler;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.event.structure.StructureRemoveEvent;
 import com.chingo247.structureapi.event.structure.StructureStateChangeEvent;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
@@ -29,7 +29,7 @@ import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.xplatform.core.APlatform;
@@ -50,7 +50,7 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
 
     private static final Logger LOG = Logger.getLogger(ConstructionListener.class.getName());
 
-    protected void handleEntry(final IStructureEntry entry, final ConstructionStatus newStatus, final boolean isProgressUpdate, final String... messages) {
+    protected void handleEntry(final StructureEntry entry, final ConstructionStatus newStatus, final boolean isProgressUpdate, final String... messages) {
         StructureScheduler.getInstance().submit(entry.getStructure().getId(), new Runnable() {
             @Override
             public void run() {
@@ -148,7 +148,7 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
         
     }
 
-    protected Iterable<IPlayer> getPlayers(IStructure structure) {
+    protected Iterable<IPlayer> getPlayers(Structure structure) {
         List<IPlayer> players = Lists.newArrayList();
         OwnerDomainNode ownerDomainNode = new StructureNode(structure.getUnderlyingNode()).getOwnerDomain();
         APlatform platform = StructureAPI.getInstance().getPlatform();
@@ -162,7 +162,7 @@ public abstract class ConstructionListener implements com.chingo247.structureapi
         return players;
     }
 
-    protected String getStructureString(IStructure structure) {
+    protected String getStructureString(Structure structure) {
         IColors colors = StructureAPI.getInstance().getPlatform().getChatColors();
         return "#" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
     }

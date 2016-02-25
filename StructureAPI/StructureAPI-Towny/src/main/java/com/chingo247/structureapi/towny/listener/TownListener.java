@@ -6,9 +6,7 @@
 package com.chingo247.structureapi.towny.listener;
 
 import com.chingo247.structureapi.towny.plugin.StructureAPITowny;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
 import com.chingo247.structureapi.model.structure.StructureRepository;
-import com.chingo247.structureapi.model.world.StructureWorldRepository;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.event.NewTownEvent;
 import com.palmergames.bukkit.towny.event.TownClaimEvent;
@@ -42,7 +40,7 @@ import org.neo4j.graphdb.Transaction;
 public class TownListener implements Listener {
 
     private final GraphDatabaseService graph;
-    private final IStructureRepository structureRepository;
+    private final StructureRepository structureRepository;
 
     public TownListener(GraphDatabaseService graph, ExecutorService executor) {
         this.graph = graph;

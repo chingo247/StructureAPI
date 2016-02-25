@@ -19,10 +19,11 @@ package com.chingo247.structureapi.construction;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.construction.contract.Contract;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.RelTypes;
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
@@ -73,7 +74,7 @@ public class Contractor implements IContractor {
     /**
      * The StructureRepository for database operations
      */
-    private final IStructureRepository structureRepository;
+    private final StructureRepository structureRepository;
     /**
      * The structure entries
      */
@@ -104,7 +105,7 @@ public class Contractor implements IContractor {
         return instance;
     }
 
-    private StructureEntry getOrCreateEntry(IStructure structure, IContract plan) {
+    private StructureEntry getOrCreateEntry(Structure structure, Contract plan) {
         synchronized (entryMutex) {
             StructureEntry entry = entries.get(structure.getId());
             if (entry == null) {
@@ -115,7 +116,7 @@ public class Contractor implements IContractor {
         }
     }
 
-    private StructureEntry getEntry(IStructure structure) {
+    private StructureEntry getEntry(Structure structure) {
         synchronized (entryMutex) {
             return entries.get(structure.getId());
         }
@@ -127,7 +128,7 @@ public class Contractor implements IContractor {
      * @param contract
      */
     @Override
-    public void submit(final IStructure structure, final IContract constract) {
+    public void submit(final Structure structure, final Contract constract) {
         final APlatform platform = StructureAPI.getInstance().getPlatform();
         final IColors colors = platform.getChatColors();
         final IPlayer player = constract.getPlayer() != null ? platform.getPlayer(constract.getPlayer()) : null;
@@ -241,7 +242,7 @@ public class Contractor implements IContractor {
                                         }
 
                                         PhysicsWatch watcher = StructureAPI.getInstance().getPhysicsWatcher();
-                                        IStructureEntry startEntry = null;
+                                        StructureEntry startEntry = null;
                                         if (constract.isRecursive()) {
                                             StructureEntry prevEntry = null;
                                             try {
@@ -278,7 +279,7 @@ public class Contractor implements IContractor {
                                                 Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                                             }
                                         } else {
-                                            IStructureEntry entry = getOrCreateEntry(structure, constract);
+                                            StructureEntry entry = getOrCreateEntry(structure, constract);
 //                                            constract.registerListeners(entry);
                                             watcher.register(structure);
                                             
@@ -321,9 +322,9 @@ public class Contractor implements IContractor {
         });
     }
 
-    private void remove(Iterable<? extends IStructure> structures) {
+    private void remove(Iterable<? extends Structure> structures) {
         synchronized (entryMutex) {
-            for (IStructure structure : structures) {
+            for (Structure structure : structures) {
                 entries.remove(structure.getId());
             }
         }
@@ -339,12 +340,12 @@ public class Contractor implements IContractor {
     }
 
     @Override
-    public void remove(IStructureEntry entry) {
+    public void remove(StructureEntry entry) {
         remove(entry.getStructure().getId());
     }
 
     @Override
-    public void purge(final IStructure structure) {
+    public void purge(final Structure structure) {
         structurePool.execute(structure.getId(), new Runnable() {
 
             @Override

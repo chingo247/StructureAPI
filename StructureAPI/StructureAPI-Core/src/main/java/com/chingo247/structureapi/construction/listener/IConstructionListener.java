@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.construction.listener;
 
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 
 /**
  *
@@ -24,16 +24,16 @@ import com.chingo247.structureapi.construction.IStructureEntry;
  */
 public interface IConstructionListener {
 
-    void onStarted(IStructureEntry entry);
+    void onStarted(StructureEntry entry);
 
-    void onQueued(IStructureEntry entry);
+    void onQueued(StructureEntry entry);
 
-    void onComplete(IStructureEntry entry);
+    void onComplete(StructureEntry entry);
 
-    void onProgress(IStructureEntry entry);
+    void onProgress(StructureEntry entry);
 
-    void onCancelled(IStructureEntry entry);
+    void onCancelled(StructureEntry entry);
     
-    void onFailed(IStructureEntry entry);
+    void onFailed(StructureEntry entry);
 
 }

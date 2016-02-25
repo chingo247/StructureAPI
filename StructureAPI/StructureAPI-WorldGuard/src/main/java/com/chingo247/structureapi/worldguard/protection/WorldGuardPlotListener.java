@@ -21,13 +21,8 @@ import com.chingo247.structureapi.event.structure.StructureCreateEvent;
 import com.chingo247.structureapi.event.structure.StructureRemoveEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureAddOwnerEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureRemoveOwnerEvent;
-import com.chingo247.structureapi.event.zone.ConstructionZoneRemoveOwnerEvent;
-import com.chingo247.structureapi.event.zone.ConstructionZoneUpdateOwnerEvent;
-import com.chingo247.structureapi.event.zone.ConstructionZoneCreateEvent;
-import com.chingo247.structureapi.event.zone.ConstructionZoneEventDelete;
 import com.chingo247.structureapi.model.owner.OwnerType;
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.platform.ConfigProvider;
 import com.google.common.eventbus.Subscribe;
 import java.util.UUID;
@@ -47,7 +42,7 @@ public class WorldGuardPlotListener {
 
     @Subscribe
     public void onStructureCreate(StructureCreateEvent structureCreateEvent) {
-        IStructure structure = structureCreateEvent.getStructure();
+        Structure structure = structureCreateEvent.getStructure();
         ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
         if (configProvider.isProtectStructures()) {
             worldGuardHelper.protect(structure);
@@ -56,8 +51,8 @@ public class WorldGuardPlotListener {
 
     @Subscribe
     public void onStructureRemove(StructureRemoveEvent structureRemoveEvent) {
-        IStructure structure = structureRemoveEvent.getStructure();
-        worldGuardHelper.removeProtection(structure, false);
+        Structure structure = structureRemoveEvent.getStructure();
+        worldGuardHelper.removeProtection(structure, false, false);
     }
 
     @Subscribe
@@ -67,7 +62,7 @@ public class WorldGuardPlotListener {
         if (configProvider.isProtectStructures()) {
             final UUID player = addOwnerEvent.getAddedOwner();
             final OwnerType type = addOwnerEvent.getOwnerType();
-            final IStructure structure = addOwnerEvent.getStructure();
+            final Structure structure = addOwnerEvent.getStructure();
             if (type == OwnerType.MEMBER) {
                 worldGuardHelper.addMember(player, structure);
             } else {
@@ -84,7 +79,7 @@ public class WorldGuardPlotListener {
         if (configProvider.isProtectStructures()) {
             final UUID player = removeOwnerEvent.getRemovedOwner();
             final OwnerType type = removeOwnerEvent.getOwnerType();
-            final IStructure structure = removeOwnerEvent.getStructure();
+            final Structure structure = removeOwnerEvent.getStructure();
             if (type == OwnerType.MEMBER) {
                 worldGuardHelper.removeMember(player, structure);
             } else {

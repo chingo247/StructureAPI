@@ -13,3 +13,12 @@ StructureAPI/nb-configuration.xml
 StructureAPI/StructureAPI-Towny/nbactions.xml
 StructureAPI/StructureAPI-Bukkit/StructureCraft-Bukkit.iml
 StructureAPI/StructureAPI-WorldGuard/SettlerCraft-WorldGuard.iml
+StructureAPI/StructureAPI-BlockStore/StructureAPI-BlockStore.iml
+StructureAPI/StructureAPI-Bukkit/StructureAPI-Bukkit.iml
+StructureAPI/StructureAPI-Core/StructureAPI-Core.iml
+StructureAPI/StructureAPI-HolographicDisplays/StructureAPI-HolographicDisplays.iml
+StructureAPI/StructureAPI-Towny/StructureAPI-Towny.iml
+StructureAPI/StructureAPI-WorldGuard/StructureAPI-WorldGuard.iml
+StructureAPI/StructureAPI.iml
+StructureAPI/StructureAPI.ipr
+StructureAPI/StructureAPI.iws

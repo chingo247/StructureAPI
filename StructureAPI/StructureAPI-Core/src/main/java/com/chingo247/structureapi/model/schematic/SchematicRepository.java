@@ -30,7 +30,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-public class SchematicRepository implements ISchematicRepository {
+public class SchematicRepository {
     
     private final GraphDatabaseService graph;
 
@@ -38,7 +38,6 @@ public class SchematicRepository implements ISchematicRepository {
         this.graph = graph;
     }
     
-    @Override
     public SchematicDataNode findByHash(long hash) {
         SchematicDataNode node = null;
         try(Transaction tx = graph.beginTx()) {
@@ -57,7 +56,6 @@ public class SchematicRepository implements ISchematicRepository {
         return node;
     }
     
-    @Override
     public Collection<SchematicDataNode> findBeforeDate(long date) {
         List<SchematicDataNode> schematics = Lists.newArrayList();
         try(Transaction tx = graph.beginTx()) {
@@ -76,7 +74,6 @@ public class SchematicRepository implements ISchematicRepository {
         return schematics;
     }
     
-    @Override
     public Collection<SchematicDataNode> findAfterDate(long date) {
         List<SchematicDataNode> schematics = Lists.newArrayList();
         try(Transaction tx = graph.beginTx()) {
@@ -95,7 +92,6 @@ public class SchematicRepository implements ISchematicRepository {
         return schematics;
     }
     
-    @Override
     public void addSchematic(String name, long xxhash64, int width, int height, int length, int axis, long importDate) {
         Node n = graph.createNode(SchematicDataNode.LABEL);
         n.setProperty(SchematicDataNode.NAME_PROPERTY, name);

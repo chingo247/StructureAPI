@@ -36,7 +36,7 @@ import org.neo4j.graphdb.Node;
  * None of the opertions of this class have to be executed within a transaction
  * @author Chingo
  */
-public class Structure extends Plot implements IStructure {
+public class Structure extends Plot  {
     
     
     private Long id;
@@ -46,7 +46,6 @@ public class Structure extends Plot implements IStructure {
     private double price;
     private Direction direction;
     
-    private CuboidRegion cuboidRegion;
     private Date completedAt;
     private Date createdAt;
     private Date deletedAt;
@@ -62,7 +61,6 @@ public class Structure extends Plot implements IStructure {
         this.origin = structure.getOrigin();
         this.status = structure.getStatus();
         this.price = structure.getPrice();
-        this.cuboidRegion = structure.getCuboidRegion();
         this.direction = structure.getDirection();
         this.deletedAt = structure.getDeletedAt();
         this.createdAt = structure.getCreatedAt();
@@ -76,7 +74,6 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The id of the structure
      */
-    @Override
     public Long getId() {
         return id;
     }
@@ -86,7 +83,6 @@ public class Structure extends Plot implements IStructure {
      *
      * @return
      */
-    @Override
     public String getName() {
         return name;
     }
@@ -96,18 +92,8 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The position
      */
-    @Override
     public Vector getOrigin() {
         return origin;
-    }
-
-    /**
-     * The region this structure overlaps
-     * @return The region
-     */
-    @Override
-    public CuboidRegion getCuboidRegion() {
-        return cuboidRegion;
     }
 
     /**
@@ -115,7 +101,6 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The value/price of this structure
      */
-    @Override
     public double getPrice() {
         return price;
     }
@@ -124,7 +109,6 @@ public class Structure extends Plot implements IStructure {
      * Gets the direction in which this structure is oriented
      * @return the direction
      */
-    @Override
     public Direction getDirection() {
         return direction;
     }
@@ -143,14 +127,11 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The date of completion
      */
-    @Override
     public Date getCompletedAt() {
         return completedAt;
     }
     
-    public Vector getSize() {
-        return cuboidRegion.getMaximumPoint().subtract(cuboidRegion.getMinimumPoint()).add(Vector.ONE);
-    }
+    
 
     /**
      * Gets when this structure was created
@@ -166,12 +147,10 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The date of removal
      */
-    @Override
     public Date getDeletedAt() {
         return deletedAt;
     }
 
-    @Override
     public ConstructionStatus getStatus() {
         return status;
     }
@@ -185,7 +164,6 @@ public class Structure extends Plot implements IStructure {
      * @param offset The offset
      * @return the location
      */
-    @Override
     public Vector translateRelativeLocation(Vector offset) {
         Vector p = WorldUtil.translateLocation(getOrigin(), getDirection(), offset.getX(), offset.getY(), offset.getZ());
         return new Vector(p.getBlockX(), p.getBlockY(), p.getBlockZ());
@@ -196,7 +174,6 @@ public class Structure extends Plot implements IStructure {
      * @param worldPosition The worldposition
      * @return The relative position
      */
-    @Override
     public Vector getRelativePosition(Vector worldPosition) {
         switch (getDirection()) {
             case NORTH:
@@ -233,7 +210,6 @@ public class Structure extends Plot implements IStructure {
      *
      * @return The directory
      */
-    @Override
     public final File getDirectory() {
         IWorld world = StructureAPI.getInstance().getPlatform().getServer().getWorld(getWorldUUID());
         
@@ -241,7 +217,6 @@ public class Structure extends Plot implements IStructure {
         return new File(worldStructureFolder, String.valueOf(getId()));
     }
 
-    @Override
     public IStructurePlan getStructurePlan() throws StructurePlanException {
         File planFile = new File(getDirectory(), "structureplan.xml");
         if(!planFile.exists()) {
@@ -255,8 +230,7 @@ public class Structure extends Plot implements IStructure {
     }
 
 
-    @Override
-    public IRollbackData getRollbackData() {
+    public RollbackData getRollbackData() {
         return new RollbackData(this);
     }
 

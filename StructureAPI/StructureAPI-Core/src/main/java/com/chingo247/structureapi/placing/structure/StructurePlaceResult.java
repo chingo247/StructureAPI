@@ -5,19 +5,19 @@
  */
 package com.chingo247.structureapi.placing.structure;
 
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.google.common.base.Preconditions;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.placing.IPlaceResult;
 
 /**
  *
  * @author Chingo
  */
-public class StructurePlaceResult implements IStructurePlaceResult {
+public class StructurePlaceResult implements IPlaceResult<Structure> {
     
-    private IStructure structure = null;
+    private Structure structure = null;
     private String errorMessage  = null;
     
-    void setStructure(IStructure structure) {
+    void setStructure(Structure structure) {
         this.structure = structure;
     }
     
@@ -26,7 +26,7 @@ public class StructurePlaceResult implements IStructurePlaceResult {
     }
 
     @Override
-    public IStructure getPlacedStructure() {
+    public Structure getPlaced() {
         return structure;
     }
 

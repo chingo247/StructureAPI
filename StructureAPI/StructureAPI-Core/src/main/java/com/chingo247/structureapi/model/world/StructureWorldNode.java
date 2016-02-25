@@ -6,7 +6,7 @@
 package com.chingo247.structureapi.model.world;
 
 import com.chingo247.structureapi.model.structure.StructureNode;
-import com.chingo247.settlercraft.core.model.world.SCWorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.zone.ConstructionZoneNode;
 import org.neo4j.graphdb.Node;
@@ -15,7 +15,7 @@ import org.neo4j.graphdb.Relationship;
 /**
  * @author Chingo
  */
-public class StructureWorldNode extends SCWorldNode  {
+public class StructureWorldNode extends WorldNode  {
 
     public StructureWorldNode(Node worldNode) {
         super(worldNode);

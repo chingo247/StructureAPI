@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.event.structure;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 
 /**
@@ -25,7 +25,7 @@ import com.chingo247.structureapi.model.structure.IStructure;
  */
 public class StructureRemoveEvent extends StructureEvent {
 
-    public StructureRemoveEvent(IStructure structure) {
+    public StructureRemoveEvent(Structure structure) {
         super(structure);
     }
     

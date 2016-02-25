@@ -28,7 +28,7 @@ import java.util.UUID;
 import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
 import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.event.task.StructureTaskQueuedEvent;
 
 /**
@@ -60,7 +60,7 @@ public class AWEPlacementTask extends StructurePlacingTask {
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, IStructureEntry structureEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, StructureEntry structureEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
         super(structureEntry, playerOrRandomUUID);
         this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;

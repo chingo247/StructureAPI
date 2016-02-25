@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.event.zone;
 
 import com.chingo247.structureapi.model.owner.OwnerType;
-import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.model.zone.ConstructionZone;
 import java.util.UUID;
 
 /**
@@ -29,7 +29,7 @@ public class ConstructionZoneRemoveOwnerEvent extends ConstructionZoneEvent {
     private UUID player;
     private OwnerType type;
 
-    public ConstructionZoneRemoveOwnerEvent(IConstructionZone zone, UUID player, OwnerType type) {
+    public ConstructionZoneRemoveOwnerEvent(ConstructionZone zone, UUID player, OwnerType type) {
         super(zone);
         
         this.type = type;

@@ -23,23 +23,21 @@ import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
 import com.chingo247.structureapi.event.structure.owner.StructureAddOwnerEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureRemoveOwnerEvent;
-import com.chingo247.structureapi.model.owner.IOwnership;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
-import com.chingo247.structureapi.model.settler.ISettlerRepository;
-import com.chingo247.structureapi.model.settler.SettlerRepositiory;
+import com.chingo247.structureapi.model.settler.SettlerRepository;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.construction.IContract;
+import com.chingo247.structureapi.construction.contract.Contract;
 import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.contract.DemolitionContract;
 import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
+import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.owner.StructureOwnership;
 import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.platform.permission.Permissions;
@@ -305,7 +303,7 @@ public class StructureCommands {
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, safeContract);
+        structureAPI.getContractor().submit(structure, safeContract);
     }
 
     @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
@@ -351,13 +349,13 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        IContract rollbackContract = new RollbackContract()
+        Contract rollbackContract = new RollbackContract()
                 .setRecursive(false)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, rollbackContract);
+        structureAPI.getContractor().submit(structure, rollbackContract);
 
     }
 
@@ -406,7 +404,7 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        IContract contract;
+        Contract contract;
         if (StructureAPI.getInstance().getConfig().isDemolishIsRollback() && structure.getRollbackData().hasBlockStore()) {
             contract = new RollbackContract();
         } else {
@@ -420,7 +418,7 @@ public class StructureCommands {
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
-        structureAPI.getConstructionExecutor().submit(structure, contract);
+        structureAPI.getContractor().submit(structure, contract);
 
     }
 
@@ -468,7 +466,7 @@ public class StructureCommands {
         String structureInfo = colors.reset() + ": #" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
         sender.sendMessage(colors.red() + "STOPPING" + structureInfo);
 
-        structureAPI.getConstructionExecutor().purge(structure);
+        structureAPI.getContractor().purge(structure);
 
     }
 
@@ -492,7 +490,7 @@ public class StructureCommands {
 
     private static StructureNode getStructure(CommandContext args, Transaction activeTransaction) throws CommandException {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final IStructureRepository structureRepository = new StructureRepository(graph);
+        final StructureRepository structureRepository = new StructureRepository(graph);
         Long structureId = null;
         String structureIdArg = args.getString(0);
         if (!NumberUtils.isNumber(structureIdArg)) {
@@ -563,7 +561,7 @@ public class StructureCommands {
     private static void updateOwnership(ICommandSender sender, CommandContext args, IStructureAPI structureAPI, OwnerType type) throws CommandException {
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         IColors colors = structureAPI.getPlatform().getChatColors();
-        ISettlerRepository settlerRepository = new SettlerRepositiory(graph);
+        SettlerRepository settlerRepository = new SettlerRepository(graph);
 
         // Set help message
         String help;
@@ -598,7 +596,7 @@ public class StructureCommands {
 
             if (!isOP(sender)) {
                 IPlayer player = (IPlayer) sender;
-                IOwnership ownership = structureNode.getOwnerDomain().getOwnership(player.getUniqueId());
+                Ownership ownership = structureNode.getOwnerDomain().getOwnership(player.getUniqueId());
 
                 if (ownership == null) {
                     tx.success();
@@ -664,7 +662,7 @@ public class StructureCommands {
             if (method.equalsIgnoreCase("add")) {
                 BaseSettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
-                IOwnership ownershipToUpdate = ownerDomain.getOwnership(settler.getUniqueId());
+                Ownership ownershipToUpdate = ownerDomain.getOwnership(settler.getUniqueId());
 
                 if (ownershipToUpdate == null) {
                     ownerDomain.setOwnership(settler, type);
@@ -705,7 +703,7 @@ public class StructureCommands {
     @Command(aliases = {"structure:list", "stt:list"}, usage = "stt:list <member|owner|master>", desc = "Displays a list of structure your are owner of")
     public static void list(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final ISettlerRepository structureOwnerRepository = new SettlerRepositiory(graph);
+        final SettlerRepository structureOwnerRepository = new SettlerRepository(graph);
         final IColors colors = structureAPI.getPlatform().getChatColors();
 
         int page = 0;
@@ -792,7 +790,7 @@ public class StructureCommands {
     @Command(aliases = {"structure:location", "stt:location"}, desc = "")
     public static void location(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final IStructureRepository structureRepository = new StructureRepository(graph);
+        final StructureRepository structureRepository = new StructureRepository(graph);
         final IColors colors = structureAPI.getPlatform().getChatColors();
         final IPlayer player = (IPlayer) sender;
 

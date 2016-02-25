@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.construction.listener;
 
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.util.Progress;
 import com.chingo247.xplatform.core.APlatform;
@@ -30,7 +30,7 @@ import com.chingo247.xplatform.core.IColors;
 public class DemolitionListener extends ConstructionListener {
 
     @Override
-    public void onComplete(IStructureEntry structureEntry) {
+    public void onComplete(StructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String[] message = new String[]{
@@ -41,7 +41,7 @@ public class DemolitionListener extends ConstructionListener {
     }
 
     @Override
-    public void onCancelled(IStructureEntry structureEntry) {
+    public void onCancelled(StructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String message = getStructureString(structureEntry.getStructure()) + colors.red() + " DEMOLITION CANCELLED" ;
@@ -49,7 +49,7 @@ public class DemolitionListener extends ConstructionListener {
     }
 
     @Override
-    public void onStarted(IStructureEntry structureEntry) {
+    public void onStarted(StructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String message = getStructureString(structureEntry.getStructure()) + colors.yellow() + " DEMOLISHING";
@@ -57,7 +57,7 @@ public class DemolitionListener extends ConstructionListener {
     }
 
     @Override
-    public void onQueued(IStructureEntry structureEntry) {
+    public void onQueued(StructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String message = getStructureString(structureEntry.getStructure())  + colors.reset() + " QUEUED";
@@ -65,7 +65,7 @@ public class DemolitionListener extends ConstructionListener {
     }
 
     @Override
-    public void onProgress(IStructureEntry structureEntry) {
+    public void onProgress(StructureEntry structureEntry) {
         if (structureEntry.hasProgress() && structureEntry.getProgress() < 100.0) {
             APlatform platform = StructureAPI.getInstance().getPlatform();
             IColors colors = platform.getChatColors();
@@ -75,7 +75,7 @@ public class DemolitionListener extends ConstructionListener {
     }
 
     @Override
-    public void onFailed(IStructureEntry structureEntry) {
+    public void onFailed(StructureEntry structureEntry) {
         APlatform platform = StructureAPI.getInstance().getPlatform();
         IColors colors = platform.getChatColors();
         String message = getStructureString(structureEntry.getStructure()) + colors.red() + " FAILED";

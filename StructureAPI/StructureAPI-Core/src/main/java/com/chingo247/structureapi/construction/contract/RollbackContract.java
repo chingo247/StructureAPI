@@ -18,19 +18,19 @@ package com.chingo247.structureapi.construction.contract;
 
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
-import com.chingo247.structureapi.blockstore.IBlockStoreRegion;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreRegion;
+import com.chingo247.blockstore.IBlockStoreChunk;
+import com.chingo247.blockstore.IBlockStoreRegion;
+import com.chingo247.blockstore.safe.SafeBlockStore;
+import com.chingo247.blockstore.safe.SafeBlockStoreReader;
+import com.chingo247.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.listener.ConstructionListener;
 import com.chingo247.structureapi.construction.listener.RollbackListener;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.BlockStoreChunkPlacement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
@@ -44,7 +44,7 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
  *
  * @author Chingo
  */
-public class RollbackContract extends AContract {
+public class RollbackContract extends Contract {
 
     protected static final ConstructionListener ROLLBACK__LISTENER = new RollbackListener();
 
@@ -62,13 +62,13 @@ public class RollbackContract extends AContract {
     }
 
     @Override
-    public void apply(IStructureEntry entry) throws StructureException {
+    public void apply(StructureEntry entry) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector structureMin = entry.getStructure().getMin(); // Always place from the min position... 
         entry.addListener(ROLLBACK__LISTENER);
 
-        IStructure structure = entry.getStructure();
+        Structure structure = entry.getStructure();
         File blockStoreFile = structure.getRollbackData().getBlockStoreDirectory();
 
         if (!blockStoreFile.exists()) {

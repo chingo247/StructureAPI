@@ -6,8 +6,6 @@
 package com.chingo247.structureapi;
 
 import com.chingo247.structureapi.placing.structure.StructurePlacer;
-import com.chingo247.structureapi.placing.structure.IStructurePlacer;
-import com.chingo247.structureapi.placing.structure.IStructurePlacerFactory;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IWorld;
 
@@ -15,7 +13,7 @@ import com.chingo247.xplatform.core.IWorld;
  *
  * @author Chingo
  */
-public class StructurePlacerFactory implements IStructurePlacerFactory {
+public class StructurePlacerFactory  {
 
     private APlatform platform;
 
@@ -23,8 +21,7 @@ public class StructurePlacerFactory implements IStructurePlacerFactory {
         this.platform = platform;
     }
 
-    @Override
-    public IStructurePlacer createPlacer(String worldName) {
+    public StructurePlacer createPlacer(String worldName) {
         IWorld world = platform.getServer().getWorld(worldName);
         if (world == null) {
             throw new IllegalArgumentException("World with name '" + worldName + "' does not exist");

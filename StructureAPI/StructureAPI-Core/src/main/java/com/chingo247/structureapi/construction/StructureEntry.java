@@ -16,10 +16,11 @@
  */
 package com.chingo247.structureapi.construction;
 
+import com.chingo247.structureapi.construction.contract.Contract;
 import com.chingo247.structureapi.construction.listener.IConstructionListener;
 import com.chingo247.structureapi.construction.task.ITaskStartedListener;
 import com.chingo247.structureapi.construction.task.StructureTask;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.util.ProgressChecker;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -32,22 +33,22 @@ import java.util.Queue;
  *
  * @author Chingo
  */
-public class StructureEntry implements IStructureEntry {
+public class StructureEntry  {
     
-    private IStructure structure;
+    private Structure structure;
     private IContractor constractor;
     private StructureEntry nextEntry;
     private StructureEntry prevEntry;
     private StructureTask currentTask;
     private Queue<StructureTask> tasks;
-    private IContract contract;
+    private Contract contract;
     private int total = 0, done = 0;
     private List<IConstructionListener> listeners;
     private double reportableProgress;
     private boolean firstQueue = true, firstStarted = true;
     private ProgressChecker checker;
 
-    protected StructureEntry(IContractor constractor, IStructure structure, IContract contract) {
+    protected StructureEntry(IContractor constractor, Structure structure, Contract contract) {
         Preconditions.checkNotNull(structure, "Structure may not be null!");
         this.tasks = new LinkedList<>();
         this.structure = structure;
@@ -68,25 +69,21 @@ public class StructureEntry implements IStructureEntry {
         return reportableProgress;
     }
     
-    @Override
-    public void update(IStructure structure) {
+    public void update(Structure structure) {
         if(!structure.getId().equals(this.structure.getId())) {
             throw new IllegalArgumentException("Structure id does not match with current structure!");
         }
         this.structure = structure;
     }
     
-    @Override
-    public IContract getContract() {
+    public Contract getContract() {
         return contract;
     }
 
-    @Override
     public IContractor getConstructionExecutor() {
         return constractor;
     }
 
-    @Override
     public void addTask(StructureTask task) {
         this.tasks.add(task);
         total++;
@@ -103,7 +100,6 @@ public class StructureEntry implements IStructureEntry {
         nextEntry.setPrevEntry(this);
     }
 
-    @Override
     public double getProgress() {
         if (done == 0) {
             return 0.0; // Never divide by zero...
@@ -121,8 +117,7 @@ public class StructureEntry implements IStructureEntry {
         }
     }
 
-    @Override
-    public IStructure getStructure() {
+    public Structure getStructure() {
         return structure;
     }
 
@@ -137,12 +132,10 @@ public class StructureEntry implements IStructureEntry {
         firstStarted = true;
     }
 
-    @Override
     public void addListener(IConstructionListener listener) {
         this.listeners.add(listener);
     }
 
-    @Override
     public void proceed() {
 
         // If it was cancelled or has failed... abort all
@@ -218,7 +211,6 @@ public class StructureEntry implements IStructureEntry {
     /**
      * Stops running tasks, clears existing ones.
      */
-    @Override
     public void purge() {
         if (currentTask != null && !currentTask.isCancelled()) {
             currentTask.cancel();
@@ -245,17 +237,14 @@ public class StructureEntry implements IStructureEntry {
         }
     }
 
-    @Override
     public boolean hasNextTask() {
         return tasks.peek() != null;
     }
 
-    @Override
     public int numTasks() {
         return tasks.size();
     }
 
-    @Override
     public boolean hasProgress() {
         return (checker.checkProgress(getProgress(), reportableProgress));
     }

@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.watchers;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  *
@@ -24,8 +24,8 @@ import com.chingo247.structureapi.model.structure.IStructure;
  */
 public interface IWatcher {
     
-    void register(IStructure structure);
+    void register(Structure structure);
     
-    void unregister(IStructure structure);
+    void unregister(Structure structure);
     
 }
