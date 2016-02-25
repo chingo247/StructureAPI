@@ -22,24 +22,22 @@ import java.io.File;
  *
  * @author Chingo
  */
-public class RollbackData implements IRollbackData {
+public class RollbackData {
     
     public static final String ROLLBACK_DIRECTORY = "rollback";
     
-    private IStructure structure;
+    private Structure structure;
 
-    RollbackData(IStructure structure) {
+    RollbackData(Structure structure) {
         this.structure = structure;
     }
 
-    @Override
     public File getBlockStoreDirectory() {
         File rollbackDirectory = new File(structure.getDirectory(), ROLLBACK_DIRECTORY);
         rollbackDirectory.mkdirs();
         return rollbackDirectory;
     }
     
-    @Override
     public boolean hasBlockStore() {
         return new File(structure.getDirectory(), ROLLBACK_DIRECTORY).exists();
     }

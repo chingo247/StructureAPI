@@ -13,27 +13,23 @@ import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
-import com.chingo247.structureapi.model.settler.ISettlerRepository;
 import com.chingo247.structureapi.model.settler.SettlerNode;
-import com.chingo247.structureapi.model.settler.SettlerRepositiory;
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
-import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.settler.SettlerRepository;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
-import com.chingo247.structureapi.model.world.IStructureWorldRepository;
 import com.chingo247.structureapi.model.world.StructureWorldNode;
 import com.chingo247.structureapi.model.world.StructureWorldRepository;
 import com.chingo247.structureapi.placement.FilePlacement;
 import com.chingo247.structureapi.placement.IPlacement;
-import com.chingo247.structureapi.placing.AbstractPlacer;
+import com.chingo247.structureapi.model.owner.OwnerDomain;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.plan.io.export.PlacementExporter;
 import com.chingo247.structureapi.plan.io.export.UnsupportedPlacementException;
 import com.chingo247.structureapi.StructureRestriction;
 import com.chingo247.structureapi.exeption.StructureRestrictionException;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.placing.IPlaceResult;
 import com.chingo247.structureapi.util.PlacementUtil;
-import com.chingo247.structureapi.util.RegionUtil;
 import com.chingo247.xplatform.core.ILocation;
 import com.chingo247.xplatform.core.IWorld;
 import com.google.common.collect.Sets;
@@ -56,7 +52,7 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements IStructurePlacer {
+public class StructurePlacer  {
 
     private final Monitor monitor;
     private String name;
@@ -64,10 +60,11 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
     private boolean inheritOwnership;
     private boolean checkOwnerRestriction;
     private boolean checkStructureRestrictions;
-    private IStructure parent;
+    private Structure parent;
     private StructureAPI structureAPI;
     private final IWorld world;
     private UUID placer;
+    private OwnerDomain ownersToAdd;
 
     public StructurePlacer(IWorld world) {
         this.world = world;
@@ -77,85 +74,82 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         this.structureAPI = (StructureAPI)StructureAPI.getInstance();
         this.monitor = structureAPI.getMonitor(world.getName());
         this.checkStructureRestrictions = true;
+        this.ownersToAdd = new OwnerDomain();
     }
 
-    @Override
-    public IStructurePlacer setPlacer(UUID placer) {
+    public StructurePlacer setPlacer(UUID placer) {
         this.placer = placer;
         return this;
     }
 
     
-    @Override
-    public IStructurePlacer setCheckStructureRestrictions(boolean checkStructureRestrictions) {
+    public StructurePlacer setCheckStructureRestrictions(boolean checkStructureRestrictions) {
         this.checkStructureRestrictions = checkStructureRestrictions;
         return this;
     }
     
     
 
-    @Override
-    public IStructurePlacer setCheckOwnerRestriction(boolean enable) {
+    public StructurePlacer setCheckOwnerRestriction(boolean enable) {
         this.checkOwnerRestriction = enable;
         return this;
     }
     
     
 
-    @Override
     public StructurePlacer setInheritOwnership(boolean inheritOwnership) {
         this.inheritOwnership = inheritOwnership;
         return this;
     }
 
-    @Override
     public StructurePlacer setPrice(double price) {
         this.price = price;
         return this;
     }
 
-    @Override
     public StructurePlacer setName(String name) {
         this.name = name;
         return this;
     }
 
-    @Override
-    public IStructurePlacer setParent(IStructure parent) {
+    public StructurePlacer setParent(Structure parent) {
         this.parent = parent;
         return this;
     }
 
-  
+    public StructurePlacer addOwner(UUID owner, OwnerType type) {
+        this.ownersToAdd.addOwner(owner, type);
+        return this;
+    }
+    
+    
 
-    @Override
-    public IStructurePlaceResult place(final IPlacement placement, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException {
+    public IPlaceResult<Structure> place(final IPlacement placement, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException {
         Vector min = position;
         Vector max = PlacementUtil.getPoint2Right(min, direction, placement.getCuboidRegion().getMaximumPoint());
-        IStructurePlaceResult result = place(new CuboidRegion(min, max), position, direction, new ICallback() {
+        IPlaceResult<Structure> result = place(new CuboidRegion(min, max), position, direction, new ICallback() {
 
             @Override
-            public void onCreate(IStructure structure) throws IOException, UnsupportedPlacementException {
+            public void onCreate(Structure structure) throws IOException, UnsupportedPlacementException {
                 copyResources(structure, placement);
             }
         }, null);
         return result;
     }
 
-    @Override
-    public IStructurePlaceResult place(final IStructurePlan plan, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException  {
+    public IPlaceResult<Structure> place(final IStructurePlan plan, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException  {
         CuboidRegion affectedArea = getAffectedRegion(plan.getPlacement(), position, direction);
-        IStructurePlaceResult placeResult = place(affectedArea, position, direction, new ICallback() {
+        IPlaceResult<Structure> placeResult = place(affectedArea, position, direction, new ICallback() {
 
             @Override
-            public void onCreate(IStructure structure) throws IOException {
+            public void onCreate(Structure structure) throws IOException {
                 copyResources(structure, plan);
             }
         }, plan);
         return placeResult;
     }
 
-    private IStructurePlaceResult place(CuboidRegion region, Vector position, Direction direction, ICallback callback, IStructurePlan plan) throws IOException, UnsupportedPlacementException {
+    private IPlaceResult<Structure> place(CuboidRegion region, Vector position, Direction direction, ICallback callback, IStructurePlan plan) throws IOException, UnsupportedPlacementException {
         StructurePlaceResult placeResult = new StructurePlaceResult();
         ILocation spawn = world.getSpawn();
 
@@ -194,7 +188,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 
 
                 // Set parent if applicable
-                IStructureRepository structureRepository = new StructureRepository(graph);
+                StructureRepository structureRepository = new StructureRepository(graph);
                 StructureNode parentNode = null;
                 if (parent == null) {
                     parentNode = structureRepository.findStructureOnPosition(world.getUUID(), position);
@@ -240,13 +234,13 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 }
                 
                 // Add structure to the world
-                IStructureWorldRepository worldRepository = new StructureWorldRepository(graph);
+                StructureWorldRepository worldRepository = new StructureWorldRepository(graph);
                 StructureWorldNode sructureWorld = worldRepository.addOrGet(world.getName(), world.getUUID());
                 sructureWorld.addStructure(structureNode);
                 
                 
                 // Set ownerships...
-                ISettlerRepository settlerRepository = new SettlerRepositiory(graph);
+                SettlerRepository settlerRepository = new SettlerRepository(graph);
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 
                 // Set placer as MASTER owner
@@ -270,7 +264,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 }
                 
                 // Add Masters
-                for(UUID playerUUID : getMasters()) {
+                for(UUID playerUUID : ownersToAdd.getOwners(OwnerType.MASTER)) {
                     if(!added.contains(playerUUID)) {
                         SettlerNode settler = settlerRepository.findByUUID(playerUUID);
                         ownerDomain.setOwnership(settler, OwnerType.MASTER);
@@ -278,7 +272,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 }
                 
                 // Add Owners
-                for(UUID playerUUID : getOwners()) {
+                for(UUID playerUUID : ownersToAdd.getOwners(OwnerType.OWNER)) {
                     if(!added.contains(playerUUID)) {
                         SettlerNode settler = settlerRepository.findByUUID(playerUUID);
                         ownerDomain.setOwnership(settler, OwnerType.OWNER);
@@ -286,7 +280,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 }
                 
                 // Add Members
-                for(UUID playerUUID : getMembers()) {
+                for(UUID playerUUID : ownersToAdd.getOwners(OwnerType.MEMBER)) {
                     if(!added.contains(playerUUID)) {
                         SettlerNode settler = settlerRepository.findByUUID(playerUUID);
                         ownerDomain.setOwnership(settler, OwnerType.MEMBER);
@@ -314,7 +308,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
                 monitor.leave();
             }
             if(placeResult.succes()) {
-                structureAPI.getEventDispatcher().dispatchEvent(new StructureCreateEvent(placeResult.getPlacedStructure()));
+                structureAPI.getEventDispatcher().dispatchEvent(new StructureCreateEvent(placeResult.getPlaced()));
             }
         } catch (StructureRestrictionException | StructureException ex) {
             placeResult.setError(ex.getMessage());
@@ -329,7 +323,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         return new CuboidRegion(min, max);
     }
 
-    private void copyResources(IStructure structure, IStructurePlan plan) throws IOException {
+    private void copyResources(Structure structure, IStructurePlan plan) throws IOException {
         // Give this structure a directory!
         File structureDirectory = structure.getDirectory();
         if (structureDirectory.exists()) {
@@ -352,7 +346,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
         }
     }
 
-    private void copyResources(IStructure structure, IPlacement placement) throws IOException, UnsupportedPlacementException {
+    private void copyResources(Structure structure, IPlacement placement) throws IOException, UnsupportedPlacementException {
         File structureDirectory = structure.getDirectory();
         if (structureDirectory.exists()) {
             FileUtils.deleteDirectory(structureDirectory);
@@ -367,7 +361,7 @@ public class StructurePlacer extends AbstractPlacer<IStructurePlacer> implements
 
     private interface ICallback {
 
-        void onCreate(IStructure structure) throws IOException, UnsupportedPlacementException;
+        void onCreate(Structure structure) throws IOException, UnsupportedPlacementException;
 
     }
 

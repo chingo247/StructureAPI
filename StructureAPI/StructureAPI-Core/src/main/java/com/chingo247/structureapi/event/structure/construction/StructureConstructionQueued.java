@@ -6,7 +6,7 @@
 package com.chingo247.structureapi.event.structure.construction;
 
 import com.chingo247.structureapi.event.structure.StructureEvent;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  *
@@ -14,7 +14,7 @@ import com.chingo247.structureapi.model.structure.IStructure;
  */
 public class StructureConstructionQueued extends StructureEvent {
 
-    public StructureConstructionQueued(IStructure structure) {
+    public StructureConstructionQueued(Structure structure) {
         super(structure);
     }
     

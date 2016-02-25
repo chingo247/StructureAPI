@@ -5,11 +5,13 @@
  */
 package com.chingo247.structureapi.placing;
 
+import com.chingo247.structureapi.model.Spatial;
+
 /**
  *
  * @author Chingo
  */
-public interface IPlaceResult {
+public interface IPlaceResult<T extends Spatial> {
     
     /**
      * Returns true if the placing was succesfull
@@ -22,5 +24,7 @@ public interface IPlaceResult {
      * @return the error message or null if the operation was succesfull
      */
     String error();
+    
+    T getPlaced();
     
 }

@@ -16,6 +16,7 @@
  */
 package com.chingo247.structureapi.model.plot;
 
+import com.chingo247.structureapi.model.Spatial;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
@@ -25,7 +26,7 @@ import org.neo4j.graphdb.Node;
  *
  * @author Chingo
  */
-public class Plot implements IPlot {
+public class Plot implements Spatial {
     
     private Node underlyingNode;
     private Vector min, max;
@@ -73,7 +74,10 @@ public class Plot implements IPlot {
         return worldName;
     }
     
-    
+    public Vector getSize() {
+        CuboidRegion cuboidRegion = getCuboidRegion();
+        return cuboidRegion.getMaximumPoint().subtract(cuboidRegion.getMinimumPoint()).add(Vector.ONE);
+    }
     
     
     

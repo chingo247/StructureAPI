@@ -18,7 +18,7 @@ package com.chingo247.structureapi.construction.contract;
 
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import static com.chingo247.structureapi.construction.contract.BuildContract.BUILD_PRODUCER;
 import com.chingo247.structureapi.construction.listener.DemolitionListener;
@@ -36,7 +36,7 @@ import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
  *
  * @author Chingo
  */
-public class DemolitionContract extends AContract {
+public class DemolitionContract extends Contract {
     
     private static final BlockPlacementProducer DEMOLITION_PRODUCER = new DemolitionPlacementProducer();
     private static final DemolitionListener DEMOLITION_LISTENER = new DemolitionListener();
@@ -53,7 +53,7 @@ public class DemolitionContract extends AContract {
     
     
     @Override
-    public void apply(IStructureEntry entry) throws StructureException {
+    public void apply(StructureEntry entry) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = entry.getStructure().getMin(); // Always place from the min position... 

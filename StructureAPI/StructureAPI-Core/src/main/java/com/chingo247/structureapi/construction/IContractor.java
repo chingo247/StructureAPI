@@ -16,7 +16,8 @@
  */
 package com.chingo247.structureapi.construction;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.construction.contract.Contract;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  *
@@ -24,20 +25,10 @@ import com.chingo247.structureapi.model.structure.IStructure;
  */
 public interface IContractor {
 
-    void submit(final IStructure structure, final IContract contract);
+    void submit(final Structure structure, final Contract contract);
 
-//    IConstruction newBuildPlan(IStructure structure) throws StructureException, StructurePlanException;
-//
-//    IConstruction newDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException;
-//
-//    IConstruction newRollbackPlan(IStructure structure) throws StructureException, Exception;
-//
-//    IConstruction newSaveBuildPlan(IStructure structure) throws StructureException, StructurePlanException;
-//
-//    IConstruction newSaveDemolitionPlan(IStructure structure) throws StructureException, StructurePlanException;
+    void purge(Structure structure);
 
-    void purge(IStructure structure);
-
-    void remove(IStructureEntry entry);
+    void remove(StructureEntry entry);
 
 }

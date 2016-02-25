@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.event.zone;
 
-import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.model.zone.ConstructionZone;
 
 /**
  *
@@ -24,13 +24,13 @@ import com.chingo247.structureapi.model.zone.IConstructionZone;
  */
 public abstract class ConstructionZoneEvent {
 
-    private IConstructionZone zone;
+    private ConstructionZone zone;
 
-    public ConstructionZoneEvent(IConstructionZone zone) {
+    public ConstructionZoneEvent(ConstructionZone zone) {
         this.zone = zone;
     }
 
-    public IConstructionZone getZone() {
+    public ConstructionZone getZone() {
         return zone;
     }
     

@@ -18,7 +18,7 @@ package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.exeption.StructurePlanException;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.IPlacement;
 import com.chingo247.structureapi.placement.RotationalPlacement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
@@ -33,7 +33,7 @@ public class BuildPlacementProducer extends BlockPlacementProducer {
     }
 
     @Override
-    public IBlockPlacement produce(IStructure structure) throws StructureException {
+    public IBlockPlacement produce(Structure structure) throws StructureException {
         try {
             IPlacement placement = structure.getStructurePlan().getPlacement();
             checkIsBlockPlacement(placement);

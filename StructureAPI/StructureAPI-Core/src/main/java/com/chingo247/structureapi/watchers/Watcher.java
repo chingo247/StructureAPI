@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.watchers;
 
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.google.common.collect.Maps;
 import java.util.Map;
 
@@ -27,7 +27,7 @@ import java.util.Map;
 public class Watcher implements IWatcher {
     
     
-    protected Map<Long, IStructure> registered;
+    protected Map<Long, Structure> registered;
     protected final Object mutex = new Object();
     
 
@@ -36,14 +36,14 @@ public class Watcher implements IWatcher {
     }
 
     @Override
-    public void register(IStructure structure) {
+    public void register(Structure structure) {
         synchronized(mutex) {
             this.registered.put(structure.getId(), structure);
         }
     }
 
     @Override
-    public void unregister(IStructure structure) {
+    public void unregister(Structure structure) {
         synchronized(mutex) {
             this.registered.remove(structure.getId());
         }

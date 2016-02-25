@@ -23,19 +23,17 @@ import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.plan.StructurePlanManager;
 import com.chingo247.structureapi.IStructureAPI;
+import com.chingo247.structureapi.StructurePlacerFactory;
 import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.getPlanID;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.getValue;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.isStructurePlan;
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.selection.CUISelectionManager;
 import com.chingo247.structureapi.selection.ISelectionManager;
 import com.chingo247.structureapi.selection.NoneSelectionManager;
 import com.chingo247.structureapi.platform.permission.PermissionManager;
-import com.chingo247.structureapi.placing.structure.IStructurePlaceResult;
-import com.chingo247.structureapi.placing.structure.IStructurePlacerFactory;
 import com.chingo247.structureapi.util.PlacementUtil;
 import com.chingo247.structureapi.util.WorldUtil;
 import com.chingo247.xplatform.core.AInventory;
@@ -182,8 +180,8 @@ public class PlayerPlanPlacer {
                                 pos1 = WorldUtil.translateLocation(pos1, direction, (-(selection.getMaximumPoint().getBlockZ() - 1)), 0, 0);
                             }
 
-                            IStructurePlacerFactory placerFactory = structureAPI.getStructurePlacerFactory();
-                            IStructurePlaceResult placeResult = placerFactory.createPlacer(player.getWorld().getName())
+                            StructurePlacerFactory placerFactory = structureAPI.getStructurePlacerFactory();
+                            IPlaceResult<Structure> placeResult = placerFactory.createPlacer(player.getWorld().getName())
                                     .setPlacer(playerUUID)
                                     .setCheckOwnerRestriction(true)
                                     .setInheritOwnership(true)
@@ -198,7 +196,7 @@ public class PlayerPlanPlacer {
                                 player.getInventory().removeItem(clone);
                                 player.updateInventory();
                                 // start construction
-                                IStructure structure = placeResult.getPlacedStructure();
+                                Structure structure = placeResult.getPlaced();
                                 if (!structureAPI.isQueueLocked(player.getUniqueId())) {
                                     BuildContract buildContract = new BuildContract();
                                     SafeContract safeContract = new SafeContract(buildContract);

@@ -25,7 +25,7 @@ import org.neo4j.graphdb.Relationship;
  *
  * @author Chingo
  */
-public class SchematicDataNode implements ISchematicData {
+public class SchematicDataNode  {
     
     public static final String LABEL_NAME = "SCHEMATIC_DATA";
     public static final Label LABEL = DynamicLabel.label(LABEL_NAME);
@@ -51,7 +51,6 @@ public class SchematicDataNode implements ISchematicData {
         return underlyingNode.hasProperty(AXIS_OFFSET_PROPERTY);
     }
 
-    @Override
     public int getAxisOffset() {
         Integer rotation = underlyingNode.hasProperty(AXIS_OFFSET_PROPERTY) ? (Integer)underlyingNode.getProperty(AXIS_OFFSET_PROPERTY) : Integer.MIN_VALUE;
         return rotation;
@@ -61,42 +60,34 @@ public class SchematicDataNode implements ISchematicData {
         underlyingNode.setProperty(AXIS_OFFSET_PROPERTY, rotation);
     }
     
-    @Override
     public int getWidth() {
         return (int) underlyingNode.getProperty(WIDTH_PROPERTY);
     }
     
-    @Override
     public int getHeight() {
         return (int) underlyingNode.getProperty(HEIGHT_PROPERTY);
     }
     
-    @Override
     public int getLength() {
         return (int) underlyingNode.getProperty(LENGTH_PROPERTY);
     }
     
-    @Override
     public long getXXHash64() {
         return (long) underlyingNode.getProperty(XXHASH_PROPERTY);
     }
     
-    @Override
     public String getName() {
         return (String) underlyingNode.getProperty(NAME_PROPERTY);
     }
     
-    @Override
     public long getLastImport() {
         return (long) underlyingNode.getProperty(LAST_IMPORT);
     }
     
-    @Override
     public void setLastImport(long newImportDate) {
         this.underlyingNode.setProperty(LAST_IMPORT, newImportDate);
     }
     
-    @Override
     public void delete() {
         for(Relationship rel : underlyingNode.getRelationships()) {
             rel.delete();

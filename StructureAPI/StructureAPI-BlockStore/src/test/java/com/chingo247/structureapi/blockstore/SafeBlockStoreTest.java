@@ -23,9 +23,10 @@
  */
 package com.chingo247.structureapi.blockstore;
 
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
-import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreWriter;
+import com.chingo247.blockstore.BlockStore;
+import com.chingo247.blockstore.safe.SafeBlockStore;
+import com.chingo247.blockstore.safe.SafeBlockStoreReader;
+import com.chingo247.blockstore.safe.SafeBlockStoreWriter;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import java.io.File;
 import java.io.IOException;

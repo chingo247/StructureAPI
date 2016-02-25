@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.block.DemolishingPlacement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.util.RegionUtil;
@@ -29,7 +29,7 @@ import com.chingo247.structureapi.util.RegionUtil;
 public class DemolitionPlacementProducer extends BlockPlacementProducer {
 
     @Override
-    public IBlockPlacement produce(IStructure structure) throws StructureException {
+    public IBlockPlacement produce(Structure structure) throws StructureException {
         DemolishingPlacement placement = new DemolishingPlacement(RegionUtil.getSize(structure.getCuboidRegion()));
         return placement;
     }

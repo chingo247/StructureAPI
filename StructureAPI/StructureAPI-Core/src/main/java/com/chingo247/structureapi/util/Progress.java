@@ -11,7 +11,7 @@ import java.text.DecimalFormat;
  *
  * @author Chingo
  */
-public class Progress implements IProgressable{
+public class Progress implements IProgressable {
     
     public static final DecimalFormat ONE_DECIMAL = new DecimalFormat("#.#");
     public static final DecimalFormat TWO_DECIMAL = new DecimalFormat("#.##");

@@ -26,11 +26,10 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.ThreadPoolFactory;
 import com.chingo247.settlercraft.core.event.DefaultSubscriberExceptionHandler;
 import com.chingo247.settlercraft.core.event.EventDispatcher;
-import com.chingo247.settlercraft.core.event.IEventDispatcher;
 import com.chingo247.settlercraft.core.exception.SettlerCraftException;
 import com.chingo247.structureapi.menus.plans.StructurePlanMenuFactory;
 import com.chingo247.structureapi.menus.plans.StructurePlanMenuReader;
-import com.chingo247.settlercraft.core.model.world.SCWorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.structureapi.construction.Contractor;
 import com.chingo247.structureapi.plan.IStructurePlan;
@@ -41,11 +40,9 @@ import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.platform.services.AsyncEditSessionFactoryProvider;
 import com.chingo247.structureapi.model.zone.ConstructionZoneNode;
 import com.chingo247.structureapi.placement.block.SchematicPlacement;
-import com.chingo247.structureapi.placing.constructionzone.IConstructionZonePlacerFactory;
 import com.chingo247.structureapi.schematic.Schematic;
 import com.chingo247.structureapi.schematic.SchematicManager;
 import com.chingo247.structureapi.platform.ConfigProvider;
-import com.chingo247.structureapi.placing.structure.IStructurePlacerFactory;
 import com.chingo247.structureapi.exeption.StructureRestrictionException;
 import com.chingo247.xplatform.core.IColors;
 import com.google.common.base.Preconditions;
@@ -99,8 +96,8 @@ public class StructureAPI implements IStructureAPI {
     private final Map<String, Monitor> monitors;
     
     private final Set<StructureRestriction> restrictions;
-    private IStructurePlacerFactory structurePlacerFactory;
-    private IConstructionZonePlacerFactory constructionZonePlacerFactory;
+    private StructurePlacerFactory structurePlacerFactory;
+//    private ConstructionZonePlacerFactory constructionZonePlacerFactory;
     private IContractor constructionExecutor;
    
     private IPlugin plugin;
@@ -110,7 +107,7 @@ public class StructureAPI implements IStructureAPI {
     private CategoryMenu menuTemplate;
     private boolean isLoadingPlans = false, initialized = false;
     
-    private IEventDispatcher eventDispatcher;
+    private EventDispatcher eventDispatcher;
     private EventBus eventBus, asyncEventBus;
     
     private AsyncEditSessionFactoryProvider sessionFactoryProvider;
@@ -166,12 +163,12 @@ public class StructureAPI implements IStructureAPI {
     }
 
     @Override
-    public IEventDispatcher getEventDispatcher() {
+    public EventDispatcher getEventDispatcher() {
         return eventDispatcher;
     }
 
     @Override
-    public IStructurePlacerFactory getStructurePlacerFactory() {
+    public StructurePlacerFactory getStructurePlacerFactory() {
         return structurePlacerFactory;
     }
 
@@ -264,7 +261,7 @@ public class StructureAPI implements IStructureAPI {
             this.planMenuFactory = new StructurePlanMenuFactory(platform, menuTemplate);
             reload();
             
-            this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
+//            this.constructionZonePlacerFactory = new ConstructionZonePlacerFactory(this);
             this.structurePlacerFactory = new StructurePlacerFactory(this.getPlatform());
             this.constructionExecutor = Contractor.getInstance();
             this.initialized = true;
@@ -381,7 +378,7 @@ public class StructureAPI implements IStructureAPI {
         return asyncWorldEditIntegration.isQueueLocked(player);
     }
 
-    final File getDirectoryForStructure(SCWorldNode worldNode, Structure structureNode) {
+    final File getDirectoryForStructure(WorldNode worldNode, Structure structureNode) {
         File structuresDirectory = getStructuresDirectory(worldNode.getName());
         File structureDir = new File(structuresDirectory, String.valueOf(structureNode.getId()));
         return structureDir;

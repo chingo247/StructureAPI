@@ -6,7 +6,7 @@
 package com.chingo247.structureapi.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.settlercraft.core.model.world.SCWorldNode;
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.plot.PlotNode;
 import com.chingo247.structureapi.model.settler.SettlerNode;
@@ -29,9 +29,9 @@ import org.neo4j.graphdb.Result;
  *
  * @author Chingo
  */
-public class StructureRepository implements IStructureRepository {
+public class StructureRepository  {
 
-    private static final Logger LOG = Logger.getLogger(IStructureRepository.class.getSimpleName());
+    private static final Logger LOG = Logger.getLogger(StructureRepository.class.getSimpleName());
     private final GraphDatabaseService graph;
     private boolean checked = false;
 
@@ -39,7 +39,6 @@ public class StructureRepository implements IStructureRepository {
         this.graph = graph;
     }
 
-    @Override
     public StructureNode findById(Long id) {
         StructureNode structure = null;
         Map<String, Object> params = Maps.newHashMap();
@@ -84,7 +83,6 @@ public class StructureRepository implements IStructureRepository {
         return id;
     }
 
-    @Override
     public StructureNode addStructure(String name, Vector position, CuboidRegion region, Direction direction, double price) {
         long id = nextId();
         Node stNode = graph.createNode(StructureNode.label(), DynamicLabel.label(PlotNode.LABEL_PLOT));
@@ -115,7 +113,6 @@ public class StructureRepository implements IStructureRepository {
         return structure;
     }
 
-    @Override
     public Collection<StructureNode> findStructuresDeletedAfter(UUID worldUUID, long date) {
         List<StructureNode> structures = com.google.common.collect.Lists.newArrayList();
 
@@ -123,7 +120,7 @@ public class StructureRepository implements IStructureRepository {
         params.put("worldId", worldUUID.toString());
         params.put("date", date);
 
-        String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " > {date}"
@@ -143,7 +140,6 @@ public class StructureRepository implements IStructureRepository {
         return structures;
     }
 
-    @Override
     public Collection<StructureNode> findCreatedAfter(UUID worldUUID, long date) {
         List<StructureNode> structures = Lists.newArrayList();
 
@@ -151,7 +147,7 @@ public class StructureRepository implements IStructureRepository {
         params.put("worldId", worldUUID.toString());
         params.put("date", date);
 
-        String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.CREATED_AT_PROPERTY + " > {date}"
@@ -171,13 +167,12 @@ public class StructureRepository implements IStructureRepository {
         return structures;
     }
 
-    @Override
     public Collection<StructureNode> findByWorld(UUID worldUUID) {
         List<StructureNode> structures = Lists.newArrayList();
 
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
-        String query = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " RETURN s";
@@ -196,7 +191,6 @@ public class StructureRepository implements IStructureRepository {
         return structures;
     }
 
-    @Override
     public Collection<StructureNode> findByOwner(UUID settlerUUID) {
         List<StructureNode> structures = Lists.newArrayList();
 
@@ -223,7 +217,6 @@ public class StructureRepository implements IStructureRepository {
         return structures;
     }
 
-    @Override
     public Collection<StructureNode> findStructuresWithin(UUID worldUUID, CuboidRegion region, int limit) {
         List<StructureNode> structures = new ArrayList<>();
 
@@ -234,7 +227,7 @@ public class StructureRepository implements IStructureRepository {
         }
 
         String query
-                = "MATCH (world:" + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " IS NULL"
@@ -259,13 +252,12 @@ public class StructureRepository implements IStructureRepository {
         return structures;
     }
     
-    @Override
     public StructureNode findStructureOnPosition(UUID worldUUID, Vector position) {
         StructureNode structure = null;
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
         String query
-                = "MATCH ( world: " + SCWorldNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldId} })"
+                = "MATCH ( world: " + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN + "]-(s:" + StructureNode.LABEL + ")"
                 + " WHERE s." + StructureNode.DELETED_AT_PROPERTY + " IS NULL"
@@ -285,12 +277,10 @@ public class StructureRepository implements IStructureRepository {
         return structure;
     }
 
-    @Override
     public boolean hasStructuresWithin(UUID worldUUID, CuboidRegion region) {
         return findStructuresWithin(worldUUID, region, 1).iterator().hasNext();
     }
 
-    @Override
     public int countStructuresOfSettler(UUID settlerUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("settlerUUID", settlerUUID.toString());
@@ -313,11 +303,10 @@ public class StructureRepository implements IStructureRepository {
         return count;
     }
 
-    @Override
     public int countStructuresWithinWorld(UUID worldUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldUUID", worldUUID.toString());
-        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + SCWorldNode.UUID_PROPERTY + ": {worldUUID} })"
+        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldUUID} })"
                 + " WITH world "
                 + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(structure:" + StructureNode.LABEL + ")"
                 + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()

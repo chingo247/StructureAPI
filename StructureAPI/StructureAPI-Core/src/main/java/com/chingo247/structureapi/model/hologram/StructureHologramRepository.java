@@ -21,7 +21,7 @@ import org.neo4j.graphdb.Result;
  *
  * @author Chingo
  */
-public class StructureHologramRepository implements IStructureHologramRepository {
+public class StructureHologramRepository {
     
     private GraphDatabaseService graph;
 
@@ -29,7 +29,6 @@ public class StructureHologramRepository implements IStructureHologramRepository
         this.graph = graph;
     }
     
-    @Override
     public StructureHologramNode addHologram(StructureNode structure, Vector relativePosition) {
         Node n = graph.createNode(StructureHologramNode.LABEL);
         n.setProperty(StructureHologramNode.RELATIVE_X_PROPERTY, relativePosition.getBlockX());
@@ -40,7 +39,6 @@ public class StructureHologramRepository implements IStructureHologramRepository
         return new StructureHologramNode(n);
     }
     
-    @Override
     public Collection<StructureHologramNode> findAll() {
         Map<String,Object> params = Maps.newHashMap();
         params.put("removed", (Integer) ConstructionStatus.REMOVED.getStatusId());

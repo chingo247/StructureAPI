@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.event.structure.construction;
 
 import com.chingo247.structureapi.event.structure.StructureEvent;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  *
@@ -25,7 +25,7 @@ import com.chingo247.structureapi.model.structure.IStructure;
  */
 public class StructureConstructionFailedEvent extends StructureEvent {
 
-    public StructureConstructionFailedEvent(IStructure structure) {
+    public StructureConstructionFailedEvent(Structure structure) {
         super(structure);
     }
     

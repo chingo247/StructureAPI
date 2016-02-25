@@ -24,7 +24,7 @@ import org.neo4j.graphdb.Node;
  *
  * @author Chingo
  */
-public final class StructureHologram implements IStructureHologram {
+public final class StructureHologram {
     
     private Node underlyingNode;
     private String name;
@@ -44,72 +44,58 @@ public final class StructureHologram implements IStructureHologram {
         this.position = getPosition();
     }
 
-    @Override
     public Node getNode() {
         return underlyingNode;
     }
 
-    @Override
     public StructureHologramNode getHologramNode() {
         return new StructureHologramNode(underlyingNode);
     }
     
-    @Override
     public Structure getStructure() {
         return structure;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public double getX() {
         return position.getX();
     }
 
-    @Override
     public double getY() {
         return position.getY();
     }
 
-    @Override
     public double getZ() {
         return position.getZ();
     }
 
-    @Override
     public int getBlockX() {
         return position.getBlockX();
     }
 
-    @Override
     public int getBlockY() {
         return position.getBlockY();
     }
 
-    @Override
     public int getBlockZ() {
         return position.getBlockZ();
     }
 
-    @Override
     public int getRelativeX() {
         return relativePosition.getBlockX();
     }
 
-    @Override
     public int getRelativeY() {
         return relativePosition.getBlockY();
     }
 
-    @Override
     public int getRelativeZ() {
         return relativePosition.getBlockZ();
     }
 
-    @Override
     public Vector getPosition() {
         if(position == null) {
             position = structure.translateRelativeLocation(relativePosition);
@@ -117,7 +103,6 @@ public final class StructureHologram implements IStructureHologram {
         return position;
     }
 
-    @Override
     public Vector getRelativePosition() {
         return relativePosition;
     }

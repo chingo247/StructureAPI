@@ -7,7 +7,7 @@ package com.chingo247.structureapi.event.structure.construction;
 
 import com.chingo247.structureapi.event.structure.StructureEvent;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.util.IProgressable;
 
 /**
@@ -19,7 +19,7 @@ public class StructureProgressUpdateEvent extends StructureEvent {
     private ConstructionStatus status;
     private IProgressable progressable;
 
-    public StructureProgressUpdateEvent(IStructure structure, IProgressable progressable, ConstructionStatus status) {
+    public StructureProgressUpdateEvent(Structure structure, IProgressable progressable, ConstructionStatus status) {
         super(structure);
         this.progressable = progressable;
         this.status = status;

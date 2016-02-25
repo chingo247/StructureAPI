@@ -5,11 +5,9 @@
  */
 package com.chingo247.structureapi.model.zone;
 
-import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.model.AccessType;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.plot.Plot;
-import com.chingo247.xplatform.core.IWorld;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.neo4j.graphdb.Node;
@@ -18,7 +16,7 @@ import org.neo4j.graphdb.Node;
  *
  * @author Chingo
  */
-public class ConstructionZone extends Plot implements IConstructionZone {
+public class ConstructionZone extends Plot {
     
     private Long id;
     private AccessType accessType;
@@ -70,12 +68,10 @@ public class ConstructionZone extends Plot implements IConstructionZone {
         return region;
     }
 
-    @Override
     public String getWorldGuardRegion() {
         return wgRegion;
     }
 
-    @Override
     public boolean hasWorldGuardRegion() {
         return wgRegion != null;
     }

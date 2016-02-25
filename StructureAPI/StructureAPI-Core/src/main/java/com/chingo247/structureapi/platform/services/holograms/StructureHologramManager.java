@@ -23,13 +23,9 @@ import com.chingo247.structureapi.model.hologram.StructureHologramNode;
 import com.chingo247.structureapi.model.hologram.StructureHologramRepository;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.StructureNode;
-import com.chingo247.structureapi.model.hologram.IStructureHologram;
-import com.chingo247.structureapi.model.hologram.IStructureHologramRepository;
-import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.event.structure.StructureStateChangeEvent;
-import com.chingo247.structureapi.model.structure.IStructure;
-import com.chingo247.structureapi.model.structure.IStructureRepository;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
@@ -73,8 +69,8 @@ public class StructureHologramManager {
     private final IColors color;
     private final IScheduler scheduler;
     private final GraphDatabaseService graph;
-    private final IStructureHologramRepository structureHologramRepository;
-    private final IStructureRepository structureRepository;
+    private final StructureHologramRepository structureHologramRepository;
+    private final StructureRepository structureRepository;
     private IPlugin plugin;
 
     private HologramsProvider hologramsProvider;
@@ -118,7 +114,7 @@ public class StructureHologramManager {
         }
     }
 
-    private void registerStructureHologram(IStructure structure, Hologram hologram) {
+    private void registerStructureHologram(Structure structure, Hologram hologram) {
         if (holograms.get(structure.getId()) == null) {
             holograms.put(structure.getId(), new ArrayList<Hologram>());
         }
@@ -138,7 +134,7 @@ public class StructureHologramManager {
             if (hologramsProvider == null || !StructureAPI.getInstance().getConfig().isUseHolograms()) {
                 return;
             }
-            final IStructure structure = structureCreateEvent.getStructure();
+            final Structure structure = structureCreateEvent.getStructure();
 
             // Assures non-async behavior - Fixes concurrent exceptions that could be thrown
             scheduler.runSync(new Runnable() {
@@ -166,7 +162,7 @@ public class StructureHologramManager {
             if (hologramsProvider == null || !StructureAPI.getInstance().getConfig().isUseHolograms()) {
                 return;
             }
-            final IStructure structure = changeEvent.getStructure();
+            final Structure structure = changeEvent.getStructure();
             scheduler.runSync(new Runnable() {
 
                 @Override
@@ -206,7 +202,7 @@ public class StructureHologramManager {
 
     }
 
-    private String getStatusString(IStructure structure) {
+    private String getStatusString(Structure structure) {
         ConstructionStatus state = structure.getStatus();
         String statusString;
         switch (state) {
@@ -256,7 +252,7 @@ public class StructureHologramManager {
                     Logger.getLogger(StructureHologramManager.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            final IStructureHologram hologram = hologramQueue.poll();
+            final StructureHologram hologram = hologramQueue.poll();
             final Structure structure = hologram.getStructure();
             final Vector position = structure.translateRelativeLocation(new Vector(hologram.getRelativeX(), hologram.getRelativeY(), hologram.getRelativeZ()));
 
@@ -317,7 +313,7 @@ public class StructureHologramManager {
         }
     }
 
-    private Hologram createHologramForStructure(String plugin, World world, Vector position, IStructure structure) {
+    private Hologram createHologramForStructure(String plugin, World world, Vector position, Structure structure) {
         Hologram h;
         Structure loadedStructure = null;
         try (Transaction tx = graph.beginTx()) {

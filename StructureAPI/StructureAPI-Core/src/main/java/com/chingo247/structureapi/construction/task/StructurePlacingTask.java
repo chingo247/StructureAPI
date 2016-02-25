@@ -5,7 +5,7 @@
  */
 package com.chingo247.structureapi.construction.task;
 
-import com.chingo247.structureapi.construction.IStructureEntry;
+import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import java.util.UUID;
 
@@ -17,7 +17,7 @@ public abstract class StructurePlacingTask extends StructureTask {
 
     private PlaceOptions options;
     
-    public StructurePlacingTask(IStructureEntry constructionEntry, UUID submitter) {
+    public StructurePlacingTask(StructureEntry constructionEntry, UUID submitter) {
         super(constructionEntry, submitter);
     }
 

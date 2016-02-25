@@ -20,7 +20,6 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.util.XXHasher;
 import com.chingo247.structureapi.model.schematic.SchematicDataNode;
 import com.chingo247.structureapi.model.schematic.SchematicRepository;
-import com.chingo247.structureapi.model.schematic.ISchematicData;
 import com.chingo247.structureapi.plan.exception.SchematicException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -103,8 +102,8 @@ public class SchematicManager {
         
         if (fit.hasNext()) {
             ForkJoinPool pool = new ForkJoinPool(Runtime.getRuntime().availableProcessors()); // only create the pool if we have schematics
-            Map<Long, ISchematicData> alreadyHere = Maps.newHashMap();
-            Map<Long, ISchematicData> needsUpdating = Maps.newHashMap();
+            Map<Long, SchematicDataNode> alreadyHere = Maps.newHashMap();
+            Map<Long, SchematicDataNode> needsUpdating = Maps.newHashMap();
             
             List<SchematicProcessor> tasks = Lists.newArrayList();
             List<Schematic> alreadyDone = Lists.newArrayList();
@@ -126,7 +125,7 @@ public class SchematicManager {
                     try {
                         long checksum = hasher.hash64(schematicFile);
                         // Only load schematic data that wasn't yet loaded...
-                        ISchematicData existingData = alreadyHere.get(checksum);
+                        SchematicDataNode existingData = alreadyHere.get(checksum);
                         if (existingData != null) {
                             Schematic s = new DefaultSchematic(schematicFile, existingData.getWidth(), existingData.getHeight(), existingData.getLength(), existingData.getAxisOffset());
                             alreadyDone.add(s);

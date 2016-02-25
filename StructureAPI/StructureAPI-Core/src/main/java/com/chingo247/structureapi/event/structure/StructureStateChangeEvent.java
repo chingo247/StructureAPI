@@ -6,7 +6,7 @@
 package com.chingo247.structureapi.event.structure;
 
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
-import com.chingo247.structureapi.model.structure.IStructure;
+import com.chingo247.structureapi.model.structure.Structure;
 
 /**
  * Fired after the structure has changed state
@@ -16,7 +16,7 @@ public class StructureStateChangeEvent extends StructureEvent {
     
     private ConstructionStatus newStatus;
     
-    public StructureStateChangeEvent(IStructure structure, ConstructionStatus newStatus) {
+    public StructureStateChangeEvent(Structure structure, ConstructionStatus newStatus) {
         super(structure);
         this.newStatus = newStatus;
     }

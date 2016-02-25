@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.event.zone;
 
-import com.chingo247.structureapi.model.zone.IConstructionZone;
+import com.chingo247.structureapi.model.zone.ConstructionZone;
 
 /**
  *
@@ -24,7 +24,7 @@ import com.chingo247.structureapi.model.zone.IConstructionZone;
  */
 public class ConstructionZoneCreateEvent extends ConstructionZoneEvent {
 
-    public ConstructionZoneCreateEvent(IConstructionZone zone) {
+    public ConstructionZoneCreateEvent(ConstructionZone zone) {
         super(zone);
     }
     
