@@ -16,20 +16,15 @@
  */
 package com.chingo247.structureapi.construction.manual;
 
+import static com.chingo247.blockstore.NBTUtils.getChildTag;
 import com.chingo247.settlercraft.core.util.yaml.YAMLFormat;
-import com.chingo247.settlercraft.core.util.yaml.YAMLNode;
 import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
-import com.chingo247.structureapi.blockstore.NBTUtils;
-import static com.chingo247.structureapi.blockstore.NBTUtils.getChildTag;
-import static com.google.common.base.CharMatcher.is;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.blocks.BlockID;
-import com.sk89q.worldedit.blocks.BlockType;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
