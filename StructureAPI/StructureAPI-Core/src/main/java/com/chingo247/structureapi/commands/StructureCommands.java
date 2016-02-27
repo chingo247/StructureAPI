@@ -20,12 +20,12 @@ import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
-import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerRepository;
 import com.chingo247.structureapi.event.structure.owner.StructureAddOwnerEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureRemoveOwnerEvent;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
-import com.chingo247.structureapi.model.settler.SettlerRepository;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
@@ -39,7 +39,6 @@ import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.owner.StructureOwnership;
-import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.platform.permission.Permissions;
 import com.chingo247.structureapi.util.StringUtil;
 import com.chingo247.xplatform.core.IColors;
@@ -56,6 +55,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -636,7 +636,7 @@ public class StructureCommands {
                 try {
                     idString = playerArg.substring(1);
                     id = Long.parseLong(idString);
-                    BaseSettlerNode sn = settlerRepository.findById(id);
+                    SettlerNode sn = settlerRepository.findById(id);
                     if (sn == null) {
                         tx.success();
                         throw new CommandException("Couldn't find a player for id'" + idString + "'");
@@ -660,7 +660,7 @@ public class StructureCommands {
 
             UUID uuid = ply.getUniqueId();
             if (method.equalsIgnoreCase("add")) {
-                BaseSettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
+                SettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 Ownership ownershipToUpdate = ownerDomain.getOwnership(settler.getUniqueId());
 
@@ -703,7 +703,7 @@ public class StructureCommands {
     @Command(aliases = {"structure:list", "stt:list"}, usage = "stt:list <member|owner|master>", desc = "Displays a list of structure your are owner of")
     public static void list(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final SettlerRepository structureOwnerRepository = new SettlerRepository(graph);
+        final SettlerRepository settlerRepo = new SettlerRepository(graph);
         final IColors colors = structureAPI.getPlatform().getChatColors();
 
         int page = 0;
@@ -749,15 +749,12 @@ public class StructureCommands {
         int skip = p * (MAX_LINES - 1);
         int limit = (MAX_LINES - 1);
 
-        long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
-            SettlerNode structureOwner = structureOwnerRepository.findByUUID(playerId);
-
-            long countStart = System.currentTimeMillis();
-            long totalStructures = structureOwner.getStructureCount();
+            StructureRepository structureRepository = new StructureRepository(graph);
+            long totalStructures = structureRepository.countStructuresOfSettler(playerId);
 //            LOG.log(Level.INFO, "list count in {0} ms", (System.currentTimeMillis() - countStart));
             long totalPages = Math.round(Math.ceil(totalStructures / (MAX_LINES - 1)));
-            List<StructureOwnership> structures = structureOwner.getStructures(skip, limit);
+            Collection<StructureOwnership> structures = structureRepository.findByOwner(playerId, skip, limit);
             if (p > totalPages || p < 0) {
                 tx.success();
                 throw new CommandException("Page " + p + " out of " + totalPages + "...");

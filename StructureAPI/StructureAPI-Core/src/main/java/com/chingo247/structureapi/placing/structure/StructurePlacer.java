@@ -7,14 +7,14 @@ package com.chingo247.structureapi.placing.structure;
 
 import com.chingo247.settlercraft.core.Direction;
 import com.chingo247.settlercraft.core.SettlerCraft;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerRepository;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.event.structure.StructureCreateEvent;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
-import com.chingo247.structureapi.model.settler.SettlerNode;
-import com.chingo247.structureapi.model.settler.SettlerRepository;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.world.StructureWorldNode;

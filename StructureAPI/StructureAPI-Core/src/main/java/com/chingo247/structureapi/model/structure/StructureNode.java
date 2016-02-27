@@ -132,9 +132,9 @@ public class StructureNode extends PlotNode {
         return NodeHelper.getLong(underlyingNode, ID_PROPERTY, null);
     }
 
-    public GraphDatabaseService getGraph() {
-        return getNode().getGraphDatabase();
-    }
+//    public GraphDatabaseService getGraph() {
+//        return getNode().getGraphDatabase();
+//    }
 
     public void setCompletedAt(Long date) {
         if (date != null) {
@@ -393,7 +393,7 @@ public class StructureNode extends PlotNode {
 
     public Iterable<StructureNode> getSubStructuresWithin(CuboidRegion region) {
         final CuboidRegion thisRegion = getCuboidRegion();
-        TraversalDescription traversal = getGraph().traversalDescription();
+        TraversalDescription traversal = getNode().getGraphDatabase().traversalDescription();
         Iterable<Node> structure = traversal.relationships(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.INCOMING)
             .evaluator(Evaluators.excludeStartPosition()).evaluator(new Evaluator() {
 

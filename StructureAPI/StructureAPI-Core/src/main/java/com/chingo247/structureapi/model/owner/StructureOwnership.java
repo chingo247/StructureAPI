@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.model.owner;
 
-import com.chingo247.structureapi.model.settler.SettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import org.neo4j.graphdb.Relationship;
 

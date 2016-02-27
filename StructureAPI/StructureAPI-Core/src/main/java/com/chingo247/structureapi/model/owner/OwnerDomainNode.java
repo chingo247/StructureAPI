@@ -16,10 +16,9 @@
  */
 package com.chingo247.structureapi.model.owner;
 
-import com.chingo247.settlercraft.core.model.settler.BaseSettler;
-import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
-import com.chingo247.structureapi.model.Relations;
-import com.chingo247.structureapi.model.settler.SettlerNode;
+import com.chingo247.settlercraft.core.model.settler.Settler;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
+import com.chingo247.structureapi.model.RelTypes;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.UUID;
@@ -55,7 +54,7 @@ public class OwnerDomainNode {
     
     public Ownership getOwnership(UUID settler) {
         Ownership ownership = null;
-        for (Relationship rel : underlyingNode.getRelationships(DynamicRelationshipType.withName(Relations.RELATION_OWNED_BY), org.neo4j.graphdb.Direction.OUTGOING)) {
+        for (Relationship rel : underlyingNode.getRelationships(RelTypes.OWNED_BY, org.neo4j.graphdb.Direction.OUTGOING)) {
             SettlerNode ownerNode = new SettlerNode(rel.getOtherNode(underlyingNode));
             if (ownerNode.getUniqueId().equals(settler)) {
                 ownership = new Ownership(ownerNode, rel);
@@ -71,7 +70,7 @@ public class OwnerDomainNode {
      * @param ownerType The owner type to set, may not be null
      * @return True if there was an update
      */
-    public boolean setOwnership(BaseSettlerNode settler, OwnerType ownerType) {
+    public boolean setOwnership(SettlerNode settler, OwnerType ownerType) {
         Preconditions.checkNotNull(ownerType, "Ownertype may not be null...");
         // if exists... update it
         for(Ownership o : getOwnerships()) {
@@ -86,14 +85,14 @@ public class OwnerDomainNode {
             }
         }
         // otherwise create a new one
-        Relationship r = underlyingNode.createRelationshipTo(settler.getNode(), DynamicRelationshipType.withName(Relations.RELATION_OWNED_BY));
+        Relationship r = underlyingNode.createRelationshipTo(settler.getNode(), RelTypes.OWNED_BY);
         r.setProperty("Type", ownerType.getTypeId());
         return true;
     }
     
     
     
-    public boolean removeOwnership(BaseSettler settler) {
+    public boolean removeOwnership(Settler settler) {
         return removeOwnership(settler.getUniqueId());
     }
     
@@ -109,7 +108,7 @@ public class OwnerDomainNode {
     
     public List<Ownership> getOwnerships() {
         List<Ownership> owners = Lists.newArrayList();
-        for (Relationship rel : underlyingNode.getRelationships(DynamicRelationshipType.withName(Relations.RELATION_OWNED_BY), org.neo4j.graphdb.Direction.OUTGOING)) {
+        for (Relationship rel : underlyingNode.getRelationships(RelTypes.OWNED_BY, org.neo4j.graphdb.Direction.OUTGOING)) {
             if (rel.getOtherNode(underlyingNode).hasLabel(SettlerNode.label())) {
                 SettlerNode ownerNode = new SettlerNode(rel.getOtherNode(underlyingNode));
                 owners.add(new Ownership(ownerNode, rel));
@@ -122,7 +121,7 @@ public class OwnerDomainNode {
         Preconditions.checkNotNull(ownerType, "OwnerType may not be null");
 
         List<SettlerNode> owners = Lists.newArrayList();
-        for (Relationship rel : underlyingNode.getRelationships(DynamicRelationshipType.withName(Relations.RELATION_OWNED_BY), org.neo4j.graphdb.Direction.OUTGOING)) {
+        for (Relationship rel : underlyingNode.getRelationships(RelTypes.OWNED_BY, org.neo4j.graphdb.Direction.OUTGOING)) {
             if (rel.hasProperty("Type")) {
                 Integer typeId = (Integer) rel.getProperty("Type");
                 OwnerType type = OwnerType.match(typeId);

@@ -49,12 +49,10 @@ public class Plot implements Spatial {
         return underlyingNode;
     }
     
-    @Override
     public Vector getMin() {
         return min;
     }
 
-    @Override
     public Vector getMax() {
         return max;
     }
