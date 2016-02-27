@@ -63,8 +63,6 @@ public class PermissionManager {
     }
     
     public enum Perms {
-//        CONTENT_GENERATE_PLANS(new Permission(Permissions.CONTENT_GENERATE_PLANS, PermissionDefault.OP, "Allows to generate plans from schematics on the server - is CONSOLE only")),
-//        CONTENT_GENERATE_PLANS(new Permission(Permissions.CONTENT_GENERATE_PLANS, PermissionDefault.OP, "Allows to generate plans from schematics on the server - is CONSOLE only")),
         CONTENT_RELOAD_PLANS(new Permission(Permissions.RELOAD_PLANS, PermissionDefault.OP, "Allows a player to reload plans on the server")),
         CONTENT_ROTATE_PLACEMENT(new Permission(Permissions.ROTATE_SCHEMATIC, PermissionDefault.OP, "Allows a player to rotate the original schematic for all future placing")),
         
@@ -73,12 +71,15 @@ public class PermissionManager {
         
         SETTLER_OPEN_SHOP_MENU(new Permission(Permissions.OPEN_PLANSHOP, PermissionDefault.TRUE, "Allows a player to use the plan shop")),
         
-        SETTLER_STRUCTURE_CREATE(new Permission(Permissions.STRUCTURE_CREATE, PermissionDefault.OP, "Allows a player to create structures from selections")),
-        SETTLER_STRUCTURE_PLACE(new Permission(Permissions.STRUCTURE_PLACE, PermissionDefault.TRUE, "Allows the player to place structures")),
-        SETTLER_STRUCTURE_CONSTRUCTION(new Permission(Permissions.STRUCTURE_CONSTRUCTION, PermissionDefault.TRUE, "Allows the player to start construction.demolition of a structure")),
-        SETTLER_STRUCTURE_INFO(new Permission(Permissions.STRUCTURE_INFO, PermissionDefault.TRUE, "Allows the player to show information about a structure")),
-        SETTLER_STRUCTURE_LIST(new Permission(Permissions.STRUCTURE_LIST, PermissionDefault.TRUE, "Allows the player to show a list structures he or another player owns")),
-        SETTLER_STRUCTURE_LOCATION(new Permission(Permissions.STRUCTURE_LOCATION, PermissionDefault.TRUE, "Allows the player to show his relative position to a structure")),
+        STRUCTURE_CREATE(new Permission(Permissions.STRUCTURE_CREATE, PermissionDefault.OP, "Allows a player to create structures from selections")),
+        STRUCTURE_PLACE(new Permission(Permissions.STRUCTURE_PLACE, PermissionDefault.TRUE, "Allows the player to place structures")),
+        STRUCTURE_DEMOLISH(new Permission(Permissions.STRUCTURE_DEMOLISH, PermissionDefault.TRUE, "Allows the player to demolish a structure")),
+        STRUCTURE_BUILD(new Permission(Permissions.STRUCTURE_DEMOLISH, PermissionDefault.TRUE, "Allows the player to build a structure")),
+        STRUCTURE_HALT(new Permission(Permissions.STRUCTURE_DEMOLISH, PermissionDefault.TRUE, "Allows the player to halt any construction process of a structure")),
+        STRUCTURE_ROLLBACK(new Permission(Permissions.STRUCTURE_DEMOLISH, PermissionDefault.TRUE, "Allows the player to rollback a structure")),
+        STRUCTURE_INFO(new Permission(Permissions.STRUCTURE_INFO, PermissionDefault.TRUE, "Allows the player to show information about a structure")),
+        STRUCTURE_LIST(new Permission(Permissions.STRUCTURE_LIST, PermissionDefault.TRUE, "Allows the player to show a list structures he or another player owns")),
+        STRUCTURE_LOCATION(new Permission(Permissions.STRUCTURE_LOCATION, PermissionDefault.TRUE, "Allows the player to show his relative position to a structure")),
         
         SETTLER_CONSTRUCTION_ZONE_CREATE(new Permission(Permissions.CONSTRUCTIONZONE_CREATE, PermissionDefault.OP, "Allows a player to create construction zones")),
         SETTLER_CONSTRUCTION_ZONE_DELETE(new Permission(Permissions.CONSTRUCTIONZONE_DELETE, PermissionDefault.OP, "Allows a player to delete construction zones"));

@@ -258,7 +258,7 @@ public class StructureCommands {
         }
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_BUILD)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:build", "stt:build"}, desc = "Builds a structure", min = 1, max = 1, flags = "f")
     public static void build(final CommandContext args, final ICommandSender sender, final IStructureAPI structureAPI) throws Exception {
@@ -306,7 +306,7 @@ public class StructureCommands {
         structureAPI.getContractor().submit(structure, safeContract);
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_ROLLBACK)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:rollback", "stt:rollback"}, desc = "Restores the area back to before the structure was placed", min = 1, max = 1, flags = "f")
     public static void rollback(final CommandContext args, final ICommandSender sender, final IStructureAPI structureAPI) throws Exception {
@@ -338,13 +338,38 @@ public class StructureCommands {
         }
 //        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
 
+        
+        if (!structure.getRollbackData().hasBlockStore()) {
+            throw new CommandException("No rollback file...");
+        }
+        
         if (structure.getStatus() == ConstructionStatus.REMOVED) {
-            throw new CommandException("Can't ROLLBACK a REMOVED structure!");
+            if(!isOP(sender)) {
+                throw new CommandException("You don't have permission to rollback a REMOVED Structure");
+            }
+            
+            try(Transaction tx = graph.beginTx()) {
+                Collection<StructureNode> overlappingStructures = structureRepository.findStructuresWithin(structure.getWorldUUID(), structure.getCuboidRegion(), 10);
+                if(overlappingStructures.size() > 0) {
+                    String error = "Couldn't rollback, there are currently other structures at the place of #" + structure.getId() + "\n";
+                    error += "The following structures need to be deleted before rollback is possible:\n";
+                    boolean first = true;
+                    for (StructureNode node : overlappingStructures) {
+                        if(!first) {
+                            error += ", ";
+                        }
+                        error += "#" + node.getId();
+                    }
+                    tx.success();
+                    throw new CommandException(error);
+                }
+                tx.success();
+            }
+            
+            
+            
         }
 
-        if (!structure.getRollbackData().hasBlockStore()) {
-            throw new CommandException("Rollback not available for this structure");
-        }
 
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
@@ -359,7 +384,7 @@ public class StructureCommands {
 
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_DEMOLISH)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:demolish", "stt:demolish"}, desc = "Demolishes a structure", min = 1, max = 1, flags = "f")
     public static void demolish(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
@@ -422,7 +447,7 @@ public class StructureCommands {
 
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_HALT)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:halt", "stt:halt"}, desc = "Stop building or demolishing of a structure", min = 1, max = 1, flags = "f")
     public static void halt(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {

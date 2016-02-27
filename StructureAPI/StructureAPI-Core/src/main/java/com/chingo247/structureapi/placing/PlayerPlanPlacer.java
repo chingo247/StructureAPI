@@ -101,7 +101,7 @@ public class PlayerPlanPlacer {
         final IPlayer player = SettlerCraft.getInstance().getPlatform().getPlayer(playerUUID);
 
         // Check if the player has permission to structures
-        if (!PermissionManager.getInstance().isAllowed(player, PermissionManager.Perms.SETTLER_STRUCTURE_PLACE)) {
+        if (!PermissionManager.getInstance().isAllowed(player, PermissionManager.Perms.STRUCTURE_PLACE)) {
             player.sendMessage(color.red() + "You have no permission to place structures");
             return;
         }
