@@ -49,14 +49,49 @@ Note: There is a small requirement for loading the schematics into SettlerCraft.
 StructureAPI has hooks to other plugins. For maintainability and other reasons, these hooks are provided separately:
 * [SettlerCraft-WorldGuard](https://github.com/chingo247/SettlerCraft/releases/) - WorldGuard support (requires worldguard 6.0)
 * [SettlerCraft-HolographicDisplays](https://github.com/chingo247/SettlerCraft/releases/) - Hologram support (requires HolographicDisplays 2.1.x)
-
 * [SettlerCraft-Towny](https://github.com/chingo247/SettlerCraft/releases/) - Support for Towny (since SettlerCraft-2.1.0) and ofcourse requires Towny. Mayors are able to place structures in the wildernis and players won't be able to place structures on or across plots they don't own.
-
 * [Vault 1.5.x](http://dev.bukkit.org/bukkit-plugins/vault/) - Plugin that serves a a Economyhub, 
  
 ## Client Plugin Hooks (LiteLoader)
-Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1292886-worldeditcui) in order to see areas being 'marked',
+Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1292886-worldeditcui) in order to see areas being 'marked'. 
 
-![StructureAPI WorldEdit CUI view](http://dev.bukkit.org/thumbman/images/83/716/600x434/worldedit-cui.PNG.-m1.png "WorldEditCUI")
+## Commands
+
+### Settler Commands
+| Command | Alias | Desciption |
+| ------------- |:-------------:| :----- |
+| settler:me | settler:whoami | Will tell you you're settler id, this id can be used for commands in cases where the player name was not unique |
+
+### Structure Commands
+| Command | Alias | Arguments | Desciption |
+| ------------- |:-------------:|:-------------:| ----- |
+| structure:build | stt:build | [Structure-Id] | Start building process of a structure |
+| structure:demolish | stt:demolish | [Structure-Id] | Start demolition process of a structure |
+| structure:rollback | stt:rollback | [Structure-Id] | Start rollback process of a structure |
+| structure:halt | stt:halt | [Structure-Id] | Stop any construction process of a structure |
+| structure:list | stt:list | [page] | List structures you own |
+| structure:info | stt:info | (id) | Displays information of the structure you are in or with the given id |
+| structure:members | stt:members | (Structure-Id) | Display a list of members of a structure |   
+| structure:members | stt:members | (Structure-Id) (add/remove) (playername) | Add or remove a player as member of a structure |
+| structure:members | stt:members | (Structure-Id) (add/remove) (Settler-Id) | Add or remove a player as member of a structure |
+| structure:owners | stt:owners | (Structure-Id) | Display a list of owner of a structure |   
+| structure:owners | stt:owners | (Structure-Id) (add/remove) (playername) | Add or remove a player as owner of a structure |  
+| structure:owners | stt:owners | (Structure-Id) (add/remove) (Settler-Id) | Add or remove a player as owner of a structure |  
+| structure:masters | stt:masters | (Structure-Id) |  Display a list of masters of a structure |   
+| structure:masters | stt:masters | (Structure-Id) (add/remove) (playername) | Add or remove a player as master of a structure | 
+| structure:masters | stt:masters | (Structure-Id) (add/remove) (Settler-ID) | Add or remove a player as master of a structure | 
+
+### StructurePlan Commands
+| Command | Desciption |
+| ------------- | ------- |
+| plans:generate| Generates plans for schematics located in directory: */plugins/SettlerCraft-StructureAPI/generate* |
+| plans:menu | opens plan menu where plans are **free** |
+| plans:shop | opens plan shop menu where plans are **not free** |
+| plans:reload | reloads plans located in directory: */plugins/SettlerCraft-StructureAPI/plans* |
+
+### Schematic Commands
+| Command | Arguments | Desciption |
+| ------------- |:-------------:| ----- |
+| schematic:rotate | (Structure-Id) (degrees) | Rotates a schematic by structure id. Note this will rotate the **original** schematic and will only work for structures that will be placed in the future.
 
 
