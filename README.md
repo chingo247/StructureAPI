@@ -55,14 +55,16 @@ StructureAPI has hooks to other plugins. For maintainability and other reasons, 
 ## Client Plugin Hooks (LiteLoader)
 Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1292886-worldeditcui) in order to see areas being 'marked'. 
 
-## Commands
+![WorldEdit CUI Preview](http://dev.bukkit.org/thumbman/images/83/716/600x434/worldedit-cui.PNG.-m1.png "Preview")
 
-### Settler Commands
+## Commands  <div id="commands"/>
+
+### Settler Commands <div id="settlercommands"/>
 | Command | Alias | Desciption |
 | ------------- |:-------------:| :----- |
-| settler:me | settler:whoami | Will tell you you're settler id, this id can be used for commands in cases where the player name was not unique |
+| settler:me | settler:whoami | Will tell you you're settler id, this id can be used with some commands for cases where the player name was not unique |
 
-### Structure Commands
+### Structure Commands <div id="structurecommands"/>
 | Command | Alias | Arguments | Desciption |
 | ------------- |:-------------:|:-------------:| ----- |
 | structure:build | stt:build | [Structure-Id] | Start building process of a structure |
@@ -81,17 +83,33 @@ Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.n
 | structure:masters | stt:masters | (Structure-Id) (add/remove) (playername) | Add or remove a player as master of a structure | 
 | structure:masters | stt:masters | (Structure-Id) (add/remove) (Settler-ID) | Add or remove a player as master of a structure | 
 
-### StructurePlan Commands
+### StructurePlan Commands <div id="planscommands"/>
 | Command | Desciption |
 | ------------- | ------- |
-| plans:generate| Generates plans for schematics located in directory: */plugins/SettlerCraft-StructureAPI/generate* |
+| plans:generate| Generates plans for schematics located in directory: */plugins/SettlerCraft-StructureAPI/generate*. Note can only be executed from console (non-players) |
 | plans:menu | opens plan menu where plans are **free** |
 | plans:shop | opens plan shop menu where plans are **not free** |
 | plans:reload | reloads plans located in directory: */plugins/SettlerCraft-StructureAPI/plans* |
 
-### Schematic Commands
+### Schematic Commands <div id="schematiccommands"/>
 | Command | Arguments | Desciption |
-| ------------- |:-------------:| ----- |
+| ------------- |:-------:| ----- |
 | schematic:rotate | (Structure-Id) (degrees) | Rotates a schematic by structure id. Note this will rotate the **original** schematic and will only work for structures that will be placed in the future.
+
+## Permissions
+
+| Permission | Desciption |
+| ------------- | ------- |
+| structureapi.plans.reload | Allows a player to reload plans using the /plans:reload commands |
+| structureapi.schematic.rotate | Allows a player to rotate **the original** schematic using the /schematic:rotate command |
+| structureapi.structure.place | Allows a player to place structures using a structureplan |
+| structureapi.structure.info | Allows a player to show info of a structure using /stt:info |
+| structureapi.structure.list | Allows a player to list structures using /stt:list |
+| structureapi.location | Allows a player to see it's current relative position from a structure |
+| structureapi.demolish | Allows a player to demolish a structure |
+| structureapi.build | Allows a player to build a structure |
+| structureapi.rollback | Allows a player to rollback a structure |
+| structureapi.halt | Allows a player to halt any construction process of a structure |
+
 
 
