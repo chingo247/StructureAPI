@@ -45,6 +45,18 @@ Note: There is a small requirement for loading the schematics into SettlerCraft.
 * [WorldEdit 6.1](http://dev.bukkit.org/bukkit-plugins/worldedit/files/61-world-edit-6-1-up-to-mc-1-8-6/)
 * [AsyncWorldEdit](https://github.com/SBPrime/AsyncWorldEdit/releases|) - version 2.2.x (**Note:** you will need both **AsyncWorldEdit** and **AsyncWorldEditInjector**)
 
+## Optional Hooks
+StructureAPI has hooks to other plugins. For maintainability and other reasons, these hooks are provided separately:
+* [SettlerCraft-WorldGuard](https://github.com/chingo247/SettlerCraft/releases/) - WorldGuard support (requires worldguard 6.0)
+* [SettlerCraft-HolographicDisplays](https://github.com/chingo247/SettlerCraft/releases/) - Hologram support (requires HolographicDisplays 2.1.x)
 
+* [SettlerCraft-Towny](https://github.com/chingo247/SettlerCraft/releases/) - Support for Towny (since SettlerCraft-2.1.0) and ofcourse requires Towny. Mayors are able to place structures in the wildernis and players won't be able to place structures on or across plots they don't own.
+
+* [Vault 1.5.x](http://dev.bukkit.org/bukkit-plugins/vault/) - Plugin that serves a a Economyhub, 
  
+## Client Plugin Hooks (LiteLoader)
+Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/1292886-worldeditcui) in order to see areas being 'marked',
+
+![StructureAPI WorldEdit CUI view](http://dev.bukkit.org/thumbman/images/83/716/600x434/worldedit-cui.PNG.-m1.png "WorldEditCUI")
+
 
