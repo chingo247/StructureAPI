@@ -320,7 +320,6 @@ public class StructureCommands {
             throw new CommandException("Expected a number but got '" + structureIdArg + "' \n" + "/structure:build [id]");
         }
         long id = Long.parseLong(structureIdArg);
-        long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
             StructureNode sn = structureRepository.findById(id);
 

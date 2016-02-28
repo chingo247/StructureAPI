@@ -30,6 +30,7 @@ import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.blockstore.safe.SafeBlockStoreWriter;
+import com.chingo247.structureapi.construction.task.StructurePlacingTask;
 import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.model.structure.RollbackData;
 import com.chingo247.structureapi.placement.RotationalPlacement;
@@ -92,7 +93,7 @@ public class SafeContract extends Contract {
     }
 
     @Override
-    public void apply(StructureEntry entry) throws StructureException {
+    public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
         Structure structure = entry.getStructure();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         IBlockPlacement placement = getPlacementProducer().produce(structure);
@@ -119,15 +120,6 @@ public class SafeContract extends Contract {
         World world = entryContract.getEditSession().getWorld();
         EditSession editSession = entryContract.getEditSession();
 
-        PlaceOptions placeOptions;
-        if(contract.getPlaceOptions() == null) {
-            placeOptions = new PlaceOptions();
-            placeOptions.setCubeY(placement.getHeight() / 2);
-        } else {
-            placeOptions = contract.getPlaceOptions();
-        }
-        
-
         Iterator<Vector> traversalSafe = new CuboidIterator(
                 placeOptions.getCubeX() < 0 ? placement.getWidth(): placeOptions.getCubeX(),
                 placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
@@ -147,11 +139,14 @@ public class SafeContract extends Contract {
         int countBlock = 0;
 
         while (countBlock < totalBlocks) {
-            entry.addTask(new SafeTask(entry, player, placement, world, safeBlockStore, traversalSafe, MAX_BLOCKS_PER_TASK));
+            SafeTask task = new SafeTask(entry, player, placement, world, safeBlockStore, traversalSafe, MAX_BLOCKS_PER_TASK);
+            entry.addTask(task);
             SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
-            entry.addTask(new AWEPlacementTask(
-                    asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())
-            );
+            
+            StructurePlacingTask placingTask = new AWEPlacementTask(
+                    asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin()); 
+            placingTask.setOptions(placeOptions);
+            entry.addTask(placingTask);
             countBlock += MAX_BLOCKS_PER_TASK;
         }
 
@@ -160,9 +155,11 @@ public class SafeContract extends Contract {
         // Empties the last blocks in placelater-queue
         SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
         safePlacement.setLast(true);
-        entry.addTask(new AWEPlacementTask(
-                asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin())
-        );
+        
+        StructurePlacingTask task = new AWEPlacementTask(
+                asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
+        task.setOptions(placeOptions);
+        entry.addTask(task);
 
     }
 

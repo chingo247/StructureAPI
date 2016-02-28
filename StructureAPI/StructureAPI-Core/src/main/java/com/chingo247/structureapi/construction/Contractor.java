@@ -27,6 +27,8 @@ import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
+import com.chingo247.structureapi.placement.options.BlockPredicate;
+import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.xplatform.core.IColors;
@@ -34,8 +36,11 @@ import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IPlayer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -50,6 +55,8 @@ import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
 /**
+ * Contractor, like in someone who takes on contracts to build them for you.
+ * Once a contract is submitted it will be executed.
  *
  * @author Chingo
  */
@@ -143,17 +150,29 @@ public class Contractor implements IContractor {
             playerOrRandomUUID = CONSOLE;
             sender = platform.getConsole();
         }
-
-        World world = SettlerCraft
+       
+        // Set default editsession if null
+        if (constract.getEditSession() == null) {
+            
+             // Get the world where it's happening
+            World world = SettlerCraft
                 .getInstance()
                 .getWorld(
                         structure.getWorldName()
                 );
-        Player ply = SettlerCraft.getInstance().getPlayer(playerOrRandomUUID);
-        final AsyncEditSession editSession = constract.getEditSession() != null ? constract.getEditSession()
-                : (AsyncEditSession) (ply != null ? StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1, ply)
-                        : StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1));
-        constract.setEditsession(editSession);
+            
+            // Gets the player or null
+            Player playerOrNull = SettlerCraft.getInstance()
+                    .getPlayer(playerOrRandomUUID);
+
+            // Create a editsession for the player or the randomUUID if player was null
+            final EditSession editSession = playerOrNull != null ? 
+                   StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1, playerOrNull)
+                            : StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1);
+
+            // Set the editsession if the editsession was null
+            constract.setEditsession((AsyncEditSession) editSession);
+        }
 
         es.execute(new Runnable() {
 
@@ -190,6 +209,7 @@ public class Contractor implements IContractor {
                             @Override
                             public void run() {
                                 List<Structure> structures = null;
+                                Map<Long, List<CuboidRegion>> substructureMap = Maps.newHashMap();
                                 Transaction tx = null;
                                 try {
 
@@ -212,8 +232,21 @@ public class Contractor implements IContractor {
                                                 .nodes();
 
                                         structures = Lists.newArrayList();
-                                        for (Node sn : nodes) {
+                                        for (Node n : nodes) {
+                                            StructureNode sn = new StructureNode(n);
                                             structures.add(new Structure(sn));
+                                            
+                                            if(sn.hasSubstructures()) {
+                                                List<CuboidRegion> substructures = new ArrayList<>();
+                                                
+                                                
+                                                for(StructureNode sub : sn.getSubstructures()) {
+                                                    substructures.add(sub.getCuboidRegion());
+                                                }
+                                                substructureMap.put(sn.getId(), substructures);
+                                            }
+                                            
+                                            
                                         }
 
                                         tx.success();
@@ -246,8 +279,7 @@ public class Contractor implements IContractor {
                                         if (constract.isRecursive()) {
                                             StructureEntry prevEntry = null;
                                             try {
-                                                
-                                                
+
                                                 for (Structure s : structures) {
                                                     StructureEntry currentEntry = getOrCreateEntry(s, constract);
                                                     watcher.register(structure);
@@ -256,11 +288,17 @@ public class Contractor implements IContractor {
                                                     if (startEntry == null) {
                                                         startEntry = currentEntry;
                                                     }
+                                                    
+                                                    PlaceOptions p = constract.getPlaceOptionsFactory().makeOptions(structure);
+                                                    
+                                                    List<CuboidRegion> subregionsToIgnore = substructureMap.get(s.getId());
+                                                    if(subregionsToIgnore != null) {
+                                                        p.addIgnore(subregionsToIgnore);
+                                                    }
+                                                    
 //                                                    constract.getAssigner().assignTasks(editSession, playerOrRandomUUID, currentEntry);
-                                                    
-                                                    constract.apply(currentEntry);
-                                                    
-                                                    
+                                                    constract.apply(currentEntry, p);
+
                                                     if (prevEntry != null) {
                                                         prevEntry.setNextEntry(currentEntry);
                                                     }
@@ -282,10 +320,10 @@ public class Contractor implements IContractor {
                                             StructureEntry entry = getOrCreateEntry(structure, constract);
 //                                            constract.registerListeners(entry);
                                             watcher.register(structure);
-                                            
-                                           
+                                            PlaceOptions p = constract.getPlaceOptionsFactory().makeOptions(structure);
+                                                    
                                             try {
-                                                constract.apply(entry);
+                                                constract.apply(entry, p);
                                                 startEntry = entry;
                                             } catch (StructureException ex) {
                                                 startEntry = null;
@@ -354,9 +392,7 @@ public class Contractor implements IContractor {
                 entry.stop();
             }
         });
-        
+
     }
-    
-    
 
 }

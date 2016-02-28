@@ -17,7 +17,6 @@
 package com.chingo247.structureapi.platform;
 
 import com.chingo247.settlercraft.core.util.yaml.YAMLFormat;
-import com.chingo247.settlercraft.core.util.yaml.YAMLNode;
 import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
 import com.chingo247.structureapi.exeption.StructureAPIException;
 import java.io.File;
@@ -130,7 +129,7 @@ public class ConfigProvider {
         ConfigProvider config = new ConfigProvider(f);
         config.setVersion(yamlp.getString("version", null));
         config.setAllowsSubstructures(getValue(yamlp, "structures.allow-substructures", Boolean.class));
-        config.setRestrictedToZones(getValue(yamlp, "structures.restricted-to-zones", Boolean.class));
+//        config.setRestrictedToZones(getValue(yamlp, "structures.restricted-to-zones", Boolean.class));
         config.setUseHolograms(getValue(yamlp, "structures.use-holograms", Boolean.class));
         config.setProtectStructures(getValue(yamlp, "structures.protected", Boolean.class));
 //        config.setProtectConstructionZones(getValue(yamlp, "constructionzones.protected", Boolean.class));

@@ -5,6 +5,10 @@
  */
 package com.chingo247.structureapi.placement.options;
 
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
+import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.regions.Region;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +39,18 @@ public class PlaceOptions {
      */
     public void addIgnore(BlockPredicate blockPredicate) {
         toIgnore.add(blockPredicate);
+    }
+    
+    public void addIgnore(Iterable<? extends Region> regionsToIgnore) {
+        for(final Region region : regionsToIgnore) {
+            toIgnore.add(new BlockPredicate() {
+
+                @Override
+                public boolean evaluate(Vector position, Vector worldPosition, BaseBlock block) {
+                    return (region.contains(worldPosition));
+                }
+            });
+        }
     }
 
     /**

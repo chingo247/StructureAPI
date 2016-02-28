@@ -30,6 +30,8 @@ import static com.chingo247.structureapi.menus.plans.StructurePlanItem.getPlanID
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.getValue;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.isStructurePlan;
 import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.structure.StructureNode;
+import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.selection.CUISelectionManager;
 import com.chingo247.structureapi.selection.ISelectionManager;
 import com.chingo247.structureapi.selection.NoneSelectionManager;
@@ -50,6 +52,8 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  *
@@ -179,10 +183,27 @@ public class PlayerPlanPlacer {
                                 // Fix WTF HOW?!!1?
                                 pos1 = WorldUtil.translateLocation(pos1, direction, (-(selection.getMaximumPoint().getBlockZ() - 1)), 0, 0);
                             }
+                            
+                            Structure parent = null;
+                            if(structureAPI.getConfig().allowsSubstructures()) {
+                                GraphDatabaseService graph = structureAPI.getGraphDatabase();
+                                try(Transaction tx = graph.beginTx()) {
+                                    StructureRepository structureRepository = new StructureRepository(graph);
+                                    StructureNode sn = structureRepository.findStructureOnPosition(player.getWorld().getUUID(), pos1);
+                                    if(sn != null) {
+                                        parent = new Structure(sn);
+                                    }
+                                    tx.success();
+                                }
+                            }
+                            
+                            
+                            
 
                             StructurePlacerFactory placerFactory = structureAPI.getStructurePlacerFactory();
                             IPlaceResult<Structure> placeResult = placerFactory.createPlacer(player.getWorld().getName())
                                     .setPlacer(playerUUID)
+                                    .setParent(parent)
                                     .setCheckOwnerRestriction(true)
                                     .setInheritOwnership(true)
                                     .setName(plan.getName())

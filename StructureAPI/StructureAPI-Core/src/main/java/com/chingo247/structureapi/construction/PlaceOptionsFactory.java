@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,25 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.placement.options;
+package com.chingo247.structureapi.construction;
 
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.blocks.BaseBlock;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.placement.options.PlaceOptions;
 
 /**
  *
  * @author Chingo
  */
-public interface BlockPredicate {
+public interface PlaceOptionsFactory {
     
-    
-    /**
-     * Evaluates the position
-     * @param position The relative position to evaluate
-     * @param worldPosition
-     * @param block The block to evaluate
-     * @return true if evaluation expression is true
-     */
-    boolean evaluate(Vector position, Vector worldPosition, BaseBlock block);
+    PlaceOptions makeOptions(Structure structure);
     
 }

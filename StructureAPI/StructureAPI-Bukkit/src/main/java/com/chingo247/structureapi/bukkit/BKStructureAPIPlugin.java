@@ -115,7 +115,16 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             return;
         }
 
-        createDefaults();
+        try {
+            createDefaults();
+        } catch (StructureAPIException ex) {
+            Bukkit.getConsoleSender().sendMessage(new String[]{
+                ChatColor.RED + ex.getMessage(), ChatColor.RED + "Disabling SettlerCraft-StructureAPI"
+            });
+//            Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
+            this.setEnabled(false);
+            return;
+        }
 
         // Get GraphDatabase
         graph = SettlerCraft.getInstance().getNeo4j();
@@ -241,7 +250,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
         return temp;
     }
 
-    private void createDefaults() {
+    private void createDefaults() throws StructureAPIException {
         try {
             checkConfigUpdate();
             JarUtil.createDefault(new File(getDataFolder(), "menu.xml"), getFile(), RESOURCES_PATH + "menu.xml");
@@ -250,7 +259,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
         }
     }
 
-    private void checkConfigUpdate() throws IOException {
+    private void checkConfigUpdate() throws IOException, StructureAPIException {
         File configFile = new File(getDataFolder(), "config.yml");
         if (configFile.exists()) {
             File temp = getTempDir();
@@ -265,7 +274,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             try {
                 currentConfig = ConfigProvider.load(configFile);
             } catch (Exception ex) {
-                throw new RuntimeException("An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
+                throw new StructureAPIException("[SettlerCraft-StructureAPI]: An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
             }
             
             if(currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfigVersion) == -1) {
