@@ -22,6 +22,7 @@ import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.contract.Contract;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.RelTypes;
+import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.structure.Structure;
@@ -41,6 +42,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -49,8 +51,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.traversal.Evaluation;
+import org.neo4j.graphdb.traversal.Evaluator;
 import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
@@ -128,6 +134,13 @@ public class Contractor implements IContractor {
             return entries.get(structure.getId());
         }
     }
+    
+    private void recursiveAdd(StructureNode parent, List<StructureNode> holder) {
+        holder.add(parent);
+        for(StructureNode s : parent.getSubstructures()) {
+            recursiveAdd(s, holder);
+        }
+    }
 
     /**
      * Submits a contract for execution
@@ -194,7 +207,7 @@ public class Contractor implements IContractor {
                             tx.failure();
                         }
                         if (player != null) {
-                            sender.sendMessage(colors.red() + "[StructureCraft]: An error ocurrerd... See console");
+                            sender.sendMessage(colors.red() + "[StructureCraft]: An error occurred... See console");
                         }
                         LOG.log(Level.SEVERE, ex.getMessage(), ex);
                     } finally {
@@ -218,23 +231,30 @@ public class Contractor implements IContractor {
 
                                         StructureNode structureNode = structureRepository.findById(structure.getId());
 
-                                        // Traverse the structures from the database/graph
-                                        TraversalDescription traversal = graph.traversalDescription()
-                                                .relationships(RelTypes.SUBSTRUCTURE_OF, Direction.INCOMING)
-                                                .breadthFirst();
-
-                                        if (constract.isReversed()) {
-                                            traversal = traversal.reverse();
-                                        }
-
-                                        Iterable<Node> nodes = traversal
-                                                .traverse(structureNode.getNode())
-                                                .nodes();
 
                                         structures = Lists.newArrayList();
-                                        for (Node n : nodes) {
-                                            StructureNode sn = new StructureNode(n);
+                                        
+                                        List<StructureNode> nodes = Lists.newArrayList();
+                                        recursiveAdd(structureNode, nodes);
+                                        
+                                        if(constract.isReversed()) {
+                                            Collections.reverse(nodes);
+                                        }
+                                        
+                                        
+                                        
+                                        
+                                        for (StructureNode sn : nodes) {
+                                            
+                                            
+                                            
+                                            // ASSURE THIS WON'T HAPPEN
+                                            if(sn.getStatus() == ConstructionStatus.REMOVED) {
+                                                continue;
+                                            }
+                                            
                                             structures.add(new Structure(sn));
+                                            sn.setStatus(ConstructionStatus.QUEUED);
                                             
                                             if(sn.hasSubstructures()) {
                                                 List<CuboidRegion> substructures = new ArrayList<>();
@@ -255,7 +275,7 @@ public class Contractor implements IContractor {
                                             tx.failure();
                                         }
                                         if (player != null) {
-                                            sender.sendMessage(colors.red() + "[StructureAPI]: An error ocurrerd... See console");
+                                            sender.sendMessage(colors.red() + "[StructureAPI]: An error occurred... See console");
                                         }
                                         LOG.log(Level.SEVERE, ex.getMessage(), ex);
                                         structures = null;
@@ -311,7 +331,7 @@ public class Contractor implements IContractor {
                                             } catch (Exception ex) {
                                                 startEntry = null;
                                                 if (player != null) {
-                                                    sender.sendMessage(colors.red() + "[StructureAPI]: An error occured... See console");
+                                                    sender.sendMessage(colors.red() + "[StructureAPI]: An error occurred... See console");
                                                 }
                                                 remove(structures); // Cleanup entries
                                                 Logger.getLogger(Contractor.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
@@ -343,7 +363,7 @@ public class Contractor implements IContractor {
                                     }
                                 } catch (Exception ex) {
                                     if (player != null) {
-                                        player.sendMessage(colors.red() + "[StructureAPI]: An error occured... see console");
+                                        player.sendMessage(colors.red() + "[StructureAPI]: An error occurred... see console");
                                     }
                                     LOG.log(Level.SEVERE, ex.getMessage(), ex);
                                 }

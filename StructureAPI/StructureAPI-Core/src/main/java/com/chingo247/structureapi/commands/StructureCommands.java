@@ -218,7 +218,6 @@ public class StructureCommands {
             } catch (NumberFormatException nfe) {
                 throw new CommandException("Expected a number but got '" + args.getString(0) + "'");
             }
-            long start = System.currentTimeMillis();
 
             try (Transaction tx = graph.beginTx()) {
                 structure = structureRepository.findById(id);
@@ -374,7 +373,7 @@ public class StructureCommands {
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
         Contract rollbackContract = new RollbackContract()
-                .setRecursive(false)
+                .setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setReversedOrder(true)
@@ -438,7 +437,6 @@ public class StructureCommands {
 
         contract.setRecursive(true)
                 .setRestrictive(true)
-                .setRecursive(false)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);

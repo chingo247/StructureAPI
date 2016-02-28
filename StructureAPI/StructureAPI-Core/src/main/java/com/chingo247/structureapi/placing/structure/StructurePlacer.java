@@ -30,6 +30,7 @@ import com.chingo247.structureapi.exeption.StructureRestrictionException;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placing.IPlaceResult;
 import com.chingo247.structureapi.util.PlacementUtil;
+import com.chingo247.structureapi.util.RegionUtil;
 import com.chingo247.xplatform.core.ILocation;
 import com.chingo247.xplatform.core.IWorld;
 import com.google.common.collect.Sets;
@@ -148,6 +149,15 @@ public class StructurePlacer  {
         }, plan);
         return placeResult;
     }
+    
+    private void checkRecursiveInprogress(StructureNode parentNode) throws StructureException {
+        if(parentNode.getStatus().isInProgress()) {
+            throw new StructureException("Can't place in structure #" + parentNode.getId() + ", structure is in progress!");
+        } else if(parentNode.hasParent()) {
+            checkRecursiveInprogress(parentNode.getParent());
+        }
+    }
+    
 
     private IPlaceResult<Structure> place(CuboidRegion region, Vector position, Direction direction, ICallback callback, IStructurePlan plan) throws IOException, UnsupportedPlacementException {
         StructurePlaceResult placeResult = new StructurePlaceResult();
@@ -204,6 +214,12 @@ public class StructurePlacer  {
 
                     // Check parent - In parent only if applicable
                 } else {
+                    
+                    if(!RegionUtil.isDimensionWithin(parent.getCuboidRegion(), region)) {
+                        throw new StructureException("Structure overlaps another structure \nStructure not within parent structure");
+                    }
+                    
+                    checkRecursiveInprogress(parentNode);
                     
                     if(placer != null && checkOwnerRestriction) {
                         Ownership ownership = parentNode.getOwnerDomain().getOwnership(placer);

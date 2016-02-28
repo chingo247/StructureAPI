@@ -51,15 +51,7 @@ public class RegionUtil {
     }
 
     public static boolean isDimensionWithin(CuboidRegion parent, CuboidRegion child) {
-        CuboidRegion p = new CuboidRegion(parent.getMinimumPoint(), parent.getMaximumPoint());
-        CuboidRegion c = new CuboidRegion(child.getMinimumPoint(), child.getMaximumPoint());
-        return p.getMinimumPoint().getBlockX() > c.getMinimumPoint().getBlockX()
-                && p.getMinimumY() >= c.getMinimumY()
-                && p.getMinimumPoint().getBlockZ() > c.getMinimumPoint().getBlockZ()
-                && p.getMaximumPoint().getBlockX() < c.getMaximumPoint().getBlockX()
-                && p.getMaximumPoint().getBlockY() < c.getMaximumPoint().getBlockY()
-                && p.getMaximumPoint().getBlockZ() < c.getMaximumPoint().getBlockZ();
-
+        return parent.contains(child.getMinimumPoint()) && parent.contains(child.getMaximumPoint());
     }
 
     /**
