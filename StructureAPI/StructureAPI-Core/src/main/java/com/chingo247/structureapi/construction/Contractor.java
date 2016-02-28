@@ -409,7 +409,9 @@ public class Contractor implements IContractor {
             @Override
             public void run() {
                 StructureEntry entry = getEntry(structure);
-                entry.stop();
+                if(entry != null) {
+                    entry.stop();
+                }
             }
         });
 

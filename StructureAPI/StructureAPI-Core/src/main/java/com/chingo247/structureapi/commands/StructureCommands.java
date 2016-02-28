@@ -484,6 +484,10 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
+        if(structure.getConstructionStatus() == ConstructionStatus.REMOVED) {
+            throw new CommandException("Can't HALT a removed structure");
+        }
+        
         // Stop current action
         String structureInfo = colors.reset() + ": #" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
         sender.sendMessage(colors.red() + "STOPPING" + structureInfo);

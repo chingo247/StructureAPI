@@ -230,12 +230,7 @@ public class StructurePlacer  {
                         }
                     }
 
-                    // Check parent in progress
-                    if (parentNode.getStatus().isInProgress()) {
-                        throw new StructureException("Can't place structures in structures that are in progress");
-                    }
-
-                    if (parentNode.hasSubstructuresWithin(region)) {
+                    if (parentNode.overlapsSubstructures(region)) {
                         throw new StructureException("Structure overlaps another structure");
                     }
                 }

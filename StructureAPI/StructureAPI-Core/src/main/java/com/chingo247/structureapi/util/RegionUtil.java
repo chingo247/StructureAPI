@@ -58,12 +58,12 @@ public class RegionUtil {
      * Checks whether two CuboidDimensionals overlap each other
      *
      * @param dimensionalA The dimensional
-     * @param dimensianalB The other dimensional
+     * @param dimensional The other dimensional
      * @return True if the two CuboidDimensionals overlap each other
      */
-    public static boolean overlaps(CuboidRegion dimensionalA, CuboidRegion dimensianalB) {
+    public static boolean overlaps(CuboidRegion dimensionalA, CuboidRegion dimensional) {
         CuboidRegion p = new CuboidRegion(dimensionalA.getMinimumPoint(), dimensionalA.getMaximumPoint());
-        CuboidRegion c = new CuboidRegion(dimensianalB.getMinimumPoint(), dimensianalB.getMaximumPoint());
+        CuboidRegion c = new CuboidRegion(dimensional.getMinimumPoint(), dimensional.getMaximumPoint());
 
         Vector pMax = p.getMaximumPoint();
         Vector pMin = p.getMinimumPoint();

@@ -392,32 +392,26 @@ public class StructureNode extends PlotNode {
     }
 
     public Iterable<StructureNode> getSubStructuresWithin(CuboidRegion region) {
-        final CuboidRegion thisRegion = getCuboidRegion();
-        TraversalDescription traversal = getNode().getGraphDatabase().traversalDescription();
-        Iterable<Node> structure = traversal.relationships(RelTypes.SUBSTRUCTURE_OF, org.neo4j.graphdb.Direction.INCOMING)
-            .evaluator(Evaluators.excludeStartPosition()).evaluator(new Evaluator() {
-
-            @Override
-            public Evaluation evaluate(Path path) {
-                
-                
-                StructureNode endStructure = new StructureNode(path.endNode());
-                if (endStructure.getStatus() == ConstructionStatus.REMOVED) {
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                } else if(RegionUtil.overlaps(endStructure.getCuboidRegion(), thisRegion)) {
-                    return Evaluation.INCLUDE_AND_CONTINUE;
-                } else {
-                    return Evaluation.EXCLUDE_AND_PRUNE;
-                }
+        List<StructureNode> structures = Lists.newArrayList();
+        for(StructureNode structure : getSubstructures()) {
+            if(RegionUtil.overlaps(structure.getCuboidRegion(), region)) {
+                structures.add(structure);
             }
-        }).breadthFirst().traverse(underlyingNode).nodes();
+        }
         
-        return NodeHelper.makeIterable(structure, StructureNode.class);
+        
+        return structures;
+    }
+    
+    public boolean overlapsSubstructures(CuboidRegion region) {
+        for(StructureNode structure : getSubstructures()) {
+            if(RegionUtil.overlaps(structure.getCuboidRegion(), region)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public boolean hasSubstructuresWithin(CuboidRegion region) {
-        return getSubStructuresWithin(region).iterator().hasNext();
-    }
     
     
     
