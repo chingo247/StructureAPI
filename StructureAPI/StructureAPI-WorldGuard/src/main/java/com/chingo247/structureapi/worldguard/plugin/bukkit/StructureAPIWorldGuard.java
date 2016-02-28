@@ -66,7 +66,7 @@ public class StructureAPIWorldGuard extends JavaPlugin {
             System.out.println("[SettlerCraft-WorldGuard]: Couldn't find WorldGuard! Disabling SettlerCraft-WorldGuard");
             this.setEnabled(false);
         }
-        registerCommands();
+//        registerCommands();
     }
     
     private void registerCommands() {

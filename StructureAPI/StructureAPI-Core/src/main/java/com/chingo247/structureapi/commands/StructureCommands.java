@@ -729,7 +729,6 @@ public class StructureCommands {
     @Command(aliases = {"structure:list", "stt:list"}, usage = "stt:list <member|owner|master>", desc = "Displays a list of structure your are owner of")
     public static void list(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final SettlerRepository settlerRepo = new SettlerRepository(graph);
         final IColors colors = structureAPI.getPlatform().getChatColors();
 
         int page = 0;
@@ -879,14 +878,5 @@ public class StructureCommands {
 
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CREATE)
-    @CommandExtras(async = true, senderType = CommandSenderType.PLAYER)
-    @Command(aliases = {"structure:create", "/stt:create"}, desc = "Create a structure from selection or given arguments")
-    public static void create(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
-        if (args.argsLength() == 0) { // Create from selection
-            IPlayer plySender = (IPlayer) sender;
-            Player player = SettlerCraft.getInstance().getPlayer(plySender.getUniqueId());
 
-        }
-    }
 }
