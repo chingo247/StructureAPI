@@ -124,7 +124,7 @@ public class BlockStoreSection implements IBlockStoreSection {
         CompoundTag tag = getTileEntityData(x, y, z);
 
         if (id < 0 || blockData < 0) {
-            System.out.println("id: " + id + " data: " + blockData);
+//            System.out.println("id: " + id + " data: " + blockData);
             return null;
         }
 
