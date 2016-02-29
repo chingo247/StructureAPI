@@ -4,8 +4,7 @@
 version: 2.2.0
 ## Structure Section
 structures:
-    allow-substructures: true
-    restricted-to-zones: false
+    allow-substructures: false
     # required Holographic Displays 
     use-holograms: true
     # required WorldGuard
@@ -17,4 +16,4 @@ structures:
 ## Menu Section
 menus:
     planmenu-enabled: true
-    planshop-enabled: true
+    planshop-enabled: false

@@ -53,7 +53,8 @@ public class StructureAPIWorldGuard extends JavaPlugin {
             return; 
         }
         
-        if(Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI") == null) {
+        if(Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI") == null 
+                || !Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI").isEnabled()) {
            System.out.println("[SettlerCraft-WorldGuard]: SettlerCraft-StructureAPI NOT FOUND!!! Disabling...");
             this.setEnabled(false);
             return; 

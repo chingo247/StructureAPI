@@ -24,6 +24,7 @@ import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
 import com.chingo247.settlercraft.core.util.JarUtil;
 import com.chingo247.settlercraft.core.util.VersionUtil;
+import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureInvalidator;
 import com.chingo247.structureapi.commands.ConstructionZoneCommands;
@@ -241,7 +242,10 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
 
     @Override
     public void onDisable() {
-        super.onDisable(); //To change body of generated methods, choose Tools | Templates.
+        if(StructureAPI.getInstance().getExecutor() != null) {
+            System.out.println("[SettlerCraft-StructureAPI]: Stopping running threads...");
+            StructureAPI.getInstance().getExecutor().shutdown();
+        }
     }
 
     private File getTempDir() {
@@ -270,14 +274,26 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             
             String newConfigVersion = ConfigProvider.getVersion(newConfigFile);
             
-            ConfigProvider currentConfig;
+            ConfigProvider currentConfig = null;
+            boolean needsUpdating = false;
             try {
                 currentConfig = ConfigProvider.load(configFile);
             } catch (Exception ex) {
-                throw new StructureAPIException("[SettlerCraft-StructureAPI]: An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
+                
+                YAMLProcessor processor = new YAMLProcessor(configFile, false);
+                if(processor.getProperty("version") != null) {
+                    throw new StructureAPIException("[SettlerCraft-StructureAPI]: An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
+                } else {
+                    needsUpdating = true;
+                }
+                        
+                
+                
+                
+                
             }
             
-            if(currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfigVersion) == -1) {
+            if(needsUpdating || (currentConfig != null && (currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfigVersion) == -1))) {
                 int count = 1;
                 String baseName = FilenameUtils.getBaseName(configFile.getName());
                 File oldFile = new File(getDataFolder(), baseName + "(" + count + ").old.yml");
@@ -287,7 +303,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
                 }
                 
                 String reason;
-                if(currentConfig.getVersion() == null) {
+                if(needsUpdating || (currentConfig != null && currentConfig.getVersion() == null)) {
                     reason = "No 'version' value found in config";
                 } else {
                     reason = "Older 'version' value found in config.yml";

@@ -28,6 +28,13 @@ public class SettlerCraftHolographicDisplaysPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if(Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI") == null 
+                || !Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI").isEnabled()) {
+            System.out.println("Missing SettlerCraft-StructureAPI or SettlerCraft-StructureAPI is not enabled!");
+            this.setEnabled(false);
+            return;
+        }
+        
         if (Bukkit.getPluginManager().getPlugin("HolographicDisplays") != null) {
             StructureHologramManager.getInstance().setHologramProvider(new HolographicDisplaysHologramProvider());
 //            HologramSelectionManager.getInstance().setHologramsProvider(new HolographicDisplaysHologramProvider());
