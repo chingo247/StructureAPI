@@ -32,7 +32,6 @@ Note: There is a small requirement for loading the schematics into SettlerCraft.
 1. Download the following required SettlerCraft dependencies from https://github.com/chingo247/SettlerCraft/releases
       * SettlerCraft-Core-Bukkit-2.x.x.jar
       * SettlerCraft-MenuAPI-Bukkit-2.x.x.jar
-      * SettlerCraft-StructureAPI-2.x.x.zip
 2. Put all these dependencies in the plugins directory of your server.
 
 3. **SKIP THIS STEP WHEN USING 2.2.0** Unzip/extract 'SettlerCraft-StructureAPI-2.x.x.zip' within the plugins directory, so that you will have both SettlerCraft-StructureAPI-Bukkit-2.x.x-jar and the 'SettlerCraft-StructureAPI' directory within the plugins directory of your server.
