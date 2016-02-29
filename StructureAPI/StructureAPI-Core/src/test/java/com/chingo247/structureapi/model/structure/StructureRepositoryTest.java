@@ -163,7 +163,13 @@ public class StructureRepositoryTest {
             assertTrue(structureRepository.hasStructuresWithin(otherUUID, new CuboidRegion(Vector.ZERO, new BlockVector(10, 10, 10))));
             assertFalse(structureRepository.hasStructuresWithin(otherUUID, new CuboidRegion(new BlockVector(11, 11, 11), new BlockVector(22, 22, 22))));
             assertFalse(structureRepository.hasStructuresWithin(otherUUID, new CuboidRegion(new BlockVector(-1, 0, -1), new BlockVector(-22, 22, -22))));
-
+            
+            assertTrue(structureRepository.countStructuresWithinWorld(worldUUID) == 1);
+            assertTrue(structureRepository.countStructuresWithinWorld(otherUUID) == 1);
+            
+            
+            
+            
             tx.success();
         }
     }
@@ -214,6 +220,11 @@ public class StructureRepositoryTest {
             for (StructureOwnership structure : other) {
                 assertTrue(structure.getOwner().getUniqueId().equals(otherUUID));
             }
+            
+            assertTrue(instance.countStructuresOfSettler(playerUUID) == 1);
+            assertTrue(instance.countStructuresOfSettler(otherUUID) == 1);
+            
+            
             tx.success();
         }
         

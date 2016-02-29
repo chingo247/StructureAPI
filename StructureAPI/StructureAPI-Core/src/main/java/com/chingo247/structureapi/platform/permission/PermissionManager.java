@@ -67,6 +67,7 @@ public class PermissionManager {
         CONTENT_ROTATE_PLACEMENT(new Permission(Permissions.ROTATE_SCHEMATIC, PermissionDefault.OP, "Allows a player to rotate the original schematic for all future placing")),
         
         SETTLER_GIVE_PLAN(new Permission(Permissions.GIVE_PLAN, PermissionDefault.OP, "Give a single plan to another player")),
+        SETTLER_ME(new Permission(Permissions.SETTLER_ME, PermissionDefault.TRUE, "Give a single plan to another player")),
         SETTLER_OPEN_PLAN_MENU(new Permission(Permissions.OPEN_PLANMENU, PermissionDefault.OP, "Allows a player to use the plan menu (contains plans for FREE)")),
         
         SETTLER_OPEN_SHOP_MENU(new Permission(Permissions.OPEN_PLANSHOP, PermissionDefault.TRUE, "Allows a player to use the plan shop")),

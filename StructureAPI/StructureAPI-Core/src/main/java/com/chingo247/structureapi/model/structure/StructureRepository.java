@@ -319,47 +319,49 @@ public class StructureRepository {
         return findStructuresWithin(worldUUID, region, 1).iterator().hasNext();
     }
 
-    public int countStructuresOfSettler(UUID settlerUUID) {
+    public long countStructuresOfSettler(UUID settlerUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("settlerUUID", settlerUUID.toString());
-        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.ID_PROPERTY + ": {settlerUUID} })"
+        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.UUID_PROPERTY + ": {settlerUUID} })"
                 + " WITH settler "
-                + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(structure:" + StructureNode.LABEL + ")"
-                + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
-                + " RETURN COUNT(structure) as total";
+                + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(s:" + StructureNode.LABEL + ")"
+                + " WHERE NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
+                + " RETURN COUNT(s) as total";
 
         Result r = graph.execute(query, params);
 
-        int count = 0;
+        long count = 0;
         if (r.hasNext()) {
             Map<String, Object> map = r.next();
             Object o = map.get("total");
             if (o != null) {
-                count = (int) o;
+                count = (long) o;
             }
         }
         return count;
     }
 
-    public int countStructuresWithinWorld(UUID worldUUID) {
+    public long countStructuresWithinWorld(UUID worldUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldUUID", worldUUID.toString());
-        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldUUID} })"
+        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldUUID} })"
                 + " WITH world "
-                + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(structure:" + StructureNode.LABEL + ")"
-                + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
-                + " RETURN COUNT(structure) as total";
+                + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
+                + " WHERE NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
+                + " RETURN COUNT(s) as total";
 
         Result r = graph.execute(query, params);
 
-        int count = 0;
+        long count = 0;
         if (r.hasNext()) {
             Map<String, Object> map = r.next();
             Object o = map.get("total");
             if (o != null) {
-                count = (int) o;
+                count = (long) o;
             }
         }
+        
+        
         return count;
     }
 

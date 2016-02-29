@@ -127,7 +127,7 @@ public class StructureCommands {
         int count = 0;
 
         for (String ownership : owners) {
-            ownershipString += ownership;
+            ownershipString += colors.yellow() + ownership + colors.reset();
             count++;
             if (count != size) {
                 ownershipString += ", ";
@@ -157,9 +157,9 @@ public class StructureCommands {
 
         if (!owners.isEmpty()) {
             if (owners.size() == 1) {
-                line += colors.reset() + "Owners(MASTER): " + colors.yellow() + ownershipString + "\n";
+                line += colors.reset() + "Owners(MASTER): " + ownershipString + "\n";
             } else {
-                line += colors.reset() + "Owners(MASTER): \n" + colors.yellow() + ownershipString + "\n";
+                line += colors.reset() + "Owners(MASTER): \n"  + ownershipString + "\n";
             }
         }
 
@@ -556,7 +556,7 @@ public class StructureCommands {
             int count = 0;
 
             for (String ownership : ownerships) {
-                ownershipString += ownership;
+                ownershipString += COLOR.yellow() + ownership + COLOR.reset();
                 count++;
                 if (count != size) {
                     ownershipString += ", ";
@@ -633,6 +633,15 @@ public class StructureCommands {
                     tx.success();
                     throw new CommandException("You don't have enough privileges to " + method + " players of type '" + type.name() + "'");
                 }
+                
+                if(ownership.getOwnerType() == OwnerType.MASTER && (type == OwnerType.MEMBER || type == OwnerType.OWNER)) {
+                    // Safety! can't remove last master!
+                    if(structureNode.getOwnerDomain().getOwners(OwnerType.MASTER).size() == 1) {
+                        tx.success();
+                        throw new CommandException("You can't downgrade or remove as you are the last MASTER");
+                    }
+                }
+                
 
                 if (type == OwnerType.MASTER && ownership.getOwnerType() == type && method.equalsIgnoreCase("remove")) {
                     tx.success();
