@@ -43,13 +43,13 @@ Note: There is a small requirement for loading the schematics into SettlerCraft.
 * [SettlerCraft-Core](https://github.com/chingo247/SettlerCraft/releases/) - Core functionality of SettlerCraft, contains a distribution of [Neo4j](http://neo4j.com/) database
 * [SettlerCraft-MenuAPI](https://github.com/chingo247/SettlerCraft/releases/) - Menu library of SettlerCraft
 * [WorldEdit 6.1](http://dev.bukkit.org/bukkit-plugins/worldedit/files/61-world-edit-6-1-up-to-mc-1-8-6/)
-* [AsyncWorldEdit](https://github.com/SBPrime/AsyncWorldEdit/releases|) - version 2.2.x (**Note:** you will need both **AsyncWorldEdit** and **AsyncWorldEditInjector**)
+* [AsyncWorldEdit](https://github.com/SBPrime/AsyncWorldEdit/releases/tag/2.2.2) - version 2.2.x (**Note:** you will need both **AsyncWorldEdit** and **AsyncWorldEditInjector**) or see [The Spigot Page](https://www.spigotmc.org/resources/asyncworldedit.327/)
 
 ## Optional Hooks
 StructureAPI has hooks to other plugins. For maintainability and other reasons, these hooks are provided separately:
-* [SettlerCraft-WorldGuard](https://github.com/chingo247/SettlerCraft/releases/) - WorldGuard support (requires worldguard 6.0)
-* [SettlerCraft-HolographicDisplays](https://github.com/chingo247/SettlerCraft/releases/) - Hologram support (requires HolographicDisplays 2.1.x)
-* [SettlerCraft-Towny](https://github.com/chingo247/SettlerCraft/releases/) - Support for Towny (since SettlerCraft-2.1.0) and ofcourse requires Towny. Mayors are able to place structures in the wildernis and players won't be able to place structures on or across plots they don't own.
+* [StructureAPI-WorldGuard](https://github.com/chingo247/StructureAPI/releases/) - WorldGuard support (requires worldguard 6.0). **NOTE** [Old versions are listed here!](https://github.com/chingo247/SettlerCraft/releases/)
+* [StructureAPI-HolographicDisplays](https://github.com/chingo247/StructureAPI/releases/) - Hologram support (requires HolographicDisplays 2.1.x).  **NOTE** [Old versions are listed here!](https://github.com/chingo247/SettlerCraft/releases/)
+* [StructureAPI-Towny](https://github.com/chingo247/StructureAPI/releases/) - Support for Towny (since SettlerCraft-2.1.0) and ofcourse requires Towny. Mayors are able to place structures in the wildernis and players won't be able to place structures on or across plots they don't own. . **NOTE**  [Old versions are listed here!](https://github.com/chingo247/SettlerCraft/releases/)
 * [Vault 1.5.x](http://dev.bukkit.org/bukkit-plugins/vault/) - Plugin that serves a a Economyhub, 
  
 ## Client Plugin Hooks (LiteLoader)
