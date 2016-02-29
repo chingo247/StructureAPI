@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.chingo247</groupId>
+    <artifactId>StructureAPI</artifactId>
+    <version>2.2.0</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>StructureAPI-BlockStore</module>
+        <module>StructureAPI-Bukkit</module>
+        <module>StructureAPI-Core</module>
+        <module>StructureAPI-HolographicDisplays</module>
+        <module>StructureAPI-WorldGuard</module>
+        <module>StructureAPI-Towny</module>
+    </modules>
+    <properties>
+        <settlercraft.version>2.2.0</settlercraft.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
+    <repositories>
+        <!-- ThirdParty Repo-->
+        <repository>
+            <id>Nexus</id>
+            <url>http://chingo247.com:8081/nexus/content/repositories/thirdparty/</url>
+        </repository>
+        <!--WorldEdit Repo-->
+        <repository>
+            <id>WorldEdit</id>
+            <url>http://maven.sk89q.com/repo</url>
+        </repository>
+        <!--Bukkit Repo-->
+        <repository>
+            <id>bukkit-repo</id>
+            <url>http://repo.bukkit.org/content/groups/public/</url>
+        </repository>
+        <!--Vault Repo-->
+        <repository>
+            <id>vault-repo</id>
+            <url>http://nexus.theyeticave.net/content/repositories/pub_releases</url>
+        </repository>
+    </repositories>
+    
+    <dependencies>
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>craftbukkit</artifactId>
+            <version>1.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Bukkit-->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.8</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.primesoft</groupId>
+            <artifactId>blocksHub</artifactId>
+            <version>1.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Vault-->
+        <dependency>
+            <groupId>net.milkbowl</groupId>
+            <artifactId>vault</artifactId>
+            <version>1.5.6</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--AsyncWorldEdit-->
+        <dependency>
+            <groupId>org.primesoft</groupId>
+            <artifactId>AsyncWorldEdit</artifactId>  
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--AsyncWorldEdi-Injector-->
+        <dependency>
+            <groupId>org.primesoft</groupId>
+            <artifactId>AsyncWorldEditInjector</artifactId>  
+            <version>2.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--WorldEdit-->
+        <dependency>
+            <groupId>com.sk89</groupId>
+            <artifactId>worldedit</artifactId>  
+            <version>6.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>SettlerCraft-MenuAPI</artifactId>
+            <version>${settlercraft.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>SettlerCraft-Core</artifactId>
+            <version>${settlercraft.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        
+        
+        
+        
+    </dependencies>
+    <name>StructureAPI</name>
+</project>

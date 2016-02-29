@@ -1,0 +1,19 @@
+## YAML Template.
+
+## Config version DO NOT EDIT
+version: 2.2.0
+## Structure Section
+structures:
+    allow-substructures: false
+    # required Holographic Displays 
+    use-holograms: true
+    # required WorldGuard
+    protected: true
+    # If true, demolish command will rollback a structure instead of replacing the area with air
+    # NOTE rollback will only occur if a rollback file was made during construction of the structure
+    demolish-is-rollback: true
+
+## Menu Section
+menus:
+    planmenu-enabled: true
+    planshop-enabled: false
