@@ -27,15 +27,19 @@ public class Permissions {
     private static final String PREFIX = "structureapi.";
     
     public static final String GIVE_PLAN = PREFIX + "plans.give";
+    
     public static final String RELOAD_PLANS = PREFIX + "plans.reload";
-    public static final String GENERATE_PLANS = PREFIX + "plans.generate";
+//    public static final String GENERATE_PLANS = PREFIX + "plans.generate";
     public static final String ROTATE_SCHEMATIC = PREFIX + "schematic.rotate";
     
     public static final String STRUCTURE_PLACE = PREFIX + "structure.place";
     public static final String STRUCTURE_CREATE = PREFIX + "structure.create";
     public static final String STRUCTURE_INFO = PREFIX + "structure.info";
     public static final String STRUCTURE_LIST = PREFIX + "structure.list";
-    public static final String STRUCTURE_CONSTRUCTION = PREFIX + "structure.construction";
+    public static final String STRUCTURE_DEMOLISH = PREFIX + "structure.demolish";
+    public static final String STRUCTURE_ROLLBACK = PREFIX + "structure.rollback";
+    public static final String STRUCTURE_BUILD = PREFIX + "structure.build";
+    public static final String STRUCTURE_HALT = PREFIX + "structure.halt";
     public static final String STRUCTURE_LOCATION = PREFIX + "structure.location";
     
     public static final String OPEN_PLANMENU = PREFIX + "planmenu.open";

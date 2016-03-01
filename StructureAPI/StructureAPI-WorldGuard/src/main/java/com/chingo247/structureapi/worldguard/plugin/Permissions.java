@@ -14,17 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.model;
+package com.chingo247.structureapi.worldguard.plugin;
 
 /**
- *
+ * Permissions as of 2.2.0 in format {on-what}.{operation}
  * @author Chingo
  */
-public class Relations {
+public class Permissions {
     
-    /**
-     * Should point to it's owner
-     */
-    public static final String RELATION_OWNED_BY = "OWNED_BY";
+    private Permissions() {}
+    
+    private static final String PREFIX = "structureapi.wg.";
+    
+    public static final String EXPIRE_SINGLE = PREFIX + "expire.single";
+    public static final String EXPIRE_ALL = PREFIX + "expire.all";
+    public static final String PROTECT_SINGLE = PREFIX + "protect.single";
+    public static final String PROTECT_ALL = PREFIX + "protect.all";
+    
+   
+    
+    
+    
     
 }

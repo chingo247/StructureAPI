@@ -20,12 +20,12 @@ import com.chingo247.menuapi.menu.util.ShopUtil;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
-import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerRepository;
 import com.chingo247.structureapi.event.structure.owner.StructureAddOwnerEvent;
 import com.chingo247.structureapi.event.structure.owner.StructureRemoveOwnerEvent;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
-import com.chingo247.structureapi.model.settler.SettlerRepository;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
@@ -39,7 +39,6 @@ import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.owner.StructureOwnership;
-import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.platform.permission.Permissions;
 import com.chingo247.structureapi.util.StringUtil;
 import com.chingo247.xplatform.core.IColors;
@@ -56,6 +55,7 @@ import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
@@ -127,7 +127,7 @@ public class StructureCommands {
         int count = 0;
 
         for (String ownership : owners) {
-            ownershipString += ownership;
+            ownershipString += colors.yellow() + ownership + colors.reset();
             count++;
             if (count != size) {
                 ownershipString += ", ";
@@ -157,9 +157,9 @@ public class StructureCommands {
 
         if (!owners.isEmpty()) {
             if (owners.size() == 1) {
-                line += colors.reset() + "Owners(MASTER): " + colors.yellow() + ownershipString + "\n";
+                line += colors.reset() + "Owners(MASTER): " + ownershipString + "\n";
             } else {
-                line += colors.reset() + "Owners(MASTER): \n" + colors.yellow() + ownershipString + "\n";
+                line += colors.reset() + "Owners(MASTER): \n"  + ownershipString + "\n";
             }
         }
 
@@ -218,7 +218,6 @@ public class StructureCommands {
             } catch (NumberFormatException nfe) {
                 throw new CommandException("Expected a number but got '" + args.getString(0) + "'");
             }
-            long start = System.currentTimeMillis();
 
             try (Transaction tx = graph.beginTx()) {
                 structure = structureRepository.findById(id);
@@ -258,7 +257,7 @@ public class StructureCommands {
         }
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_BUILD)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:build", "stt:build"}, desc = "Builds a structure", min = 1, max = 1, flags = "f")
     public static void build(final CommandContext args, final ICommandSender sender, final IStructureAPI structureAPI) throws Exception {
@@ -306,7 +305,7 @@ public class StructureCommands {
         structureAPI.getContractor().submit(structure, safeContract);
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_ROLLBACK)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:rollback", "stt:rollback"}, desc = "Restores the area back to before the structure was placed", min = 1, max = 1, flags = "f")
     public static void rollback(final CommandContext args, final ICommandSender sender, final IStructureAPI structureAPI) throws Exception {
@@ -320,7 +319,6 @@ public class StructureCommands {
             throw new CommandException("Expected a number but got '" + structureIdArg + "' \n" + "/structure:build [id]");
         }
         long id = Long.parseLong(structureIdArg);
-        long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
             StructureNode sn = structureRepository.findById(id);
 
@@ -338,19 +336,44 @@ public class StructureCommands {
         }
 //        LOG.log(Level.INFO, "rollback in {0} ms", (System.currentTimeMillis() - start));
 
+        
+        if (!structure.getRollbackData().hasBlockStore()) {
+            throw new CommandException("No rollback file...");
+        }
+        
         if (structure.getStatus() == ConstructionStatus.REMOVED) {
-            throw new CommandException("Can't ROLLBACK a REMOVED structure!");
+            if(!isOP(sender)) {
+                throw new CommandException("You don't have permission to rollback a REMOVED Structure");
+            }
+            
+            try(Transaction tx = graph.beginTx()) {
+                Collection<StructureNode> overlappingStructures = structureRepository.findStructuresWithin(structure.getWorldUUID(), structure.getCuboidRegion(), 10);
+                if(overlappingStructures.size() > 0) {
+                    String error = "Couldn't rollback, there are currently other structures at the place of #" + structure.getId() + "\n";
+                    error += "The following structures need to be deleted before rollback is possible:\n";
+                    boolean first = true;
+                    for (StructureNode node : overlappingStructures) {
+                        if(!first) {
+                            error += ", ";
+                        }
+                        error += "#" + node.getId();
+                    }
+                    tx.success();
+                    throw new CommandException(error);
+                }
+                tx.success();
+            }
+            
+            
+            
         }
 
-        if (!structure.getRollbackData().hasBlockStore()) {
-            throw new CommandException("Rollback not available for this structure");
-        }
 
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
         Contract rollbackContract = new RollbackContract()
-                .setRecursive(false)
+                .setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setReversedOrder(true)
@@ -359,7 +382,7 @@ public class StructureCommands {
 
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_DEMOLISH)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:demolish", "stt:demolish"}, desc = "Demolishes a structure", min = 1, max = 1, flags = "f")
     public static void demolish(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
@@ -414,7 +437,6 @@ public class StructureCommands {
 
         contract.setRecursive(true)
                 .setRestrictive(true)
-                .setRecursive(false)
                 .setForced(useForce)
                 .setReversedOrder(true)
                 .setPlayer(uuid);
@@ -422,7 +444,7 @@ public class StructureCommands {
 
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CONSTRUCTION)
+    @CommandPermissions(Permissions.STRUCTURE_HALT)
     @CommandExtras(async = true)
     @Command(aliases = {"structure:halt", "stt:halt"}, desc = "Stop building or demolishing of a structure", min = 1, max = 1, flags = "f")
     public static void halt(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
@@ -462,6 +484,10 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
+        if(structure.getConstructionStatus() == ConstructionStatus.REMOVED) {
+            throw new CommandException("Can't HALT a removed structure");
+        }
+        
         // Stop current action
         String structureInfo = colors.reset() + ": #" + colors.gold() + structure.getId() + colors.blue() + " " + structure.getName();
         sender.sendMessage(colors.red() + "STOPPING" + structureInfo);
@@ -530,7 +556,7 @@ public class StructureCommands {
             int count = 0;
 
             for (String ownership : ownerships) {
-                ownershipString += ownership;
+                ownershipString += COLOR.yellow() + ownership + COLOR.reset();
                 count++;
                 if (count != size) {
                     ownershipString += ", ";
@@ -607,6 +633,15 @@ public class StructureCommands {
                     tx.success();
                     throw new CommandException("You don't have enough privileges to " + method + " players of type '" + type.name() + "'");
                 }
+                
+                if(ownership.getOwnerType() == OwnerType.MASTER && (type == OwnerType.MEMBER || type == OwnerType.OWNER)) {
+                    // Safety! can't remove last master!
+                    if(structureNode.getOwnerDomain().getOwners(OwnerType.MASTER).size() == 1) {
+                        tx.success();
+                        throw new CommandException("You can't downgrade or remove as you are the last MASTER");
+                    }
+                }
+                
 
                 if (type == OwnerType.MASTER && ownership.getOwnerType() == type && method.equalsIgnoreCase("remove")) {
                     tx.success();
@@ -636,7 +671,7 @@ public class StructureCommands {
                 try {
                     idString = playerArg.substring(1);
                     id = Long.parseLong(idString);
-                    BaseSettlerNode sn = settlerRepository.findById(id);
+                    SettlerNode sn = settlerRepository.findById(id);
                     if (sn == null) {
                         tx.success();
                         throw new CommandException("Couldn't find a player for id'" + idString + "'");
@@ -660,7 +695,7 @@ public class StructureCommands {
 
             UUID uuid = ply.getUniqueId();
             if (method.equalsIgnoreCase("add")) {
-                BaseSettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
+                SettlerNode settler = settlerRepository.findByUUID(ply.getUniqueId());
                 OwnerDomainNode ownerDomain = structureNode.getOwnerDomain();
                 Ownership ownershipToUpdate = ownerDomain.getOwnership(settler.getUniqueId());
 
@@ -703,7 +738,6 @@ public class StructureCommands {
     @Command(aliases = {"structure:list", "stt:list"}, usage = "stt:list <member|owner|master>", desc = "Displays a list of structure your are owner of")
     public static void list(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
         final GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        final SettlerRepository structureOwnerRepository = new SettlerRepository(graph);
         final IColors colors = structureAPI.getPlatform().getChatColors();
 
         int page = 0;
@@ -749,15 +783,12 @@ public class StructureCommands {
         int skip = p * (MAX_LINES - 1);
         int limit = (MAX_LINES - 1);
 
-        long start = System.currentTimeMillis();
         try (Transaction tx = graph.beginTx()) {
-            SettlerNode structureOwner = structureOwnerRepository.findByUUID(playerId);
-
-            long countStart = System.currentTimeMillis();
-            long totalStructures = structureOwner.getStructureCount();
+            StructureRepository structureRepository = new StructureRepository(graph);
+            long totalStructures = structureRepository.countStructuresOfSettler(playerId);
 //            LOG.log(Level.INFO, "list count in {0} ms", (System.currentTimeMillis() - countStart));
             long totalPages = Math.round(Math.ceil(totalStructures / (MAX_LINES - 1)));
-            List<StructureOwnership> structures = structureOwner.getStructures(skip, limit);
+            Collection<StructureOwnership> structures = structureRepository.findByOwner(playerId, skip, limit);
             if (p > totalPages || p < 0) {
                 tx.success();
                 throw new CommandException("Page " + p + " out of " + totalPages + "...");
@@ -856,14 +887,5 @@ public class StructureCommands {
 
     }
 
-    @CommandPermissions(Permissions.STRUCTURE_CREATE)
-    @CommandExtras(async = true, senderType = CommandSenderType.PLAYER)
-    @Command(aliases = {"structure:create", "/stt:create"}, desc = "Create a structure from selection or given arguments")
-    public static void create(final CommandContext args, ICommandSender sender, IStructureAPI structureAPI) throws Exception {
-        if (args.argsLength() == 0) { // Create from selection
-            IPlayer plySender = (IPlayer) sender;
-            Player player = SettlerCraft.getInstance().getPlayer(plySender.getUniqueId());
 
-        }
-    }
 }

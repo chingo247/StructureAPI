@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.worldguard.protection;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
 import com.chingo247.structureapi.worldguard.restriction.WorldGuardRestriction;
 import com.chingo247.structureapi.StructureAPI;
@@ -123,7 +123,7 @@ public class WorldGuardProtection {
             for (Ownership owner : ownerDomain.getOwnerships()) {
 
                 // Set privilages by type
-                BaseSettlerNode ownerNode = owner.getOwner();
+                SettlerNode ownerNode = owner.getOwner();
                 OwnerType type = owner.getOwnerType();
                 if (type == OwnerType.MEMBER) {
                     region.getMembers().addPlayer(ownerNode.getUniqueId());

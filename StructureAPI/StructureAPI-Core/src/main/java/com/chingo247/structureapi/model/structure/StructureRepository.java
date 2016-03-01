@@ -6,10 +6,11 @@
 package com.chingo247.structureapi.model.structure;
 
 import com.chingo247.settlercraft.core.Direction;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structureapi.model.RelTypes;
+import com.chingo247.structureapi.model.owner.StructureOwnership;
 import com.chingo247.structureapi.model.plot.PlotNode;
-import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.Vector;
@@ -23,13 +24,14 @@ import java.util.logging.Logger;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.Result;
 
 /**
  *
  * @author Chingo
  */
-public class StructureRepository  {
+public class StructureRepository {
 
     private static final Logger LOG = Logger.getLogger(StructureRepository.class.getSimpleName());
     private final GraphDatabaseService graph;
@@ -59,27 +61,27 @@ public class StructureRepository  {
     }
 
     private long nextId() {
-        if(!checked) {
+        if (!checked) {
             Result r = graph.execute("MATCH (sid: ID_GENERATOR {name:'STRUCTURE_ID'}) "
-                        + "RETURN sid "
-                        + "LIMIT 1");
-            if(!r.hasNext()) {
+                    + "RETURN sid "
+                    + "LIMIT 1");
+            if (!r.hasNext()) {
                 graph.execute("CREATE (sid: ID_GENERATOR {name:'STRUCTURE_ID', nextId: 1})");
                 checked = true;
                 return 1;
             }
             checked = true;
         }
-        
+
         // Work-around for getting the next Id
         // Sets the lock at this node by removing a non-existent property
         String idQuery = "MATCH (sid:ID_GENERATOR {name:'STRUCTURE_ID'}) "
-                        +"REMOVE sid.lock " // NON-EXISTENT PROPERTY
-                        +"SET sid.nextId = sid.nextId + 1 "
-                        +"RETURN sid.nextId as nextId";
+                + "REMOVE sid.lock " // NON-EXISTENT PROPERTY
+                + "SET sid.nextId = sid.nextId + 1 "
+                + "RETURN sid.nextId as nextId";
         Result r = graph.execute(idQuery);
         long id = (long) r.next().get("nextId");
-        
+
         return id;
     }
 
@@ -167,18 +169,31 @@ public class StructureRepository  {
         return structures;
     }
 
-    public Collection<StructureNode> findByWorld(UUID worldUUID) {
-        List<StructureNode> structures = Lists.newArrayList();
-
+    public Collection<StructureNode> findByWorld(UUID worldUUID, int skip, int limit) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldId", worldUUID.toString());
+        if (skip > 0) {
+            params.put("skip", skip);
+        }
+        if (limit > 0) {
+            params.put("limit", params);
+        }
+
         String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldId} })"
                 + " WITH world "
-                + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
-                + " RETURN s";
+                + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")";
+        
+        query += " RETURN s";
+        if (skip > 0) {
+            query += " SKIP {skip}";
+        }
+        if (limit > 0) {
+            query += " LIMIT {limit}";
+        }
 
         Result r = graph.execute(query, params);
 
+        List<StructureNode> structures = Lists.newArrayList();
         while (r.hasNext()) {
             Map<String, Object> map = r.next();
 
@@ -191,30 +206,53 @@ public class StructureRepository  {
         return structures;
     }
 
-    public Collection<StructureNode> findByOwner(UUID settlerUUID) {
-        List<StructureNode> structures = Lists.newArrayList();
+    public Collection<StructureNode> findByWorld(UUID worldUUID) {
+        return findByWorld(worldUUID, -1, -1);
+    }
+
+    public Collection<StructureOwnership> findByOwner(UUID settlerUUID, int skip, int limit) {
+        List<StructureOwnership> ownerships = Lists.newArrayList();
 
         Map<String, Object> params = Maps.newHashMap();
         params.put("settlerUUID", settlerUUID.toString());
-        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.ID_PROPERTY + ": {settlerUUID} })"
+        if(skip > 0) {
+            params.put("skip", skip);
+        }
+        if(limit > 0) {
+            params.put("limit", limit);
+        }
+        
+        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.UUID_PROPERTY + ": {settlerUUID} })"
                 + " WITH settler "
-                + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(structure:" + StructureNode.LABEL + ")"
-                + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
-                + " ORDER BY " + StructureNode.CREATED_AT_PROPERTY + " DESC "
-                + " RETURN structure";
+                + " MATCH (settler)<-[r:" + RelTypes.OWNED_BY.name() + "]-(s:" + StructureNode.LABEL + ")"
+                + " WHERE NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId();
+                query+= " RETURN settler, r";
+                query+= " ORDER BY s." + StructureNode.CREATED_AT_PROPERTY + " DESC ";
+                if(skip > 0) {
+                    query += " SKIP {skip}";
+                }
+                if(limit > 0) {
+                    query += " LIMIT {limit}";
+                }
 
         Result r = graph.execute(query, params);
 
         while (r.hasNext()) {
             Map<String, Object> map = r.next();
-            Object o = map.get("structure");
+            Object o = map.get("settler");
+            Object relation = map.get("r");
+//            System.out.println("has next");
             if (o != null) {
-                Node n = (Node) o;
-                StructureNode sn = new StructureNode(n);
-                structures.add(sn);
+                Node settler = (Node) o;
+                SettlerNode sn = new SettlerNode(settler);
+                ownerships.add(new StructureOwnership(sn, (Relationship) relation));
             }
         }
-        return structures;
+        return ownerships;
+    }
+    
+    public Collection<StructureOwnership> findByOwner(UUID settlerUUID) {
+        return findByOwner(settlerUUID, -1, -1);
     }
 
     public Collection<StructureNode> findStructuresWithin(UUID worldUUID, CuboidRegion region, int limit) {
@@ -251,7 +289,7 @@ public class StructureRepository  {
 
         return structures;
     }
-    
+
     public StructureNode findStructureOnPosition(UUID worldUUID, Vector position) {
         StructureNode structure = null;
         Map<String, Object> params = Maps.newHashMap();
@@ -281,48 +319,62 @@ public class StructureRepository  {
         return findStructuresWithin(worldUUID, region, 1).iterator().hasNext();
     }
 
-    public int countStructuresOfSettler(UUID settlerUUID) {
+    public long countStructuresOfSettler(UUID settlerUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("settlerUUID", settlerUUID.toString());
-        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.ID_PROPERTY + ": {settlerUUID} })"
+        String query = "MATCH (settler:" + SettlerNode.LABEL + " { " + SettlerNode.UUID_PROPERTY + ": {settlerUUID} })"
                 + " WITH settler "
-                + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(structure:" + StructureNode.LABEL + ")"
-                + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
-                + " RETURN COUNT(structure) as total";
+                + " MATCH (settler)<-[:" + RelTypes.OWNED_BY.name() + "]-(s:" + StructureNode.LABEL + ")"
+                + " WHERE NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
+                + " RETURN COUNT(s) as total";
 
         Result r = graph.execute(query, params);
 
-        int count = 0;
+        long count = 0;
         if (r.hasNext()) {
             Map<String, Object> map = r.next();
             Object o = map.get("total");
             if (o != null) {
-                count = (int) o;
+                count = (long) o;
             }
         }
         return count;
     }
 
-    public int countStructuresWithinWorld(UUID worldUUID) {
+    public long countStructuresWithinWorld(UUID worldUUID) {
         Map<String, Object> params = Maps.newHashMap();
         params.put("worldUUID", worldUUID.toString());
-        String query = "MATCH (world:" + SettlerNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldUUID} })"
+        String query = "MATCH (world:" + WorldNode.LABEL + " { " + WorldNode.UUID_PROPERTY + ": {worldUUID} })"
                 + " WITH world "
-                + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(structure:" + StructureNode.LABEL + ")"
-                + " WHERE NOT " + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
-                + " RETURN COUNT(structure) as total";
+                + " MATCH (world)<-[:" + RelTypes.WITHIN.name() + "]-(s:" + StructureNode.LABEL + ")"
+                + " WHERE NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId()
+                + " RETURN COUNT(s) as total";
 
         Result r = graph.execute(query, params);
 
-        int count = 0;
+        long count = 0;
         if (r.hasNext()) {
             Map<String, Object> map = r.next();
             Object o = map.get("total");
             if (o != null) {
-                count = (int) o;
+                count = (long) o;
             }
         }
+        
+        
         return count;
+    }
+
+    public boolean delete(long id) {
+        StructureNode structureNode = findById(id);
+        if (structureNode != null) {
+            for (Relationship rel : structureNode.getNode().getRelationships()) {
+                rel.delete();
+            }
+            structureNode.getNode().delete();
+            return true;
+        }
+        return false;
     }
 
 }

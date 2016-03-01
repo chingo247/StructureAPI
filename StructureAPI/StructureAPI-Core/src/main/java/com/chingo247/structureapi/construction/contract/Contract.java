@@ -16,11 +16,13 @@
  */
 package com.chingo247.structureapi.construction.contract;
 
+import com.chingo247.structureapi.construction.PlaceOptionsFactory;
 import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.listener.ConstructionListener;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.placement.options.Traversal;
@@ -36,14 +38,22 @@ public abstract class Contract  {
 
     private static final Logger LOG = Logger.getLogger(Contract.class.getName());
     
-    
+    private static final PlaceOptionsFactory DEFAULT_FACTORY = new PlaceOptionsFactory() {
+
+        @Override
+        public PlaceOptions makeOptions(Structure structure) {
+            PlaceOptions options = new PlaceOptions();
+            options.setCubeY(structure.getCuboidRegion().getHeight() / 2);
+            return options;
+        }
+    };
 
     private boolean recursive, restrictive, reversed;
     private UUID player;
     private AsyncEditSession editSession;
     private Traversal traveral;
     private boolean useForce;
-    private PlaceOptions placeOptions;
+    private PlaceOptionsFactory placeOptionsFactory;
 
     public Contract() {
     }
@@ -56,15 +66,18 @@ public abstract class Contract  {
     
     public abstract IPlacementProducer<IBlockPlacement> getPlacementProducer();
     
-    public abstract void apply(StructureEntry entry) throws StructureException;
+    public abstract void apply(StructureEntry entry, PlaceOptions  placeOptions) throws StructureException;
     
-    public Contract setPlaceOptions(PlaceOptions placeOptions) {
-        this.placeOptions = placeOptions;
+    public Contract setPlaceOptionsFactory(PlaceOptionsFactory placeOptionsFactory) {
+        this.placeOptionsFactory = placeOptionsFactory;
         return this;
     }
     
-    public PlaceOptions getPlaceOptions() {
-        return placeOptions;
+    public PlaceOptionsFactory getPlaceOptionsFactory() {
+        if(placeOptionsFactory == null) {
+            return DEFAULT_FACTORY;
+        }
+        return placeOptionsFactory;
     }
 
     public Contract setStructureTraversal(Traversal traversal) {

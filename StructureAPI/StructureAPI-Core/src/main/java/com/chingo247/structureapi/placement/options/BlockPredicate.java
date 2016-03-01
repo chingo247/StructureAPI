@@ -25,13 +25,6 @@ import com.sk89q.worldedit.blocks.BaseBlock;
  */
 public interface BlockPredicate {
     
-    public static final BlockPredicate TRUE = new BlockPredicate() {
-
-        @Override
-        public boolean evaluate(Vector position, Vector worldPosition, BaseBlock block) {
-            return true;
-        }
-    };
     
     /**
      * Evaluates the position
@@ -40,6 +33,6 @@ public interface BlockPredicate {
      * @param block The block to evaluate
      * @return true if evaluation expression is true
      */
-    public boolean evaluate(Vector position, Vector worldPosition, BaseBlock block);
+    boolean evaluate(Vector position, Vector worldPosition, BaseBlock block);
     
 }

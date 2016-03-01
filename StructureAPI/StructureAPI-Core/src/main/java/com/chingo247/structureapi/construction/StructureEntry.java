@@ -174,11 +174,12 @@ public class StructureEntry  {
                     IConstructionListener next = iterator.next();
                     next.onComplete(this);
                 }
-                clear();
+                
                 constractor.remove(this);
                 if (nextEntry != null) {
                     nextEntry.proceed();
                 }
+                clear();
             } else {
                 tasks.poll();
 

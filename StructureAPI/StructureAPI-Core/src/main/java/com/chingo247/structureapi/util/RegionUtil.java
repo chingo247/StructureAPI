@@ -51,27 +51,19 @@ public class RegionUtil {
     }
 
     public static boolean isDimensionWithin(CuboidRegion parent, CuboidRegion child) {
-        CuboidRegion p = new CuboidRegion(parent.getMinimumPoint(), parent.getMaximumPoint());
-        CuboidRegion c = new CuboidRegion(child.getMinimumPoint(), child.getMaximumPoint());
-        return p.getMinimumPoint().getBlockX() > c.getMinimumPoint().getBlockX()
-                && p.getMinimumY() >= c.getMinimumY()
-                && p.getMinimumPoint().getBlockZ() > c.getMinimumPoint().getBlockZ()
-                && p.getMaximumPoint().getBlockX() < c.getMaximumPoint().getBlockX()
-                && p.getMaximumPoint().getBlockY() < c.getMaximumPoint().getBlockY()
-                && p.getMaximumPoint().getBlockZ() < c.getMaximumPoint().getBlockZ();
-
+        return parent.contains(child.getMinimumPoint()) && parent.contains(child.getMaximumPoint());
     }
 
     /**
      * Checks whether two CuboidDimensionals overlap each other
      *
      * @param dimensionalA The dimensional
-     * @param dimensianalB The other dimensional
+     * @param dimensional The other dimensional
      * @return True if the two CuboidDimensionals overlap each other
      */
-    public static boolean overlaps(CuboidRegion dimensionalA, CuboidRegion dimensianalB) {
+    public static boolean overlaps(CuboidRegion dimensionalA, CuboidRegion dimensional) {
         CuboidRegion p = new CuboidRegion(dimensionalA.getMinimumPoint(), dimensionalA.getMaximumPoint());
-        CuboidRegion c = new CuboidRegion(dimensianalB.getMinimumPoint(), dimensianalB.getMaximumPoint());
+        CuboidRegion c = new CuboidRegion(dimensional.getMinimumPoint(), dimensional.getMaximumPoint());
 
         Vector pMax = p.getMaximumPoint();
         Vector pMin = p.getMinimumPoint();

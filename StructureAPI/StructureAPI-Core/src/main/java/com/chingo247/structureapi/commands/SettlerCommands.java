@@ -19,11 +19,11 @@ package com.chingo247.structureapi.commands;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
-import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerRepository;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
-import com.chingo247.structureapi.model.settler.SettlerRepository;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.platform.permission.Permissions;
 import com.chingo247.xplatform.core.IColors;
@@ -49,7 +49,7 @@ public class SettlerCommands {
         final IColors COLOR = structureAPI.getPlatform().getChatColors();
         
         try (Transaction tx = graph.beginTx()) {
-            BaseSettlerNode node = settlerRepository.findByUUID(player.getUniqueId()); // NEVER NULL
+            SettlerNode node = settlerRepository.findByUUID(player.getUniqueId()); // NEVER NULL
             player.sendMessage("Your unique id is #" + COLOR.gold() + node.getId());
             tx.success();
         }

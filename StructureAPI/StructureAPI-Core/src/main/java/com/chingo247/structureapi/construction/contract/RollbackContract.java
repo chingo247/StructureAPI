@@ -22,14 +22,14 @@ import com.chingo247.blockstore.IBlockStoreChunk;
 import com.chingo247.blockstore.IBlockStoreRegion;
 import com.chingo247.blockstore.safe.SafeBlockStore;
 import com.chingo247.blockstore.safe.SafeBlockStoreReader;
-import com.chingo247.blockstore.safe.SafeBlockStoreRegion;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.listener.ConstructionListener;
 import com.chingo247.structureapi.construction.listener.RollbackListener;
-import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
+import com.chingo247.structureapi.construction.task.StructurePlacingTask;
+import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.BlockStoreChunkPlacement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
@@ -62,7 +62,7 @@ public class RollbackContract extends Contract {
     }
 
     @Override
-    public void apply(StructureEntry entry) throws StructureException {
+    public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector structureMin = entry.getStructure().getMin(); // Always place from the min position... 
@@ -90,7 +90,7 @@ public class RollbackContract extends Contract {
                     BlockStoreChunkPlacement placement = new BlockStoreChunkPlacement(chunk);
                     placement.rotate(structure.getDirection().getRotation());
                     placement.setReversed(true);
-                    AWEPlacementTask task = new AWEPlacementTask(
+                    StructurePlacingTask task = new AWEPlacementTask(
                             asyncWorldEdit,
                             entry,
                             placement,
@@ -98,7 +98,7 @@ public class RollbackContract extends Contract {
                             getEditSession(),
                             structureMin.add(chunk.getX(), 0, chunk.getZ())
                     );
-                    task.setOptions(new PlaceOptions());
+                    task.setOptions(placeOptions);
                     entry.addTask(task);
                 }
             }

@@ -52,15 +52,9 @@ public class BuildContract extends Contract {
         return BUILD_LISTENER;
     }
 
-    @Override
-    public PlaceOptions getPlaceOptions() {
-        return super.getPlaceOptions(); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
 
     @Override
-    public void apply(StructureEntry entry) throws StructureException {
+    public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = entry.getStructure().getMin(); // Always place from the min position... 
@@ -73,13 +67,7 @@ public class BuildContract extends Contract {
                         getEditSession(),
                         position
                 );
-        PlaceOptions placeOptions;
-        if(getPlaceOptions() == null) {
-            placeOptions = new PlaceOptions();
-            placeOptions.setCubeY(placement.getHeight() / 2);
-        } else {
-            placeOptions = getPlaceOptions();
-        }
+        
         
         task.setOptions(placeOptions);        
         entry.addListener(BUILD_LISTENER);        

@@ -19,13 +19,12 @@ package com.chingo247.structureapi;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.menuapi.menu.util.ShopUtil;
-import com.chingo247.settlercraft.core.model.settler.BaseSettlerNode;
+import com.chingo247.settlercraft.core.model.settler.SettlerNode;
 import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.util.XXHasher;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
-import com.chingo247.structureapi.model.settler.SettlerNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.world.StructureWorldRepository;
 import com.chingo247.xplatform.core.IServer;
@@ -222,7 +221,7 @@ public class StructureInvalidator {
                         OwnerDomainNode ownerDomain = sn.getOwnerDomain();
                         List<SettlerNode> masters = ownerDomain.getOwners(OwnerType.MASTER);
                         double pricePerOwner = sn.getPrice() / masters.size();
-                        for (BaseSettlerNode settler : masters) {
+                        for (SettlerNode settler : masters) {
                             economy.give(settler.getUniqueId(), pricePerOwner);
                             System.out.println("[SettlerCraft]: Refunded " + ShopUtil.valueString(pricePerOwner) + " to " + settler.getName()
                                     + " for structure #" + sn.getId() + " (" + ShopUtil.valueString(sn.getPrice()) + ")");

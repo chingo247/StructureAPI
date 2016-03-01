@@ -14,24 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.model.owner;
+package com.chingo247.structureapi.construction;
 
-import com.chingo247.settlercraft.core.model.settler.SettlerNode;
-import com.chingo247.structureapi.model.structure.StructureNode;
-import org.neo4j.graphdb.Relationship;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.placement.options.PlaceOptions;
 
 /**
  *
  * @author Chingo
  */
-public class StructureOwnership extends Ownership {
-
-    public StructureOwnership(SettlerNode owner, Relationship relation) {
-        super(owner, relation);
-    }
+public interface PlaceOptionsFactory {
     
-    public StructureNode getStructure() {
-        return new StructureNode(getOtherNode());
-    }
+    PlaceOptions makeOptions(Structure structure);
     
 }

@@ -21,14 +21,10 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
 
 /**
- *
+ * Represents a thing that takes in space in a world
  * @author Chingo
  */
 public interface Spatial {
-    
-    Vector getMin();
-    
-    Vector getMax();
     
     CuboidRegion getCuboidRegion();
     
