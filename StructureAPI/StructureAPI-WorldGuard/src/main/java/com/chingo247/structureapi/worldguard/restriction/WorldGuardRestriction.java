@@ -16,15 +16,16 @@
  */
 package com.chingo247.structureapi.worldguard.restriction;
 
-import com.chingo247.structureapi.worldguard.protection.WorldGuardProtection;
 import com.chingo247.structureapi.StructureRestriction;
 import com.chingo247.structureapi.plan.IStructurePlan;
+import com.chingo247.structureapi.worldguard.protection.WorldGuardProtection;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
@@ -35,19 +36,23 @@ import org.bukkit.Bukkit;
  * @author Chingo
  */
 public class WorldGuardRestriction extends StructureRestriction {
+    
+    private WorldGuardProtection protection;
 
     public WorldGuardRestriction() {
         super("worldguard", "worldguard.region.overlap", "Structure overlaps a worldguard region you don't own");
+        
+        this.protection = new WorldGuardProtection();
     }
 
     @Override
     public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea, IStructurePlan plan) {
         LocalPlayer localPlayer = null;
         if (whoPlaces != null) {
-            localPlayer = WorldGuardProtection.getInstance().getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));
+            localPlayer = protection.getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));
         }
 
-        RegionManager mgr = WorldGuardProtection.getInstance().getRegionManager(Bukkit.getWorld(world.getName()));
+        RegionManager mgr = WGBukkit.getRegionManager(Bukkit.getWorld(world.getName()));
         Vector p1 = affectedArea.getMinimumPoint();
         Vector p2 = affectedArea.getMaximumPoint();
         ProtectedCuboidRegion dummy = new ProtectedCuboidRegion("DUMMY", new BlockVector(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ()), new BlockVector(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ()));
