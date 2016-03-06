@@ -21,13 +21,18 @@ import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.producer.ManualOptions;
 import com.chingo247.structureapi.exeption.StructureException;
+import com.chingo247.structureapi.exeption.StructurePlanException;
+import com.chingo247.structureapi.placement.block.SchematicPlacement;
 import com.chingo247.structureapi.placement.options.BlockMask;
 import com.chingo247.structureapi.placement.options.BlockPredicate;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.math.convolution.HeightMap;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -62,7 +67,6 @@ public class ManualContract extends BuildContract {
         }
         
         
-        
         final BlockPredicate framepredicate = new BlockPredicate() {
 
             @Override
@@ -71,6 +75,9 @@ public class ManualContract extends BuildContract {
                         && block.getId() != 0 && block.getId() != BlockID.WATER && block.getId() != BlockID.LAVA;
             }
         };
+        
+        final int max = Math.max(width, length);
+        
         final BlockMask frameMask = new BlockMask() {
 
             @Override
@@ -84,7 +91,7 @@ public class ManualContract extends BuildContract {
                     // Defaults
                     int frameMaterial = BlockID.WOOD;
                     int frameData = 0;
-                    int frameSize = 3;
+                    int frameSize = Math.min(3, max);
                     if (placeOptions instanceof ManualOptions) {
                         ManualOptions options = (ManualOptions) placeOptions;
                         frameMaterial = options.getFrameMaterial();
@@ -92,12 +99,9 @@ public class ManualContract extends BuildContract {
                         frameSize = options.getFrameSize();
                     }
 
-                    if (relativePosition.getBlockY() % frameSize == 0 || 
-                            (relativePosition.getBlockX() % frameSize == 0 && relativePosition.getBlockZ() % frameSize == 0)
-                            || relativePosition.getBlockX() == 0 
-                            || relativePosition.getBlockX() == width - 1 
-                            || relativePosition.getBlockZ() == length - 1
-                            || relativePosition.getBlockZ() == 0
+                    if (/*relativePosition.getBlockY() % frameSize == 0 || */
+                             relativePosition.getBlockX() % frameSize == 0 
+                            || relativePosition.getBlockZ() % frameSize == 0
                             ) {
                         return new BaseBlock(frameMaterial, frameData);
                     } else {

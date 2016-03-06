@@ -220,7 +220,7 @@ public class PlayerPlanPlacer {
                                 // start construction
                                 Structure structure = placeResult.getPlaced();
                                 if (!structureAPI.isQueueLocked(player.getUniqueId())) {
-                                    ManualContract buildContract = new ManualContract();
+                                    BuildContract buildContract = new ManualContract();
                                     SafeContract safeContract = new SafeContract(buildContract);
                                     safeContract.setRecursive(true)
                                             .setPlayer(playerUUID)

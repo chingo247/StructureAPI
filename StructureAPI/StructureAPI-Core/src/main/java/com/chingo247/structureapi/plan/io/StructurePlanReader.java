@@ -18,6 +18,7 @@ package com.chingo247.structureapi.plan.io;
 
 import com.chingo247.settlercraft.core.util.LogLevel;
 import com.chingo247.settlercraft.core.util.SCLogger;
+import com.chingo247.structureapi.placement.FilePlacement;
 import com.chingo247.structureapi.plan.io.exception.ElementValueException;
 import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.io.document.PlacementElement;
@@ -27,9 +28,9 @@ import com.chingo247.structureapi.plan.io.document.SubStructureElement;
 import com.chingo247.structureapi.plan.io.exception.PlanException;
 import com.chingo247.structureapi.schematic.SchematicManager;
 import com.chingo247.structureapi.plan.DefaultStructurePlan;
-import com.chingo247.structureapi.plan.DefaultSubstructuresPlan;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.placement.PlacementAPI;
+import com.chingo247.structureapi.plan.DefaultSubstructuresPlan;
 import com.chingo247.structureapi.plan.flag.Flag;
 import com.google.common.base.Preconditions;
 import java.io.File;
@@ -137,74 +138,77 @@ public class StructurePlanReader {
                 PlacementProcessor placementProcessor = new PlacementProcessor(structurePlanFile.getParentFile(), placementElement);
                 placementProcessor.fork();
 
-                if (planDocument.hasSubStructureElements()) {
-
-                    DefaultSubstructuresPlan plan = new DefaultSubstructuresPlan(id, structurePlanFile, parent, placementProcessor.get());
-                    plan.setName(name);
-                    plan.setPrice(price);
-                    plan.setDescription(description);
-                    plan.setCategory(category);
-
-                    
-                    // Get and Set subplaceables
-                    List<SubStructureElement> substructureElements = planDocument.getSubStructureElements();
-                    List<StructurePlanProcessor> spps = null;
-                    List<PlacementProcessor> pps = null;
-                    if (!substructureElements.isEmpty()) {
-                        spps = new ArrayList<>();
-                        pps = new ArrayList<>();
-
-                        for (SubStructureElement subStructureElement : substructureElements) {
-                            String t = subStructureElement.getType();
-
-                            if (t.trim().toLowerCase().equals("embedded")) {
-                                // Perform recursion check here!
-                                // Fully check branch for matchin types!
-                                File f = handleEmbeddedPlan(structurePlanFile, subStructureElement);
-                                if (plan.matchesParentRecursively(f)) {
-                                    throw new PlanException("Element <" + subStructureElement.getElementName() + "> on line " + subStructureElement.getLine()
-                                            + " matches a plan in his branch!");
-                                }
-                                spps.add(new StructurePlanProcessor(f, parent));
-                            } else {
-                                pps.add(new PlacementProcessor(structurePlanFile.getParentFile(), placementElement));
-                            }
-                        }
-                    }
-
-                    // Fork the processes
-                    if (pps != null) {
-                        for (PlacementProcessor pp : pps) {
-                            pp.fork();
-                        }
-                    }
-                    if (spps != null) {
-                        for (StructurePlanProcessor spp : spps) {
-                            spp.fork();
-                        }
-                    }
-
-                    // Collect the data
-                    if (pps != null) {
-                        for (PlacementProcessor pp : pps) {
-                            plan.addPlacement(pp.get());
-                        }
-                    }
-                    if (spps != null) {
-                        for (StructurePlanProcessor spp : spps) {
-                            plan.addStructurePlan(spp.get());
-                        }
-                    }
-
-                    // Recursive process SubStructurePlans
-//                    if (parent == null) {
-//                StructurePlanUtil.validate(plan);
+//                if (planDocument.hasSubStructureElements()) {
+//
+//                    DefaultSubstructuresPlan plan = new DefaultSubstructuresPlan(id, structurePlanFile, parent, placementProcessor.get());
+//                    plan.setName(name);
+//                    plan.setPrice(price);
+//                    plan.setDescription(description);
+//                    plan.setCategory(category);
+//
+//                    
+//                    // Get and Set subplaceables
+//                    List<SubStructureElement> substructureElements = planDocument.getSubStructureElements();
+//                    List<StructurePlanProcessor> spps = null;
+//                    List<PlacementProcessor> pps = null;
+//                    if (!substructureElements.isEmpty()) {
+//                        spps = new ArrayList<>();
+//                        pps = new ArrayList<>();
+//
+//                        for (SubStructureElement subStructureElement : substructureElements) {
+//                            String t = subStructureElement.getType();
+//
+//                            if (t.trim().toLowerCase().equals("embedded")) {
+//                                // Perform recursion check here!
+//                                // Fully check branch for matchin types!
+//                                File f = handleEmbeddedPlan(structurePlanFile, subStructureElement);
+//                                if (plan.matchesParentRecursively(f)) {
+//                                    throw new PlanException("Element <" + subStructureElement.getElementName() + "> on line " + subStructureElement.getLine()
+//                                            + " matches a plan in his branch!");
+//                                }
+//                                spps.add(new StructurePlanProcessor(f, parent));
+//                            } else {
+//                                pps.add(new PlacementProcessor(structurePlanFile.getParentFile(), placementElement));
+//                            }
+//                        }
 //                    }
-
-//                    LOG.print(LogLevel.INFO, structurePlanFile, "StructurePlan", System.currentTimeMillis() - start);
-                    return plan;
-
-                } else {
+//
+//                    // Fork the processes
+//                    if (pps != null) {
+//                        for (PlacementProcessor pp : pps) {
+//                            pp.fork();
+//                        }
+//                    }
+//                    if (spps != null) {
+//                        for (StructurePlanProcessor spp : spps) {
+//                            spp.fork();
+//                        }
+//                    }
+//
+//                    // Collect the data
+//                    if (pps != null) {
+//                        for (PlacementProcessor pp : pps) {
+//                            plan.addPlacement(pp.get());
+//                        }
+//                    }
+//                    if (spps != null) {
+//                        for (StructurePlanProcessor spp : spps) {
+//                            plan.addStructurePlan(spp.get());
+//                        }
+//                    }
+//
+//                    // Recursive process SubStructurePlans
+////                    if (parent == null) {
+////                StructurePlanUtil.validate(plan);
+////                    }
+//
+////                    LOG.print(LogLevel.INFO, structurePlanFile, "StructurePlan", System.currentTimeMillis() - start);
+//                    return plan;
+//
+//                } else {
+                    Placement placement = placementProcessor.get();
+                    
+                    
                     DefaultStructurePlan plan = new DefaultStructurePlan(id, structurePlanFile, placementProcessor.get());
                     plan.setName(name);
                     plan.setPrice(price);
@@ -212,7 +216,7 @@ public class StructurePlanReader {
                     plan.setCategory(category);
 //                    LOG.print(LogLevel.INFO, structurePlanFile, "StructurePlan", System.currentTimeMillis() - start);
                     return plan;
-                }
+//                }
 
             } catch (ElementValueException ex) {
                 LOG.print(LogLevel.ERROR, "Error in '" + structurePlanFile.getAbsolutePath() + "' >> " + ex.getMessage(), "StructurePlan", null);

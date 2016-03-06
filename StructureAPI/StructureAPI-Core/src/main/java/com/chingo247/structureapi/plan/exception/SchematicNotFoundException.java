@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,19 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.placement;
-
-import java.io.File;
+package com.chingo247.structureapi.plan.exception;
 
 /**
  *
  * @author Chingo
- * @param <T> The placement options
  */
-public interface FilePlacement extends Placement {
-    
-    public File[] getFiles();
-    
-    
+public class SchematicNotFoundException extends Exception {
+
+    public SchematicNotFoundException(String message) {
+        super(message);
+    }
     
 }

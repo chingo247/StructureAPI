@@ -18,6 +18,7 @@
 package com.chingo247.structureapi.plan;
 
 import com.chingo247.settlercraft.core.util.XXHasher;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.flag.Flag;
 import com.google.common.base.Preconditions;
 import java.io.File;
@@ -36,6 +37,7 @@ public abstract class AbstractStructurePlan implements IStructurePlan {
     private final String hash;
     private final File file;
     private Map<String,Flag<?>> flags;
+    private Long placementhash;
     
     protected AbstractStructurePlan(File planFile) {
         this(String.valueOf(new XXHasher().hash32String(planFile.getAbsolutePath())), planFile);
@@ -81,9 +83,15 @@ public abstract class AbstractStructurePlan implements IStructurePlan {
     public void setFlag(Flag<?> flag) {
         this.flags.put(flag.getName(), flag);
     }
-    
-    
-    
+
+    public void setPlacementHash(Long placementhash) {
+        this.placementhash = placementhash;
+    }
+
+    @Override
+    public Long getPlacementHash() {
+        return placementhash;
+    }
     
     @Override
     public String getDescription() {

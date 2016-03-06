@@ -89,6 +89,8 @@ public interface IStructurePlan {
      */
     Placement getPlacement();
     
+    Long getPlacementHash();
+    
     
     /**
      * Gets the File that represents this StructurePlan or null if file doesn't exist...

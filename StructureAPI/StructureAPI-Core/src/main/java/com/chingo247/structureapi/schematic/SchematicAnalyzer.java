@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.construction.manual;
+package com.chingo247.structureapi.schematic;
 
 import static com.chingo247.blockstore.NBTUtils.getChildTag;
 import com.chingo247.settlercraft.core.util.yaml.YAMLFormat;
@@ -38,8 +38,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -60,14 +58,13 @@ public class SchematicAnalyzer {
         NBTInputStream stream = new NBTInputStream(new GZIPInputStream(schematicStream));
         NamedTag tag = stream.readNamedTag();
         stream.close();
-        
-        Map<String,Tag> schematic = (Map) tag.getTag().getValue();
-        
-       
+
+        Map<String, Tag> schematic = (Map) tag.getTag().getValue();
+
         short width = getChildTag(schematic, "Width", ShortTag.class).getValue();
         short length = getChildTag(schematic, "Length", ShortTag.class).getValue();
         short height = getChildTag(schematic, "Height", ShortTag.class).getValue();
-        
+
         byte[] ids = getChildTag(schematic, "Blocks", ByteArrayTag.class).getValue();
         byte[] data = getChildTag(schematic, "Data", ByteArrayTag.class).getValue();
         byte[] addId = new byte[0];
@@ -76,8 +73,8 @@ public class SchematicAnalyzer {
             addId = getChildTag(schematic, "AddBlocks", ByteArrayTag.class).getValue();
         }
 
-        Map<String,Integer> countMap = Maps.newHashMap();
-        
+        Map<String, Integer> countMap = Maps.newHashMap();
+
         int count = 0;
         for (int index = 0; index < ids.length; index++) {
             short bd = data[index];
@@ -88,25 +85,25 @@ public class SchematicAnalyzer {
                 if ((index & 1) == 0) {
                     id = (short) (((addId[index >> 1] & 0x0F) << 8) + (ids[index] & 0xFF));
                 } else {
-                   id = (short) (((addId[index >> 1] & 0xF0) << 4) + (ids[index] & 0xFF));
+                    id = (short) (((addId[index >> 1] & 0xF0) << 4) + (ids[index] & 0xFF));
                 }
             }
-            if(id == 0) {
+            if (id == 0) {
                 continue;
             }
             count++;
             addCount(countMap, id, bd);
         }
-        
+
         countMap.put("0-0", (width * height * length) - count);
-        
-        long stop = System.currentTimeMillis(); 
-        
+
+        long stop = System.currentTimeMillis();
+
         System.out.println("Finished in " + (stop - start) + "ms");
         return countMap;
     }
-    
-    private static void addCount(Map<String,Integer> map, short id, short data) {
+
+    private static void addCount(Map<String, Integer> map, short id, short data) {
         String key = String.valueOf(id) + "-" + String.valueOf(data);
         if (map.containsKey(key)) {
             int i = map.get(key);
@@ -115,35 +112,35 @@ public class SchematicAnalyzer {
             map.put(key, 1);
         }
     }
-    
-    public static void writeToFile(File file, Map<String,Integer> count) {
+
+    public static void writeToFile(File file, Map<String, Integer> count) {
         writeToFile(file, count, false);
     }
-    
-    public static void writeToFile(File file, Map<String,Integer> count, boolean sortByCount) {
+
+    public static void writeToFile(File file, Map<String, Integer> count, boolean sortByCount) {
         YAMLProcessor processor = new YAMLProcessor(file, false, YAMLFormat.COMPACT);
-        
-        List<Map<String,Object>> list = new ArrayList<>();
-        
-        for(Entry<String,Integer> entry : count.entrySet()) {
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        for (Entry<String, Integer> entry : count.entrySet()) {
             String[] arr = entry.getKey().split("-");
-            
+
             int id = Integer.parseInt(arr[0]);
             int data = Integer.parseInt(arr[1]);
-            
-            Map<String,Object> n = new HashMap<>();
+
+            Map<String, Object> n = new HashMap<>();
             n.put("id", id);
-            n.put("data",  data);
+            n.put("data", data);
             n.put("count", entry.getValue());
             list.add(n);
         }
-        
-        if(sortByCount) {
-            Comparator<Map<String,Object>> comp = new Comparator<Map<String, Object>>() {
+
+        if (sortByCount) {
+            Comparator<Map<String, Object>> comp = new Comparator<Map<String, Object>>() {
 
                 @Override
                 public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                    return ((Integer)o2.get("count")).compareTo((Integer)(o1.get("count")));
+                    return ((Integer) o2.get("count")).compareTo((Integer) (o1.get("count")));
                 }
             };
             Collections.sort(list, comp);
@@ -151,17 +148,10 @@ public class SchematicAnalyzer {
         processor.setProperty("materials", list);
         processor.save();
     }
+
     
-    public static void main(String[] args) {
-        File plans = new File("F:\\GAMES\\MineCraftServers\\bukkit\\1.8\\Bukkit 1.8-SettlerCraft-2.2.0\\plugins\\SettlerCraft-StructureAPI\\plans");
-        File schematic = new File(plans, "Shiganshina.schematic");
-        File output = new File("count.yml");
-        try {
-            writeToFile(output, count(schematic), true);
-        } catch (IOException ex) {
-            Logger.getLogger(SchematicAnalyzer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }
+
+    
+
 
 }

@@ -426,7 +426,7 @@ public class SafeContract extends Contract {
             }
 
             for (BlockMask bm : option.getBlockMasks()) {
-                block = bm.apply(blockPosition, p, block);
+                block =bm.apply(blockPosition, p, block);
             }
 
             editSession.rawSetBlock(p, block);

@@ -37,7 +37,6 @@ import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.contract.DemolitionContract;
 import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
-import com.chingo247.structureapi.construction.manual.ManualContract;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.owner.StructureOwnership;
 import com.chingo247.structureapi.platform.permission.Permissions;
@@ -53,7 +52,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.util.Collection;
@@ -297,7 +295,7 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        BuildContract buildContract = new ManualContract();
+        BuildContract buildContract = new BuildContract();
         SafeContract safeContract = new SafeContract(buildContract);
         safeContract.setRecursive(true)
                 .setRestrictive(true)
