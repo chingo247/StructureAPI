@@ -25,7 +25,7 @@ import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.plan.StructurePlanManager;
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.exeption.StructurePlanException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.placement.block.SchematicPlacement;
 import com.chingo247.structureapi.schematic.FastClipboard;
 import com.chingo247.structureapi.platform.permission.Permissions;
@@ -103,7 +103,7 @@ public class SchematicCommands {
         } catch (StructurePlanException ex) {
             throw new CommandException(ex);
         }
-        IPlacement placement = plan.getPlacement();
+        Placement placement = plan.getPlacement();
 
         if(!(placement instanceof SchematicPlacement)) {
             throw new CommandException("Placement type of structure #" + structureId + " is not a schematic");

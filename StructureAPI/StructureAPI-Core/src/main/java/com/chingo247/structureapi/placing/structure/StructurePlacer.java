@@ -20,7 +20,7 @@ import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.world.StructureWorldNode;
 import com.chingo247.structureapi.model.world.StructureWorldRepository;
 import com.chingo247.structureapi.placement.FilePlacement;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.model.owner.OwnerDomain;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.chingo247.structureapi.plan.io.export.PlacementExporter;
@@ -125,7 +125,7 @@ public class StructurePlacer  {
     
     
 
-    public IPlaceResult<Structure> place(final IPlacement placement, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException {
+    public IPlaceResult<Structure> place(final Placement placement, final Vector position, final Direction direction) throws IOException, UnsupportedPlacementException {
         Vector min = position;
         Vector max = PlacementUtil.getPoint2Right(min, direction, placement.getCuboidRegion().getMaximumPoint());
         IPlaceResult<Structure> result = place(new CuboidRegion(min, max), position, direction, new ICallback() {
@@ -327,7 +327,7 @@ public class StructurePlacer  {
         return placeResult;
     }
 
-    private CuboidRegion getAffectedRegion(IPlacement placement, Vector position, Direction direction) {
+    private CuboidRegion getAffectedRegion(Placement placement, Vector position, Direction direction) {
         Vector min = position;
         
         Vector max = PlacementUtil.getPoint2Right(min, direction, placement.getCuboidRegion().getMaximumPoint());
@@ -345,7 +345,7 @@ public class StructurePlacer  {
         structureDirectory.mkdirs();
 
         Files.copy(plan.getFile(), new File(structureDirectory, "structureplan.xml"));
-        IPlacement placement = plan.getPlacement();
+        Placement placement = plan.getPlacement();
 
         // Move the resources if applicable!
         if (placement instanceof FilePlacement) {
@@ -357,7 +357,7 @@ public class StructurePlacer  {
         }
     }
 
-    private void copyResources(Structure structure, IPlacement placement) throws IOException, UnsupportedPlacementException {
+    private void copyResources(Structure structure, Placement placement) throws IOException, UnsupportedPlacementException {
         File structureDirectory = structure.getDirectory();
         if (structureDirectory.exists()) {
             FileUtils.deleteDirectory(structureDirectory);

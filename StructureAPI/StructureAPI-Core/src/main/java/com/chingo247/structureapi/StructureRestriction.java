@@ -17,7 +17,7 @@
 package com.chingo247.structureapi;
 
 import com.chingo247.structureapi.exeption.StructureRestrictionException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;

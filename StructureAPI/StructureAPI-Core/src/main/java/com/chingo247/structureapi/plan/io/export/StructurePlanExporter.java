@@ -17,7 +17,7 @@
 
 package com.chingo247.structureapi.plan.io.export;
 
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.placement.IExportablePlacement;
 import com.chingo247.structureapi.placement.PlacementAPI;
 import com.chingo247.structureapi.plan.IStructurePlan;
@@ -43,7 +43,7 @@ public class StructurePlanExporter {
     public void export(IStructurePlan plan, File destinationDirectory, String fileName, boolean prettyPrint) throws IOException, UnsupportedPlacementException {
         Preconditions.checkArgument(destinationDirectory.isDirectory());
         
-        IPlacement placement = plan.getPlacement();
+        Placement placement = plan.getPlacement();
         if( !(placement instanceof IExportablePlacement)) {
             throw new UnsupportedPlacementException("Placement does not implement IWriteablePlacement");
         }

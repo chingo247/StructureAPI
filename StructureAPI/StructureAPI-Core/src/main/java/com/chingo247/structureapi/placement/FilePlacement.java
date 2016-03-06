@@ -23,7 +23,7 @@ import java.io.File;
  * @author Chingo
  * @param <T> The placement options
  */
-public interface FilePlacement extends IPlacement {
+public interface FilePlacement extends Placement {
     
     public File[] getFiles();
     

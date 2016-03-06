@@ -200,7 +200,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
         }
 
         for (BlockMask bm : option.getBlockMasks()) {
-            bm.apply(blockPosition, p, block);
+            block = bm.apply(blockPosition, p, block);
         }
 
         editSession.rawSetBlock(p, block);

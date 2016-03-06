@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.construction.awe;
 
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import org.primesoft.asyncworldedit.api.blockPlacer.IBlockPlacer;
@@ -28,9 +28,9 @@ import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
  */
 public abstract class AWESilentAsyncTask extends AWESilentBaseTask {
     
-    private IPlacement placement;
+    private Placement placement;
 
-    public AWESilentAsyncTask(IPlacement placement, EditSession editSession, PlayerEntry player, String commandName, IBlockPlacer blocksPlacer, AWEJobEntry job, IAWECallback callback) {
+    public AWESilentAsyncTask(Placement placement, EditSession editSession, PlayerEntry player, String commandName, IBlockPlacer blocksPlacer, AWEJobEntry job, IAWECallback callback) {
         super(editSession, player, commandName, blocksPlacer, job, callback);
         this.placement = placement;
     }
@@ -52,7 +52,7 @@ public abstract class AWESilentAsyncTask extends AWESilentBaseTask {
      * @param placement The placement
      * @throws com.sk89q.worldedit.MaxChangedBlocksException
      */
-    public abstract void task(IPlacement placement)
+    public abstract void task(Placement placement)
             throws MaxChangedBlocksException;
     
 }

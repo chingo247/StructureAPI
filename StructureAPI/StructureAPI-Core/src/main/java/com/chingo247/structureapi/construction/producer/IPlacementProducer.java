@@ -18,13 +18,13 @@ package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.structure.Structure;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 
 /**
  *
  * @author ching
  */
-public interface IPlacementProducer<T extends IPlacement> {
+public interface IPlacementProducer<T extends Placement> {
      
     T produce(Structure structure) throws StructureException;
     

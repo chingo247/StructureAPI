@@ -25,7 +25,7 @@ import com.chingo247.settlercraft.core.Direction;
  * @author Chingo
  * @param <T>
  */
-public interface RotationalPlacement extends IPlacement {
+public interface RotationalPlacement extends Placement {
     
     int getRotation();
     

@@ -1,6 +1,5 @@
-
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,34 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.placement;
-
-import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.regions.CuboidRegion;
+package com.chingo247.structureapi.construction.manual;
 
 /**
  *
  * @author Chingo
  */
-public interface IPlacement {
+public class BlockResource {
     
-    void place(EditSession session, Vector pos, PlaceOptions option);
-    
-    Vector getOffset();
-    
-    Vector getSize();
-    
-    int getWidth();
-    
-    int getHeight();
-    
-    int getLength();
-    
-    CuboidRegion getCuboidRegion();
-    
-    
-     
+    private int data;
+    private int type;
+    private int amount;
+    private String name;
 
+    public BlockResource(int data, int type, int amount, String name) {
+        this.data = data;
+        this.type = type;
+        this.amount = amount;
+        this.name = name;
+    }
+    
+    
+    
+    
 }

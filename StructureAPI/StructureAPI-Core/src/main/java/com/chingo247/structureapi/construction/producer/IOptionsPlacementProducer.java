@@ -17,36 +17,16 @@
 package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.exeption.StructurePlanException;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.placement.Placement;
-import com.chingo247.structureapi.placement.RotationalPlacement;
-import com.chingo247.structureapi.placement.block.IBlockPlacement;
+import com.chingo247.structureapi.placement.options.PlaceOptions;
 
 /**
  *
  * @author Chingo
  */
-public class BuildPlacementProducer extends BlockPlacementProducer {
-
-    public BuildPlacementProducer() {
-    }
-
-    @Override
-    public IBlockPlacement produce(Structure structure) throws StructureException {
-        try {
-            Placement placement = structure.getStructurePlan().getPlacement();
-            checkIsBlockPlacement(placement);
-
-            if (placement instanceof RotationalPlacement) {
-                RotationalPlacement rt = (RotationalPlacement) placement;
-                rt.rotate(structure.getDirection().getRotation());
-            }
-
-            return (IBlockPlacement) placement;
-        } catch (StructurePlanException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
+public interface IOptionsPlacementProducer<T extends Placement> extends IPlacementProducer<T> {
+    
+    T produce(Structure structure, PlaceOptions options) throws StructureException;
+    
 }

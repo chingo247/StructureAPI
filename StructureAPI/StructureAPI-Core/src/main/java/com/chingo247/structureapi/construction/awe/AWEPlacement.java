@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.construction.awe;
 
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.Vector;
@@ -44,7 +44,7 @@ class AWEPlacement extends AbstractAWEPlacement {
      * @param placement The placement
      * @param callback
      */
-    AWEPlacement(IAsyncWorldEdit asyncWorldEdit, PlayerEntry playerEntry, IPlacement placement, UUID taskUUID, IAWECallback callback) {
+    AWEPlacement(IAsyncWorldEdit asyncWorldEdit, PlayerEntry playerEntry, Placement placement, UUID taskUUID, IAWECallback callback) {
         super(asyncWorldEdit, playerEntry, placement);
         this.callback = callback;
         this.taskUUID = taskUUID;
@@ -79,7 +79,7 @@ class AWEPlacement extends AbstractAWEPlacement {
         scheduler.runAsync(new AWESilentAsyncTask(placement, editSession, playerEntry, null, placer, job, callback){
             
             @Override
-            public void task(IPlacement placement) throws MaxChangedBlocksException {
+            public void task(Placement placement) throws MaxChangedBlocksException {
                 if (wait != null) {
                     wait.checkAndWait(null);
                 }

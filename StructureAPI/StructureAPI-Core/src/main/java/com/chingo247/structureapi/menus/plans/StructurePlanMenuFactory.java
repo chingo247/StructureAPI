@@ -21,7 +21,7 @@ package com.chingo247.structureapi.menus.plans;
 import com.chingo247.menuapi.menu.CategoryMenu;
 import com.chingo247.menuapi.menu.DefaultCategoryMenu;
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.xplatform.core.APlatform;
 import com.chingo247.structureapi.plan.IStructurePlan;
 import com.google.common.base.Preconditions;
@@ -50,7 +50,7 @@ public class StructurePlanMenuFactory {
     }
 
     public void load(IStructurePlan plan) {
-        IPlacement placement = plan.getPlacement();
+        Placement placement = plan.getPlacement();
        
         CuboidRegion region = placement.getCuboidRegion();
         

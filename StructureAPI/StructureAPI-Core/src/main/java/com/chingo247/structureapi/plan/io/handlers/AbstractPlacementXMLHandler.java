@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.plan.io.handlers;
 
 import com.chingo247.structureapi.placement.RotationalPlacement;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.placement.IExportablePlacement;
 import com.chingo247.structureapi.plan.io.PlacementXMLConstants;
 import com.sk89q.worldedit.Vector;

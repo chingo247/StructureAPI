@@ -17,7 +17,7 @@
 
 package com.chingo247.structureapi.placement.block;
 
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.blocks.BaseBlock;
 
@@ -26,7 +26,7 @@ import com.sk89q.worldedit.blocks.BaseBlock;
  * @author Chingo
  * @param <T>
  */
-public interface IBlockPlacement extends IPlacement {
+public interface IBlockPlacement extends Placement {
     
     public BaseBlock getBlock(Vector position);
     

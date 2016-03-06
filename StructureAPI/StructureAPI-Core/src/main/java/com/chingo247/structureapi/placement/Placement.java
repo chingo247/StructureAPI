@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2015 Chingo
  *
@@ -14,19 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.chingo247.structureapi.placement;
 
-package com.chingo247.structureapi.plan.io.handlers;
-
-import com.chingo247.structureapi.placement.Placement;
-import org.dom4j.Element;
+import com.chingo247.structureapi.placement.options.PlaceOptions;
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.regions.CuboidRegion;
 
 /**
- * Writes a placement to a file
+ *
  * @author Chingo
- * @param <T> The type of the placement
  */
-public interface PlacementXMLHandler<T extends Placement> {
+public interface Placement {
     
-    public Element handle(T placement);
+    void place(EditSession session, Vector pos, PlaceOptions option);
     
+    Vector getOffset();
+    
+    Vector getSize();
+    
+    int getWidth();
+    
+    int getHeight();
+    
+    int getLength();
+    
+    CuboidRegion getCuboidRegion();
+    
+    
+     
+
 }

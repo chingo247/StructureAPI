@@ -19,7 +19,7 @@
 package com.chingo247.structureapi.plan;
 
 import com.chingo247.structureapi.plan.io.exception.PlanException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.io.export.StructurePlanExporter;
 import com.chingo247.structureapi.plan.io.export.UnsupportedPlacementException;
 import com.google.common.collect.Sets;
@@ -35,11 +35,11 @@ import java.util.Set;
 public final class DefaultSubstructuresPlan extends AbstractStructurePlan implements ISubstructurePlan {
 
     private final DefaultSubstructuresPlan parent;
-    private final IPlacement mainPlacement;
+    private final Placement mainPlacement;
     private final Set<IStructurePlan> plans;
-    private final Set<IPlacement> placements; // Substructure - placeable
+    private final Set<Placement> placements; // Substructure - placeable
 
-    public DefaultSubstructuresPlan(String id, File structurePlanFile, DefaultSubstructuresPlan parent, IPlacement placement) {
+    public DefaultSubstructuresPlan(String id, File structurePlanFile, DefaultSubstructuresPlan parent, Placement placement) {
         super(id, structurePlanFile);
         this.parent = parent;
         this.mainPlacement = placement;
@@ -48,12 +48,12 @@ public final class DefaultSubstructuresPlan extends AbstractStructurePlan implem
     }
 
     @Override
-    public boolean removePlacement(IPlacement placement) {
+    public boolean removePlacement(Placement placement) {
         return placements.remove(placement);
     }
 
     @Override
-    public void addPlacement(IPlacement placement) {
+    public void addPlacement(Placement placement) {
         placements.add(placement);
     }
 
@@ -71,7 +71,7 @@ public final class DefaultSubstructuresPlan extends AbstractStructurePlan implem
     }
 
     @Override
-    public IPlacement getPlacement() {
+    public Placement getPlacement() {
         return mainPlacement;
     }
 
@@ -81,7 +81,7 @@ public final class DefaultSubstructuresPlan extends AbstractStructurePlan implem
     }
 
     @Override
-    public Collection<IPlacement> getSubPlacements() {
+    public Collection<Placement> getSubPlacements() {
         return placements;
     }
 

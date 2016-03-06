@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.construction.producer;
 
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 
 /**
@@ -26,7 +26,7 @@ import com.chingo247.structureapi.placement.block.IBlockPlacement;
  */
 public abstract class BlockPlacementProducer implements IPlacementProducer<IBlockPlacement> {
     
-    protected void checkIsBlockPlacement(IPlacement placement) throws StructureException {
+    protected void checkIsBlockPlacement(Placement placement) throws StructureException {
         if( !(placement instanceof IBlockPlacement)) {
             throw new StructureException("Placement is not a block placement");
         }

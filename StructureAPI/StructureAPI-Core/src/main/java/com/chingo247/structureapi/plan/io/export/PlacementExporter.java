@@ -18,7 +18,7 @@
 package com.chingo247.structureapi.plan.io.export;
 
 import com.chingo247.structureapi.plan.DefaultStructurePlan;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import java.io.File;
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ import java.io.IOException;
  */
 public class PlacementExporter {
     
-    public void export(IPlacement p, File destinationDirectory, String fileName, boolean prettyprint) throws IOException, UnsupportedPlacementException {
+    public void export(Placement p, File destinationDirectory, String fileName, boolean prettyprint) throws IOException, UnsupportedPlacementException {
         File placementPlanFile = new File(destinationDirectory, fileName);
         DefaultStructurePlan plan = new PlacementPlan(placementPlanFile.getAbsolutePath(), placementPlanFile, p);
         plan.setCategory("Other");
@@ -41,7 +41,7 @@ public class PlacementExporter {
     
     private class PlacementPlan extends DefaultStructurePlan {
         
-        PlacementPlan(String id, File planFile, IPlacement placement) {
+        PlacementPlan(String id, File planFile, Placement placement) {
             super(id, planFile, placement);
         }
         

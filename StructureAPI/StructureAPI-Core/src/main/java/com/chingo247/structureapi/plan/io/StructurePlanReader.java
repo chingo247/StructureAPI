@@ -19,7 +19,7 @@ package com.chingo247.structureapi.plan.io;
 import com.chingo247.settlercraft.core.util.LogLevel;
 import com.chingo247.settlercraft.core.util.SCLogger;
 import com.chingo247.structureapi.plan.io.exception.ElementValueException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.io.document.PlacementElement;
 import com.chingo247.structureapi.plan.io.document.LineElement;
 import com.chingo247.structureapi.plan.io.document.StructurePlanDocument;
@@ -247,7 +247,7 @@ public class StructurePlanReader {
 
     }
 
-    private class PlacementProcessor extends RecursiveTask<IPlacement> {
+    private class PlacementProcessor extends RecursiveTask<Placement> {
 
         private final PlacementElement placeableNode;
         private final File sourceDirectory;
@@ -264,8 +264,8 @@ public class StructurePlanReader {
         }
 
         @Override
-        protected IPlacement compute() {
-            IPlacement placement = PlacementAPI.getInstance().parse(placeableNode.getFile(), placeableNode.getElement().getDocument(), placeableNode);
+        protected Placement compute() {
+            Placement placement = PlacementAPI.getInstance().parse(placeableNode.getFile(), placeableNode.getElement().getDocument(), placeableNode);
             return placement;
         }
 

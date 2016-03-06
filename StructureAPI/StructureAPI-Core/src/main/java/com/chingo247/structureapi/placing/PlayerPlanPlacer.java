@@ -26,6 +26,7 @@ import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructurePlacerFactory;
 import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
+import com.chingo247.structureapi.construction.manual.ManualContract;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.getPlanID;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.getValue;
 import static com.chingo247.structureapi.menus.plans.StructurePlanItem.isStructurePlan;
@@ -219,7 +220,7 @@ public class PlayerPlanPlacer {
                                 // start construction
                                 Structure structure = placeResult.getPlaced();
                                 if (!structureAPI.isQueueLocked(player.getUniqueId())) {
-                                    BuildContract buildContract = new BuildContract();
+                                    ManualContract buildContract = new ManualContract();
                                     SafeContract safeContract = new SafeContract(buildContract);
                                     safeContract.setRecursive(true)
                                             .setPlayer(playerUUID)

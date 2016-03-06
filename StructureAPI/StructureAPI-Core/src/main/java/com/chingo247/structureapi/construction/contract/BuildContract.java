@@ -21,7 +21,7 @@ import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
 import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.listener.BuildListener;
@@ -40,8 +40,6 @@ public class BuildContract extends Contract {
     protected static final BlockPlacementProducer BUILD_PRODUCER = new BuildPlacementProducer();
     protected static final BuildListener BUILD_LISTENER = new BuildListener();
     
-    
-
     @Override
     public IPlacementProducer<IBlockPlacement> getPlacementProducer() {
         return BUILD_PRODUCER;
@@ -52,13 +50,12 @@ public class BuildContract extends Contract {
         return BUILD_LISTENER;
     }
 
-
     @Override
     public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = entry.getStructure().getMin(); // Always place from the min position... 
-        IPlacement placement = BUILD_PRODUCER.produce(entry.getStructure());                
+        Placement placement = BUILD_PRODUCER.produce(entry.getStructure());                
         AWEPlacementTask task = new AWEPlacementTask(
                         asyncWorldEdit,
                         entry,
@@ -67,7 +64,6 @@ public class BuildContract extends Contract {
                         getEditSession(),
                         position
                 );
-        
         
         task.setOptions(placeOptions);        
         entry.addListener(BUILD_LISTENER);        

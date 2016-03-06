@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.plan;
 
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.flag.Flag;
 import java.io.File;
 import java.util.Map;
@@ -87,7 +87,7 @@ public interface IStructurePlan {
      * Gets the placement
      * @return The placement of this StructurePlan
      */
-    IPlacement getPlacement();
+    Placement getPlacement();
     
     
     /**

@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.construction.awe;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.xplatform.core.IScheduler;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -29,12 +29,12 @@ import org.primesoft.asyncworldedit.playerManager.PlayerEntry;
  *
  * @author Chingo
  */
-public abstract class AbstractAWEPlacement implements IPlacement {
+public abstract class AbstractAWEPlacement implements Placement {
     
     protected final IAsyncWorldEdit awe;
     protected final IBlockPlacer placer;
     protected final IScheduler scheduler;
-    protected final IPlacement placement;
+    protected final Placement placement;
     protected final PlayerEntry playerEntry;
 
     /**
@@ -43,7 +43,7 @@ public abstract class AbstractAWEPlacement implements IPlacement {
      * @param playerEntry The PlayerEntry
      * @param placement The placement
      */
-    public AbstractAWEPlacement(IAsyncWorldEdit asyncWorldEdit, PlayerEntry playerEntry, IPlacement placement) {
+    public AbstractAWEPlacement(IAsyncWorldEdit asyncWorldEdit, PlayerEntry playerEntry, Placement placement) {
         this.playerEntry = playerEntry;
         this.awe = asyncWorldEdit;
         this.placer = awe.getBlockPlacer();

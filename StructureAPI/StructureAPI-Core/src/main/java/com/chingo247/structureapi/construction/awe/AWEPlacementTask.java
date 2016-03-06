@@ -21,7 +21,7 @@ import com.chingo247.structureapi.construction.task.ITaskStartedListener;
 import com.chingo247.structureapi.construction.task.StructurePlacingTask;
 import com.chingo247.structureapi.event.task.StructureTaskStartEvent;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import java.util.UUID;
@@ -40,7 +40,7 @@ import com.chingo247.structureapi.event.task.StructureTaskQueuedEvent;
  */
 public class AWEPlacementTask extends StructurePlacingTask {
 
-    private final IPlacement placement;
+    private final Placement placement;
     private final PlayerEntry playerEntry;
     private final Vector position;
     private final EditSession editSession;
@@ -60,7 +60,7 @@ public class AWEPlacementTask extends StructurePlacingTask {
      * @param position The position
      * @param options The options to use when placing
      */
-    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, StructureEntry structureEntry, IPlacement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
+    public AWEPlacementTask(IAsyncWorldEdit asyncWorldEdit, StructureEntry structureEntry, Placement placement, UUID playerOrRandomUUID, EditSession editSession, Vector position) {
         super(structureEntry, playerOrRandomUUID);
         this.playerEntry = asyncWorldEdit.getPlayerManager().getPlayer(playerOrRandomUUID);
         this.position = position;

@@ -30,6 +30,7 @@ import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.blockstore.safe.SafeBlockStoreWriter;
+import com.chingo247.structureapi.construction.manual.ManualContract;
 import com.chingo247.structureapi.construction.task.StructurePlacingTask;
 import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.model.structure.RollbackData;
@@ -94,6 +95,12 @@ public class SafeContract extends Contract {
 
     @Override
     public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
+        if(contract instanceof ManualContract) {
+            ((ManualContract) contract).applyManual(entry, placeOptions);
+        }
+        
+        
+        
         Structure structure = entry.getStructure();
         IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
         IBlockPlacement placement = getPlacementProducer().produce(structure);
@@ -419,7 +426,7 @@ public class SafeContract extends Contract {
             }
 
             for (BlockMask bm : option.getBlockMasks()) {
-                bm.apply(blockPosition, p, block);
+                block = bm.apply(blockPosition, p, block);
             }
 
             editSession.rawSetBlock(p, block);

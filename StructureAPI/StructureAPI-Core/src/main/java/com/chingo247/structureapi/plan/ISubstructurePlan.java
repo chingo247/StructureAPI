@@ -16,7 +16,7 @@ package com.chingo247.structureapi.plan;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import java.util.Collection;
 
 /**
@@ -30,13 +30,13 @@ public interface ISubstructurePlan extends IStructurePlan {
      * @param placement The Placement to remove
      * @return True if Placement was successfully removed
      */
-    public boolean removePlacement(IPlacement placement);
+    public boolean removePlacement(Placement placement);
     
     /**
      * Adds a placement to this StructurePlan
      * @param placement The placement to add
      */
-    public void addPlacement(IPlacement placement);
+    public void addPlacement(Placement placement);
     
     /**
      * Adds a StructurePlan to this StructurePlan
@@ -62,7 +62,7 @@ public interface ISubstructurePlan extends IStructurePlan {
      * Gets all the SubPlacement of this StructurePlan
      * @return The SubPlacements
      */
-    public Collection<? extends IPlacement> getSubPlacements();
+    public Collection<? extends Placement> getSubPlacements();
     
     
     public ISubstructurePlan getParent();

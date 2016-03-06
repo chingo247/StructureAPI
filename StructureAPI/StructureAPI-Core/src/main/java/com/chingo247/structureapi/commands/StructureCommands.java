@@ -37,6 +37,7 @@ import com.chingo247.structureapi.construction.contract.BuildContract;
 import com.chingo247.structureapi.construction.contract.DemolitionContract;
 import com.chingo247.structureapi.construction.contract.RollbackContract;
 import com.chingo247.structureapi.construction.contract.SafeContract;
+import com.chingo247.structureapi.construction.manual.ManualContract;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.owner.StructureOwnership;
 import com.chingo247.structureapi.platform.permission.Permissions;
@@ -296,7 +297,7 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        BuildContract buildContract = new BuildContract();
+        BuildContract buildContract = new ManualContract();
         SafeContract safeContract = new SafeContract(buildContract);
         safeContract.setRecursive(true)
                 .setRestrictive(true)

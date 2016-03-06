@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.plan;
 
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.plan.flag.Flag;
 import com.chingo247.structureapi.plan.io.export.StructurePlanExporter;
 import com.chingo247.structureapi.plan.io.export.UnsupportedPlacementException;
@@ -31,19 +31,19 @@ import java.util.Map;
  */
 public class DefaultStructurePlan extends AbstractStructurePlan {
     
-    private final IPlacement placement;
+    private final Placement placement;
 
-    public DefaultStructurePlan(String id, File planFile, IPlacement placement) {
+    public DefaultStructurePlan(String id, File planFile, Placement placement) {
         this(id, planFile, placement, new HashMap<String, Flag<?>>());
     }
     
-    public DefaultStructurePlan(String id, File planFile, IPlacement placement, Map<String,Flag<?>> flags) {
+    public DefaultStructurePlan(String id, File planFile, Placement placement, Map<String,Flag<?>> flags) {
         super(id, planFile, flags);
         this.placement = placement;
     }
 
     @Override
-    public IPlacement getPlacement() {
+    public Placement getPlacement() {
         return placement;
     }
 

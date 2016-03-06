@@ -17,7 +17,7 @@
 package com.chingo247.structureapi.plan.io.parser;
 
 import com.chingo247.structureapi.plan.io.document.PlacementElement;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import java.io.File;
 import org.dom4j.Document;
 
@@ -26,7 +26,7 @@ import org.dom4j.Document;
  * @author Chingo
  * @param <T>
  */
-public interface PlacementParser<T extends IPlacement> {
+public interface PlacementParser<T extends Placement> {
     
     /**
      * The type this Parser can handle

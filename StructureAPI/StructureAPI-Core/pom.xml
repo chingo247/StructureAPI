@@ -73,7 +73,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>structureapi-blockstore</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <reporting>

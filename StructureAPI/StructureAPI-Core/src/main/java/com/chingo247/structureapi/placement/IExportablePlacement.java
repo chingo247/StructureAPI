@@ -9,7 +9,7 @@ package com.chingo247.structureapi.placement;
  *
  * @author Chingo
  */
-public interface IExportablePlacement extends IPlacement {
+public interface IExportablePlacement extends Placement {
     
     String getTypeName();
     

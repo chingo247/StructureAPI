@@ -54,7 +54,7 @@ public class PlacementAPI {
         return instance;
     }
     
-    public <T extends IPlacement> T parse(File f, Document d, PlacementElement e) {
+    public <T extends Placement> T parse(File f, Document d, PlacementElement e) {
         String type = e.getType();
         PlacementParser<T> pp = parsers.get(type.toLowerCase());
         if(pp == null) {

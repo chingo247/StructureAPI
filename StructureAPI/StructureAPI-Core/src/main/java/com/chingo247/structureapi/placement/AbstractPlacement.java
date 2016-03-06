@@ -26,7 +26,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
  * @author Chingo
  * @param <T>
  */
-public abstract class AbstractPlacement implements IPlacement, RotationalPlacement {
+public abstract class AbstractPlacement implements Placement, RotationalPlacement {
     
     
     protected final Vector position;

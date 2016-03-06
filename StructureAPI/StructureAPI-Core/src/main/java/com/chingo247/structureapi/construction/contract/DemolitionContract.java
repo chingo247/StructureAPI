@@ -26,7 +26,7 @@ import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.DemolitionPlacementProducer;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.placement.IPlacement;
+import com.chingo247.structureapi.placement.Placement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.sk89q.worldedit.Vector;
@@ -57,7 +57,7 @@ public class DemolitionContract extends Contract {
         IStructureAPI structureAPI = StructureAPI.getInstance();
         IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
         Vector position = entry.getStructure().getMin(); // Always place from the min position... 
-        IPlacement placement = DEMOLITION_PRODUCER.produce(entry.getStructure());                
+        Placement placement = DEMOLITION_PRODUCER.produce(entry.getStructure());                
         AWEPlacementTask task = new AWEPlacementTask(
                         asyncWorldEdit,
                         entry,
