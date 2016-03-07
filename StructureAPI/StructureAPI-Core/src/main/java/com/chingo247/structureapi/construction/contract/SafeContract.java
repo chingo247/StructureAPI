@@ -30,6 +30,7 @@ import com.chingo247.structureapi.placement.StructureBlock;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.blockstore.safe.SafeBlockStoreWriter;
+import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.structureapi.construction.task.StructurePlacingTask;
 import com.chingo247.structureapi.construction.task.StructureTask;
 import com.chingo247.structureapi.model.structure.RollbackData;
@@ -74,11 +75,12 @@ public class SafeContract extends Contract {
 
     /**
      * Constructor
+     *
      * @param contract The contract, may NOT inherit from RollbackContract
      */
     public SafeContract(Contract contract) {
         Preconditions.checkNotNull(contract, "contract may not be null");
-        Preconditions.checkArgument(! (contract instanceof RollbackContract), "RollbackContract is not allowed!");
+        Preconditions.checkArgument(!(contract instanceof RollbackContract), "RollbackContract is not allowed!");
         this.contract = contract;
     }
 
@@ -117,19 +119,18 @@ public class SafeContract extends Contract {
         // Create place areas...
         Contract entryContract = entry.getContract();
         UUID player = entryContract.getPlayer();
-        World world = entryContract.getEditSession().getWorld();
-        EditSession editSession = entryContract.getEditSession();
+        World world = SettlerCraft.getInstance().getWorld(entry.getStructure().getWorldUUID());
 
         Iterator<Vector> traversalSafe = new CuboidIterator(
-                placeOptions.getCubeX() < 0 ? placement.getWidth(): placeOptions.getCubeX(),
+                placeOptions.getCubeX() < 0 ? placement.getWidth() : placeOptions.getCubeX(),
                 placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
-                placeOptions.getCubeZ() < 0 ? placement.getLength(): placeOptions.getCubeZ()
+                placeOptions.getCubeZ() < 0 ? placement.getLength() : placeOptions.getCubeZ()
         ).iterate(placement.getSize());
 
         Iterator<Vector> traversalPlace = new CuboidIterator(
-                placeOptions.getCubeX() < 0 ? placement.getWidth(): placeOptions.getCubeX(),
+                placeOptions.getCubeX() < 0 ? placement.getWidth() : placeOptions.getCubeX(),
                 placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
-                placeOptions.getCubeZ() < 0 ? placement.getLength(): placeOptions.getCubeZ()
+                placeOptions.getCubeZ() < 0 ? placement.getLength() : placeOptions.getCubeZ()
         ).iterate(placement.getSize());
 
         PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
@@ -142,9 +143,10 @@ public class SafeContract extends Contract {
             SafeTask task = new SafeTask(entry, player, placement, world, safeBlockStore, traversalSafe, MAX_BLOCKS_PER_TASK);
             entry.addTask(task);
             SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
-            
+
+            EditSession editSession = entryContract.getEditSessionFactory().createEditSession(structure, player);
             StructurePlacingTask placingTask = new AWEPlacementTask(
-                    asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin()); 
+                    asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
             placingTask.setOptions(placeOptions);
             entry.addTask(placingTask);
             countBlock += MAX_BLOCKS_PER_TASK;
@@ -155,7 +157,8 @@ public class SafeContract extends Contract {
         // Empties the last blocks in placelater-queue
         SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
         safePlacement.setLast(true);
-        
+
+        EditSession editSession = entryContract.getEditSessionFactory().createEditSession(structure, player);
         StructurePlacingTask task = new AWEPlacementTask(
                 asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
         task.setOptions(placeOptions);
@@ -173,7 +176,6 @@ public class SafeContract extends Contract {
          * The schematicSaveData object.
          */
         private SafeBlockStore safeBlockStore;
-
 
         private int maxBlocks;
         private Iterator<Vector> traversal;
@@ -354,11 +356,9 @@ public class SafeContract extends Contract {
 
                     // only place these when having a greater xz-cubevalue to avoid placing torches etc in air and break them later
                     while (placeLater.peek() != null
-                            && (
-                            placeLater.peek().getPosition().getBlockY() < (option.getCubeY() * (Math.ceil(v.getBlockY() / option.getCubeY())))
+                            && (placeLater.peek().getPosition().getBlockY() < (option.getCubeY() * (Math.ceil(v.getBlockY() / option.getCubeY())))
                             || placeLater.peek().getPosition().getBlockX() < (option.getCubeX() * (Math.ceil(v.getBlockX() / option.getCubeX())))
-                            || placeLater.peek().getPosition().getBlockZ() < (option.getCubeZ() * (Math.ceil(v.getBlockZ() / option.getCubeZ())))
-                            )) {
+                            || placeLater.peek().getPosition().getBlockZ() < (option.getCubeZ() * (Math.ceil(v.getBlockZ() / option.getCubeZ()))))) {
                         StructureBlock plb = placeLater.poll();
                         doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
 
