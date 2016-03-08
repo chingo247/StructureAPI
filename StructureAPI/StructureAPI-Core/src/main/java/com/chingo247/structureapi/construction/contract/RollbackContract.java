@@ -95,7 +95,7 @@ public class RollbackContract extends Contract {
                             entry,
                             placement,
                             getPlayer(),
-                            getEditSession(),
+                            getEditSessionFactory().createEditSession(structure, entry.getContract().getPlayer()),
                             structureMin.add(chunk.getX(), 0, chunk.getZ())
                     );
                     task.setOptions(placeOptions);
