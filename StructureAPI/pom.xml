@@ -2,16 +2,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.chingo247</groupId>
-    <artifactId>StructureAPI</artifactId>
+    <artifactId>structureapi</artifactId>
     <version>2.2.0</version>
     <packaging>pom</packaging>
+    <name>structureapi</name>
     <modules>
-        <module>StructureAPI-BlockStore</module>
-        <module>StructureAPI-Bukkit</module>
-        <module>StructureAPI-Core</module>
-        <module>StructureAPI-HolographicDisplays</module>
-        <module>StructureAPI-WorldGuard</module>
-        <module>StructureAPI-Towny</module>
+        <module>structureapi-blockstore</module>
+        <module>structureapi-core</module>
+        <module>structureapi-bukkit</module>
+        <module>StructureAPI-towny</module>
+        <module>StructureAPI-worldguard</module>
     </modules>
     <properties>
         <settlercraft.version>2.2.0</settlercraft.version>
@@ -97,27 +97,17 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>SettlerCraft-MenuAPI</artifactId>
-            <version>${settlercraft.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>SettlerCraft-Core</artifactId>
-            <version>${settlercraft.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
-        
-        
-        
-        
+        <dependency>
+            <groupId>com.chingo247</groupId>
+            <artifactId>settlercraft-core</artifactId>
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-    <name>StructureAPI</name>
+   
 </project>

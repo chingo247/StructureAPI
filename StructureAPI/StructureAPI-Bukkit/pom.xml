@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <name>StructureAPI-Bukkit</name>
+    <name>structureapi-bukkit</name>
     <parent>
         <groupId>com.chingo247</groupId>
-        <artifactId>StructureAPI</artifactId>
+        <artifactId>structureapi</artifactId>
         <version>2.2.0</version>
     </parent>
-    <artifactId>StructureAPI-Bukkit</artifactId>
+    <artifactId>structureapi-bukkit</artifactId>
     <packaging>jar</packaging>
     
     <repositories>
@@ -27,7 +27,7 @@
         </repository>
     </repositories>
     <build>
-        <finalName>${project.name}-${project.version}</finalName>
+        <finalName>StructureAPI-Bukkit-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -53,8 +53,21 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>StructureAPI-Core</artifactId>
+            <artifactId>settlercraft-menuapi</artifactId>
+            <version>2.2.1</version>
+             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>structureapi-blockstore</artifactId>
             <version>${project.version}</version>
+            <!--<scope>provided</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>structureapi-core</artifactId>
+            <version>${project.version}</version>
+            <!--<scope>provided</scope>-->
         </dependency>
     </dependencies>
 </project>
