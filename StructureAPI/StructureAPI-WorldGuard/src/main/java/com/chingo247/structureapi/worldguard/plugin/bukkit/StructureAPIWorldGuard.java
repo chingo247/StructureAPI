@@ -92,7 +92,7 @@ public class StructureAPIWorldGuard extends JavaPlugin {
         }
 
         ExecutorService executor = StructureAPI.getInstance().getExecutor();
-        WorldGuardScheduler.getInstance().setPool(executor);
+        WorldGuardScheduler.getInstance().setExecutor(executor);
         StructureAPI.getInstance().getAsyncEventBus().register(new WorldGuardPlotListener());
         StructureAPI.getInstance().addRestriction(new WorldGuardRestriction());
 
