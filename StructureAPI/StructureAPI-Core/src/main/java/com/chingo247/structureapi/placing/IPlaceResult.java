@@ -5,13 +5,13 @@
  */
 package com.chingo247.structureapi.placing;
 
-import com.chingo247.structureapi.model.Spatial;
+import com.chingo247.structureapi.model.Area;
 
 /**
  *
  * @author Chingo
  */
-public interface IPlaceResult<T extends Spatial> {
+public interface IPlaceResult<T extends Area> {
     
     /**
      * Returns true if the placing was succesfull

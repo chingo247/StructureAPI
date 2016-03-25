@@ -16,7 +16,6 @@
  */
 package com.chingo247.structureapi.worldguard.protection;
 
-import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.event.structure.StructureCreateEvent;
 import com.chingo247.structureapi.event.structure.StructureRemoveEvent;
@@ -38,12 +37,10 @@ import org.neo4j.graphdb.Transaction;
  */
 public class WorldGuardPlotListener {
 
-    private final WorldGuardProtection worldGuardHelper;
-    private WorldGuardScheduler scheduler;
+    private StructureAPIWorldGuardScheduler scheduler;
 
     public WorldGuardPlotListener() {
-        this.scheduler = WorldGuardScheduler.getInstance();
-        this.worldGuardHelper = new WorldGuardProtection();
+        this.scheduler = StructureAPIWorldGuardScheduler.getInstance();
     }
 
     @Subscribe
@@ -60,7 +57,7 @@ public class WorldGuardPlotListener {
                     Transaction tx = null;
                     try {
                         tx = graph.beginTx();
-                        worldGuardHelper.protect(structure);
+                        StructureAPIWorldGuard.getInstance().protect(structure);
 
                         tx.success();
                     } catch (Exception ex) {
@@ -89,7 +86,7 @@ public class WorldGuardPlotListener {
                 Transaction tx = null;
                 try {
                     tx = graph.beginTx();
-                    worldGuardHelper.expire(structure);
+                    StructureAPIWorldGuard.getInstance().expire(structure);
 
                     tx.success();
                 } catch (Exception ex) {
@@ -123,10 +120,10 @@ public class WorldGuardPlotListener {
                         final OwnerType type = addOwnerEvent.getOwnerType();
                         final Structure structure = addOwnerEvent.getStructure();
                         if (type == OwnerType.MEMBER) {
-                            worldGuardHelper.addMember(player, structure);
+                            StructureAPIWorldGuard.getInstance().addMember(player, structure);
                         } else {
-                            worldGuardHelper.removeMember(player, structure);
-                            worldGuardHelper.addOwner(player, structure);
+                            StructureAPIWorldGuard.getInstance().removeMember(player, structure);
+                            StructureAPIWorldGuard.getInstance().addOwner(player, structure);
                         }
 
                         tx.success();
@@ -162,9 +159,9 @@ public class WorldGuardPlotListener {
                         final OwnerType type = removeOwnerEvent.getOwnerType();
                         final Structure structure = removeOwnerEvent.getStructure();
                         if (type == OwnerType.MEMBER) {
-                            worldGuardHelper.removeMember(player, structure);
+                            StructureAPIWorldGuard.getInstance().removeMember(player, structure);
                         } else {
-                            worldGuardHelper.removeOwner(player, structure);
+                            StructureAPIWorldGuard.getInstance().removeOwner(player, structure);
                         }
 
                         tx.success();

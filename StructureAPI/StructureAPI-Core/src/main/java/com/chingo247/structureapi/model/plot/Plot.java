@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.model.plot;
 
-import com.chingo247.structureapi.model.Spatial;
+import com.chingo247.structureapi.model.Area;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
@@ -26,7 +26,7 @@ import org.neo4j.graphdb.Node;
  *
  * @author Chingo
  */
-public class Plot implements Spatial {
+public class Plot implements Plot {
     
     private Node underlyingNode;
     private Vector min, max;

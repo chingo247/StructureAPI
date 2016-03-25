@@ -210,6 +210,7 @@ public class StructureCommands {
         final StructureRepository structureRepository = new StructureRepository(graph);
         final StructureNode structure;
 
+        
         if (args.argsLength() == 1) {
             // Find by ID
             Long id;

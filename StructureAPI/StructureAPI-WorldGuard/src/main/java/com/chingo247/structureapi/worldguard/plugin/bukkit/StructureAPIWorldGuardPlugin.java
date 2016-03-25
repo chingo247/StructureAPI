@@ -26,10 +26,8 @@ import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.worldguard.commands.WGCommands;
-import com.chingo247.structureapi.worldguard.protection.StructureRegionRepository;
-import com.chingo247.structureapi.worldguard.protection.WorldGuardProtection;
-import com.chingo247.structureapi.worldguard.protection.WorldGuardProtectionOld;
-import com.chingo247.structureapi.worldguard.protection.WorldGuardScheduler;
+import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
+import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardScheduler;
 import com.chingo247.structureapi.worldguard.restriction.WorldGuardRestriction;
 import com.chingo247.xplatform.platforms.bukkit.BukkitConsoleSender;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlayer;
@@ -44,6 +42,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -61,10 +61,11 @@ import org.neo4j.graphdb.Transaction;
  *
  * @author Chingo
  */
-public class StructureAPIWorldGuard extends JavaPlugin {
+public class StructureAPIWorldGuardPlugin extends JavaPlugin {
 
     private static final Label LABEL = DynamicLabel.label("WORLDGUARD_REGION");
     private static final String REGION_PROPERTY = "region";
+    private static final String MSG_PREFIX = "[StructureAPI-WorldGuard]: ";
 
     private PluginCommandManager commands;
 
@@ -84,15 +85,14 @@ public class StructureAPIWorldGuard extends JavaPlugin {
         }
 
         // Enable WorldGuard
-        if (Bukkit.getPluginManager().getPlugin("WorldGuard") != null) {
-            WorldGuardProtectionOld.getInstance().initialize();
-        } else {
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
             System.out.println("[SettlerCraft-WorldGuard]: Couldn't find WorldGuard! Disabling SettlerCraft-WorldGuard");
             this.setEnabled(false);
+            return;
         }
 
         ExecutorService executor = StructureAPI.getInstance().getExecutor();
-        WorldGuardScheduler.getInstance().setExecutor(executor);
+        StructureAPIWorldGuardScheduler.getInstance().setExecutor(executor);
         StructureAPI.getInstance().getAsyncEventBus().register(new WorldGuardPlotListener());
         StructureAPI.getInstance().addRestriction(new WorldGuardRestriction());
 
@@ -102,11 +102,10 @@ public class StructureAPIWorldGuard extends JavaPlugin {
             Neo4jHelper.createUniqueIndexIfNotExist(graph, LABEL, REGION_PROPERTY);
             tx.success();
         }
-        
-        
-        
-        processRegionsWithoutStructure();
 
+        if (StructureAPI.getInstance().getConfig().isProtectStructures()) {
+            processStructuresWithoutRegion();
+        }
         registerCommands();
     }
 
@@ -114,52 +113,6 @@ public class StructureAPIWorldGuard extends JavaPlugin {
         this.commands = new PluginCommandManager(StructureAPI.getInstance().getExecutor(), SettlerCraft.getInstance().getPlatform());
         CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         cmdRegister.register(WGCommands.class);
-    }
-
-    private void processRegionsWithoutStructure() {
-        GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-        StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
-
-        long total = regionRepository.countRegionsWithoutStructure();
-        long count = 0;
-        
-        long batchSize = 1000;
-        
-        WorldGuardProtection protection = new WorldGuardProtection();
-        
-        while(count < total) {
-            try(Transaction tx = graph.beginTx()) {
-            
-                List<Node> nodes = regionRepository.findRegionsWithoutStructure(count, count + batchSize);
-                
-                for (Iterator<Node> iterator = nodes.iterator(); iterator.hasNext();) {
-                    Node next = iterator.next();
-                    Structure structure = new Structure(next);
-                }
-                
-                
-                
-                
-                count++;
-                tx.success();
-            }
-            
-            
-        }
-        
-        
-        try (Transaction tx = graph.beginTx()) {
-            Result r = graph.execute(query);
-
-            while (r.hasNext()) {
-                Node n = (Node) r.next().get("structure");
-                Structure structure = new Structure(n);
-                removeProtection(structure, true, false);
-                System.out.println("[SettlerCraft-WorldGuard]: Removed protection from structure #" + structure.getId() + " because it was removed");
-            }
-
-            tx.success();
-        }
     }
 
     private void processStructuresWithoutRegion() {
@@ -188,20 +141,44 @@ public class StructureAPIWorldGuard extends JavaPlugin {
 
         if (!structures.isEmpty()) {
             System.out.println(MSG_PREFIX + "Processing " + structures.size() + " structures without a worldguard region");
-        }
+            SettlerCraft.getInstance().getExecutor().submit(new Runnable() {
 
-        SettlerCraft.getInstance().getExecutor().submit(new Runnable() {
-
-            @Override
-            public void run() {
-                for (Iterator<Structure> sit = structures.iterator(); sit.hasNext();) {
-                    Structure s = sit.next();
-                    protect(s);
-                    System.out.println(MSG_PREFIX + "Protected structure #" + s.getId() + " with 'WorldGuard'");
-                    sit.remove();
+                @Override
+                public void run() {
+                    
+                    Transaction tx = null;
+                    GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+                    int count = 0;
+                    try {
+                        tx = graph.beginTx();
+                        for (Iterator<Structure> sit = structures.iterator(); sit.hasNext();) {
+                            Structure s = sit.next();
+                            StructureAPIWorldGuard.getInstance().protect(s);
+                            count++;
+                            sit.remove();
+                        }
+                        tx.success();
+                    } catch (Exception ex) {
+                        Logger.getLogger(StructureAPIWorldGuardPlugin.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                        if (tx != null) {
+                            tx.failure();
+                        }
+                    } finally {
+                        if (tx != null) {
+                            tx.close();
+                        }
+                    }
+                    
+                    if(count > 1) {
+                        System.out.println(MSG_PREFIX + "Protected " + count + " structures with 'WorldGuard'");
+                    } else {
+                        System.out.println(MSG_PREFIX + "Protected " + count + " structure with 'WorldGuard'");
+                    }
+                    
+                    
                 }
-            }
-        });
+            });
+        }
 
     }
 

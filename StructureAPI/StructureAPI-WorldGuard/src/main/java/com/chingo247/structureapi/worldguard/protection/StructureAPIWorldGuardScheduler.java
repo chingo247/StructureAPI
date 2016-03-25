@@ -15,19 +15,19 @@ import java.util.logging.Logger;
  *
  * @author Chingo
  */
-public class WorldGuardScheduler {
+public class StructureAPIWorldGuardScheduler {
 
-    private static final Logger LOG = Logger.getLogger(WorldGuardScheduler.class.getName());
+    private static final Logger LOG = Logger.getLogger(StructureAPIWorldGuardScheduler.class.getName());
     
     private KeyPool<String> executor;
     
-    private static WorldGuardScheduler instance;
+    private static StructureAPIWorldGuardScheduler instance;
     
-    private WorldGuardScheduler() {}
+    private StructureAPIWorldGuardScheduler() {}
     
-    public static WorldGuardScheduler getInstance() {
+    public static StructureAPIWorldGuardScheduler getInstance() {
         if(instance == null) {
-            instance = new WorldGuardScheduler();
+            instance = new StructureAPIWorldGuardScheduler();
         }
         return instance;
     }

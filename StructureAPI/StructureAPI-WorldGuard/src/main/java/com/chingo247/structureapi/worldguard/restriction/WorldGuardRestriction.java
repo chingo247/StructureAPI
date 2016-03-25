@@ -18,7 +18,7 @@ package com.chingo247.structureapi.worldguard.restriction;
 
 import com.chingo247.structureapi.StructureRestriction;
 import com.chingo247.structureapi.plan.IStructurePlan;
-import com.chingo247.structureapi.worldguard.protection.WorldGuardProtection;
+import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.entity.Player;
@@ -37,19 +37,16 @@ import org.bukkit.Bukkit;
  */
 public class WorldGuardRestriction extends StructureRestriction {
     
-    private WorldGuardProtection protection;
 
     public WorldGuardRestriction() {
         super("worldguard", "worldguard.region.overlap", "Structure overlaps a worldguard region you don't own");
-        
-        this.protection = new WorldGuardProtection();
     }
 
     @Override
     public boolean evaluate(Player whoPlaces, World world, CuboidRegion affectedArea, IStructurePlan plan) {
         LocalPlayer localPlayer = null;
         if (whoPlaces != null) {
-            localPlayer = protection.getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));
+            localPlayer = StructureAPIWorldGuard.getInstance().getLocalPlayer(Bukkit.getPlayer(whoPlaces.getUniqueId()));
         }
 
         RegionManager mgr = WGBukkit.getRegionManager(Bukkit.getWorld(world.getName()));

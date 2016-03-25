@@ -7,7 +7,9 @@ package com.chingo247.structureapi.worldguard.protection;
 
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
+import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
+import com.google.common.collect.Maps;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -148,6 +150,8 @@ public class StructureRegionRepository {
         return found;
     }
     
+    
+    
     public List<Node> findExpired(long skip, long limit) {
         Map<String,Object> params = new HashMap<>();
         if(skip > 0) {
@@ -234,6 +238,26 @@ public class StructureRegionRepository {
         }
         return found;
         
+    }
+    
+    public StructureNode findById(Long id) {
+        StructureNode structure = null;
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("structureId", id);
+
+        String query
+                = " MATCH (s:" + StructureNode.LABEL + " { " + StructureNode.ID_PROPERTY + ": {structureId} })-[r:"+RelTypes.PROTECTED_BY+"]->(:WORLDGUARD_REGION) "
+                + " WHERE NOT r IS NULL"
+                + " RETURN s as structure";
+
+        Result result = graph.execute(query, params);
+
+        if (result.hasNext()) {
+            Node n = (Node) result.next().get("structure");
+            structure = new StructureNode(n);
+        }
+
+        return structure;
     }
     
     

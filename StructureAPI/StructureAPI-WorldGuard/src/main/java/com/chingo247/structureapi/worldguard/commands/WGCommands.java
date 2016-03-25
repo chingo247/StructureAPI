@@ -5,9 +5,17 @@
  */
 package com.chingo247.structureapi.worldguard.commands;
 
+import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.model.plot.PlotNode;
+import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.worldguard.plugin.PermissionManager;
+import com.chingo247.structureapi.worldguard.protection.StructureRegionRepository;
+import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
+import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardException;
+import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardScheduler;
 import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IPlayer;
@@ -15,6 +23,14 @@ import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
+import com.sk89q.worldguard.protection.managers.storage.StorageException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.lang.math.NumberUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  *
@@ -29,9 +45,13 @@ public class WGCommands {
         String subcommand = args.getString(0);
 
         switch (subcommand) {
-//            case "flag":
-//                between(args, 2, -1);
-//                flag(args, sender);
+            case "uninstall":
+                StructureAPIWorldGuard.getInstance().uninstall();
+                
+                break;
+            case "install":
+                StructureAPIWorldGuard.getInstance().install();
+                break;
             case "expire":
                 between(args, 2, 2);
                 expire(args, sender);
@@ -63,25 +83,84 @@ public class WGCommands {
     private static void expire(final CommandContext args, final ICommandSender sender) throws CommandException {
         // TODO Check permission
         // Check expire single | multi
-        if (args.getString(1).equalsIgnoreCase("ALL")) {
-            checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_EXPIRE_ALL);
+        if (!NumberUtils.isNumber(args.getString(1)))  {   
+            World w = Bukkit.getWorld(args.getString(1));
+            if(w == null) {
+                throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
+            }
+            
         } else {
             String arg = args.getString(1);
             Long id = getLong(arg);
             checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_EXPIRE_SINGLE);
+            expireSingle(id, sender);
         }
     }
     
-    private static void expireSingle(long structureId) {
+    private static void expireSingle(long structureId, ICommandSender sender) throws CommandException {
+        GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+        StructureRegionRepository repository = new StructureRegionRepository(graph);
+        try (Transaction tx = graph.beginTx()) {
+            StructureNode node = repository.findById(structureId);
+            
+            if(node != null) {
+                try {
+                    StructureAPIWorldGuard.getInstance().expire(new Structure(node));
+                } catch (StructureAPIWorldGuardException ex) {
+                    throw new CommandException(ex);
+                }
+                tx.success();
+            } else {
+                tx.failure();
+                throw new CommandException("Structure #" + structureId + " does not have a region");
+            }
+        } catch (StorageException ex) {
+            sender.sendMessage("An error occured");
+            Logger.getLogger(WGCommands.class.getName()).log(Level.SEVERE, null, ex);
+        } 
         
     }
     
     
     
 
-    private static void protect(final CommandContext args, final ICommandSender sender) {
+    private static void protect(final CommandContext args, final ICommandSender sender) throws CommandException {
         // TODO Check permission
-        // Check expire single | multi
+        
+        if(args.getString(1).equalsIgnoreCase("ALL")) {
+            GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+            
+            StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
+            regionRepository.countActive();
+            
+        } else {
+           
+            long id = getLong(args.getString(1));
+            GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+            
+            try (Transaction tx = graph.beginTx()) {
+                StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
+                StructureNode structureNode =  regionRepository.findById(id);
+                if(structureNode == null) {
+                    tx.success();
+                    throw new CommandException("Couldn't find strucuture with id '" + id + "'");
+                }
+                
+                try {
+                    StructureAPIWorldGuard.getInstance().protect(new Structure(structureNode));
+                } catch (StorageException ex) {
+                    tx.failure();
+                    Logger.getLogger(WGCommands.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new CommandException("An error occured.. see console..");
+                } catch (StructureAPIWorldGuardException ex) {
+                    throw new CommandException(ex);
+                }
+                
+                tx.success();
+            }
+            
+        }
+        
     }
 
     private static void checkAllowed(ICommandSender sender, PermissionManager.Perms perm) throws CommandException {
