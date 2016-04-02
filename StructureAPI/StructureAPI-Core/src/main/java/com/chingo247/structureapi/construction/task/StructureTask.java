@@ -102,7 +102,7 @@ public abstract class StructureTask {
         if (!cancelled) {
             setCancelled(true);
             onCancel();
-            structureEntry.getConstructionExecutor().remove(structureEntry);
+            structureEntry.getContractor().remove(structureEntry);
             finish();
         }
     }

@@ -219,13 +219,13 @@ public class PlayerPlanPlacer {
                                 // start construction
                                 Structure structure = placeResult.getPlaced();
                                 if (!structureAPI.isQueueLocked(player.getUniqueId())) {
-                                    BuildContract buildContract = new BuildContract();
-                                    SafeContract safeContract = new SafeContract(buildContract);
-                                    safeContract.setRecursive(true)
+                                    BuildContract contract = new BuildContract();
+//                                    SafeContract contract = new SafeContract(buildContract);
+                                    contract.setRecursive(true)
                                             .setPlayer(playerUUID)
                                             .setRestrictive(true)
                                             .setRecursive(true);
-                                    structureAPI.getContractor().submit(structure, safeContract);
+                                    structureAPI.getContractor().submit(structure, contract);
                                     
                                 } else {
                                     player.sendMessage(color.red() + "Your AWE queue is locked at the moment, try '/stt:build " + structure.getId() + "' when your queue is unlocked");

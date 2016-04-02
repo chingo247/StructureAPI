@@ -16,6 +16,7 @@
  */
 package com.chingo247.structureapi.construction.awe;
 
+import com.chingo247.structureapi.construction.engine.BlockPlaceSession;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.placement.IPlacement;
 import com.sk89q.worldedit.EditSession;
@@ -54,39 +55,39 @@ class AWEPlacement extends AbstractAWEPlacement {
     
 
     @Override
-    public void place(EditSession editSession, final Vector pos, final PlaceOptions options) {
+    public void place(BlockPlaceSession editSession, final Vector pos, final PlaceOptions options) {
 
-        final int jobId = getJobId();
-        final EditSession session;
-        final AWEJobEntry job;
-        final WaitFor wait;
-
-        if (editSession instanceof AsyncEditSession) {
-            AsyncEditSession aSession = (AsyncEditSession) editSession;
-            wait = aSession.getWait();
-            session = new CancelabeEditSession(aSession, aSession.getMask(), jobId);
-            job = new AWEJobEntry(playerEntry, (CancelabeEditSession) session, jobId, "place", taskUUID, callback);
-        } else {
-            session = editSession;
-            wait = null;
-            job = new AWEJobEntry(playerEntry, jobId, "place", taskUUID, callback);
-        }
-
-        if(callback != null) {
-            callback.onJobAdded(job);
-        }
-        
-        scheduler.runAsync(new AWESilentAsyncTask(placement, editSession, playerEntry, null, placer, job, callback){
-            
-            @Override
-            public void task(IPlacement placement) throws MaxChangedBlocksException {
-                if (wait != null) {
-                    wait.checkAndWait(null);
-                }
-                placement.place(session, pos, options);
-            }
-        });
-        
+//        final int jobId = getJobId();
+//        final EditSession session;
+//        final AWEJobEntry job;
+//        final WaitFor wait;
+//
+//        if (editSession instanceof AsyncEditSession) {
+//            AsyncEditSession aSession = (AsyncEditSession) editSession;
+//            wait = aSession.getWait();
+//            session = new CancelabeEditSession(aSession, aSession.getMask(), jobId);
+//            job = new AWEJobEntry(playerEntry, (CancelabeEditSession) session, jobId, "place", taskUUID, callback);
+//        } else {
+//            session = editSession;
+//            wait = null;
+//            job = new AWEJobEntry(playerEntry, jobId, "place", taskUUID, callback);
+//        }
+//
+//        if(callback != null) {
+//            callback.onJobAdded(job);
+//        }
+//        
+//        scheduler.runAsync(new AWESilentAsyncTask(placement, editSession, playerEntry, null, placer, job, callback){
+//            
+//            @Override
+//            public void task(IPlacement placement) throws MaxChangedBlocksException {
+//                if (wait != null) {
+//                    wait.checkAndWait(null);
+//                }
+//                placement.place(session, pos, options);
+//            }
+//        });
+//        
        
 
     }

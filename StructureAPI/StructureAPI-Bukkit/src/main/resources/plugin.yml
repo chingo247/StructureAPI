@@ -1,10 +1,10 @@
 name: SettlerCraft-StructureAPI
 main: com.chingo247.structureapi.bukkit.BKStructureAPIPlugin
-version: 2.2.0
+version: 3.0.0
 author: Chingo247
 description: Create structures by placing schematics.
-depend: [WorldEdit, AsyncWorldEdit, SettlerCraft-Core]
-soft-depend: [BlocksHub]
+depend: [WorldEdit, SettlerCraft-Core]
+soft-depend: [AsyncWorldEdit, FastAsyncWorldEdit]
     
 
 

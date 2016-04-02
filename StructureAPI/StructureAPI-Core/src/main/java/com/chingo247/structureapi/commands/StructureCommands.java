@@ -296,13 +296,13 @@ public class StructureCommands {
         String force = args.hasFlag('f') ? args.getFlag('f') : null;
         final boolean useForce = force != null && (force.equals("t") || force.equals("true"));
 
-        BuildContract buildContract = new BuildContract();
-        SafeContract safeContract = new SafeContract(buildContract);
-        safeContract.setRecursive(true)
+        BuildContract contract = new BuildContract();
+//        SafeContract contract = new SafeContract(buildContract);
+        contract.setRecursive(true)
                 .setRestrictive(true)
                 .setForced(useForce)
                 .setPlayer(uuid);
-        structureAPI.getContractor().submit(structure, safeContract);
+        structureAPI.getContractor().submit(structure, contract);
     }
 
     @CommandPermissions(Permissions.STRUCTURE_ROLLBACK)

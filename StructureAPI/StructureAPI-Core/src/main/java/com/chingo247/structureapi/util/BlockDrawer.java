@@ -31,29 +31,30 @@ import java.util.logging.Logger;
  *
  * @author Chingo
  */
+
 public class BlockDrawer {
     
-    private BlockDrawer() {}
-    
-    public static void visualize(World world, CuboidRegion region, BaseBlock b) {
-        EditSession session = StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1);
-        try {
-            session.setBlocks(region, b);
-        } catch (MaxChangedBlocksException ex) {
-            Logger.getLogger(BlockDrawer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    public static void visualizeBottom(World world, CuboidRegion region, BaseBlock b) {
-        EditSession session = StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1);
-        Vector min = region.getMinimumPoint();
-        Vector max = region.getMaximumPoint();
-        CuboidRegion bottom = new CuboidRegion(min, new BlockVector(max.getBlockX(), min.getBlockY() + 1, max.getBlockZ()));
-        try {
-            session.setBlocks(bottom, b);
-        } catch (MaxChangedBlocksException ex) {
-            Logger.getLogger(BlockDrawer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    private BlockDrawer() {}
+//    
+//    public static void visualize(World world, CuboidRegion region, BaseBlock b) {
+//        EditSession session = StructureAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+//        try {
+//            session.setBlocks(region, b);
+//        } catch (MaxChangedBlocksException ex) {
+//            Logger.getLogger(BlockDrawer.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
+//    
+//    public static void visualizeBottom(World world, CuboidRegion region, BaseBlock b) {
+//        EditSession session = StructureAPI.getInstance().getEditSessionFactory().getEditSession(world, -1);
+//        Vector min = region.getMinimumPoint();
+//        Vector max = region.getMaximumPoint();
+//        CuboidRegion bottom = new CuboidRegion(min, new BlockVector(max.getBlockX(), min.getBlockY() + 1, max.getBlockZ()));
+//        try {
+//            session.setBlocks(bottom, b);
+//        } catch (MaxChangedBlocksException ex) {
+//            Logger.getLogger(BlockDrawer.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     
 }

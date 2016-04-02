@@ -17,8 +17,8 @@
  */
 package com.chingo247.structureapi.placement;
 
+import com.chingo247.structureapi.construction.engine.BlockPlaceSession;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
-import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
@@ -28,7 +28,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
  */
 public interface IPlacement {
     
-    void place(EditSession session, Vector pos, PlaceOptions option);
+    void place(BlockPlaceSession session, Vector pos, PlaceOptions option);
     
     Vector getOffset();
     

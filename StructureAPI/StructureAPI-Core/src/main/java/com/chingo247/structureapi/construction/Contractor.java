@@ -20,6 +20,8 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.contract.Contract;
+import com.chingo247.structureapi.construction.engine.BlockPlaceEngine;
+import com.chingo247.structureapi.construction.engine.fawe.FAWEBlockPlaceEngine;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
@@ -33,10 +35,7 @@ import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IPlayer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
-import com.sk89q.worldedit.world.World;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +46,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Transaction;
-import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
 /**
  * Contractor, like in someone who takes on contracts to build them for you.
@@ -90,6 +88,7 @@ public class Contractor implements IContractor {
      */
     private ExecutorService es;
     
+    private BlockPlaceEngine engine;
 
     /**
      * Private Constructor.
@@ -99,6 +98,7 @@ public class Contractor implements IContractor {
         this.structurePool = new KeyPool<>(es);
         this.structureRepository = new StructureRepository(SettlerCraft.getInstance().getNeo4j());
         this.entries = Maps.newHashMap();
+        this.engine = new FAWEBlockPlaceEngine();
     }
 
     public static Contractor getInstance() {
@@ -106,6 +106,14 @@ public class Contractor implements IContractor {
             instance = new Contractor();
         }
         return instance;
+    }
+
+    public void setEngine(BlockPlaceEngine engine) {
+        this.engine = engine;
+    }
+    
+    public BlockPlaceEngine getEngine() {
+        return engine;
     }
 
     private StructureEntry getOrCreateEntry(Structure structure, Contract plan) {
@@ -157,10 +165,10 @@ public class Contractor implements IContractor {
         constract.setPlayer(playerOrRandomUUID);
        
         // Set default editsession if null
-        if (constract.getEditSessionFactory() == null) {
-            // Set the editsession if the editsession was null
-            constract.setEditSessionFactory(new DefaultStructureEditSessionFactory());
-        }
+//        if (constract.getEditSessionFactory() == null) {
+//            // Set the editsession if the editsession was null
+//            constract.setEditSessionFactory(new DefaultStructureEditSessionFactory());
+//        }
 
         es.execute(new Runnable() {
 

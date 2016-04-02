@@ -57,7 +57,6 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
-import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**
  *
@@ -96,73 +95,74 @@ public class SafeContract extends Contract {
 
     @Override
     public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
-        Structure structure = entry.getStructure();
-        IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
-        IBlockPlacement placement = getPlacementProducer().produce(structure);
-
-        CuboidRegion region = structure.getCuboidRegion();
-
-        // Get or create rollback data
-        RollbackData data = structure.getRollbackData();
-        SafeBlockStore safeBlockStore;
-        if (data.hasBlockStore()) {
-            try {
-                SafeBlockStoreReader reader = new SafeBlockStoreReader();
-                safeBlockStore = reader.read(data.getBlockStoreDirectory());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
-        } else {
-            safeBlockStore = new SafeBlockStore(data.getBlockStoreDirectory(), region.getWidth(), region.getHeight(), region.getLength());
-        }
-
-        // Create place areas...
-        Contract entryContract = entry.getContract();
-        UUID player = entryContract.getPlayer();
-        World world = SettlerCraft.getInstance().getWorld(entry.getStructure().getWorldUUID());
-
-        Iterator<Vector> traversalSafe = new CuboidIterator(
-                placeOptions.getCubeX() < 0 ? placement.getWidth() : placeOptions.getCubeX(),
-                placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
-                placeOptions.getCubeZ() < 0 ? placement.getLength() : placeOptions.getCubeZ()
-        ).iterate(placement.getSize());
-
-        Iterator<Vector> traversalPlace = new CuboidIterator(
-                placeOptions.getCubeX() < 0 ? placement.getWidth() : placeOptions.getCubeX(),
-                placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
-                placeOptions.getCubeZ() < 0 ? placement.getLength() : placeOptions.getCubeZ()
-        ).iterate(placement.getSize());
-
-        PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
-
-        int totalBlocks = placement.getWidth() * placement.getHeight() * placement.getLength();
-
-        int countBlock = 0;
-
-        while (countBlock < totalBlocks) {
-            SafeTask task = new SafeTask(entry, player, placement, world, safeBlockStore, traversalSafe, MAX_BLOCKS_PER_TASK);
-            entry.addTask(task);
-            SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
-
-            EditSession editSession = entryContract.getEditSessionFactory().createEditSession(structure, player);
-            StructurePlacingTask placingTask = new AWEPlacementTask(
-                    asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
-            placingTask.setOptions(placeOptions);
-            entry.addTask(placingTask);
-            countBlock += MAX_BLOCKS_PER_TASK;
-        }
-
-        entry.addListener(getConstructionListener());
-
-        // Empties the last blocks in placelater-queue
-        SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
-        safePlacement.setLast(true);
-
-        EditSession editSession = entryContract.getEditSessionFactory().createEditSession(structure, player);
-        StructurePlacingTask task = new AWEPlacementTask(
-                asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
-        task.setOptions(placeOptions);
-        entry.addTask(task);
+//        Structure structure = entry.getStructure();
+//        IAsyncWorldEdit asyncWorldEdit = StructureAPI.getInstance().getAsyncWorldEditIntegration().getAsyncWorldEdit();
+//        IBlockPlacement placement = getPlacementProducer().produce(structure);
+//
+//        CuboidRegion region = structure.getCuboidRegion();
+//
+//        // Get or create rollback data
+//        RollbackData data = structure.getRollbackData();
+//        SafeBlockStore safeBlockStore;
+//        if (data.hasBlockStore()) {
+//            try {
+//                SafeBlockStoreReader reader = new SafeBlockStoreReader();
+//                safeBlockStore = reader.read(data.getBlockStoreDirectory());
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+//        } else {
+//            safeBlockStore = new SafeBlockStore(data.getBlockStoreDirectory(), region.getWidth(), region.getHeight(), region.getLength());
+//        }
+//
+//        // Create place areas...
+//        Contract entryContract = entry.getContract();
+//        UUID player = entryContract.getPlayer();
+//        World world = SettlerCraft.getInstance().getWorld(entry.getStructure().getWorldUUID());
+//
+//        Iterator<Vector> traversalSafe = new CuboidIterator(
+//                placeOptions.getCubeX() < 0 ? placement.getWidth() : placeOptions.getCubeX(),
+//                placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
+//                placeOptions.getCubeZ() < 0 ? placement.getLength() : placeOptions.getCubeZ()
+//        ).iterate(placement.getSize());
+//
+//        Iterator<Vector> traversalPlace = new CuboidIterator(
+//                placeOptions.getCubeX() < 0 ? placement.getWidth() : placeOptions.getCubeX(),
+//                placeOptions.getCubeY() < 0 ? placement.getHeight() : placeOptions.getCubeY(),
+//                placeOptions.getCubeZ() < 0 ? placement.getLength() : placeOptions.getCubeZ()
+//        ).iterate(placement.getSize());
+//
+//        PriorityQueue<StructureBlock> placeLater = new PriorityQueue<>();
+//
+//        int totalBlocks = placement.getWidth() * placement.getHeight() * placement.getLength();
+//
+//        int countBlock = 0;
+//
+//        while (countBlock < totalBlocks) {
+//            SafeTask task = new SafeTask(entry, player, placement, world, safeBlockStore, traversalSafe, MAX_BLOCKS_PER_TASK);
+//            entry.addTask(task);
+//            SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
+//
+//            EditSession editSession = entryContract.getEditSessionFactory().createEditSession(structure, player);
+//            StructurePlacingTask placingTask = new AWEPlacementTask(
+//                    asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
+//            placingTask.setOptions(placeOptions);
+//            entry.addTask(placingTask);
+//            countBlock += MAX_BLOCKS_PER_TASK;
+//        }
+//
+//        entry.addListener(getConstructionListener());
+//
+//        // Empties the last blocks in placelater-queue
+//        SafePlacement safePlacement = new SafePlacement(placement, traversalPlace, MAX_BLOCKS_PER_TASK, placeLater);
+//        safePlacement.setLast(true);
+//
+//        EditSession editSession = entryContract.getEditSessionFactory().createEditSession(structure, player);
+//        StructurePlacingTask task = new AWEPlacementTask(
+//                asyncWorldEdit, entry, safePlacement, player, editSession, structure.getMin());
+//        task.setOptions(placeOptions);
+//        entry.addTask(task);
+        throw new UnsupportedOperationException("Not supported yet");
 
     }
 
@@ -288,143 +288,143 @@ public class SafeContract extends Contract {
 
     }
 
-    private class SafePlacement extends BlockPlacement {
-
-        private Iterator<Vector> traversal;
-        private int maxBlocks;
-        private IBlockPlacement placement;
-        private Queue<StructureBlock> placeLater;
-        private final Direction d;
-        private boolean last = false;
-
-        public SafePlacement(IBlockPlacement blockPlacement, Iterator<Vector> traversal, int maxBlocks, PriorityQueue<StructureBlock> placeLater) {
-            super(blockPlacement.getWidth(), blockPlacement.getHeight(), blockPlacement.getLength());
-
-            this.maxBlocks = maxBlocks;
-            this.traversal = traversal;
-            this.placement = blockPlacement;
-            this.placeLater = placeLater;
-
-            if (placement instanceof RotationalPlacement) {
-                d = WorldUtil.getDirection(((RotationalPlacement) blockPlacement).getRotation());
-            } else {
-                d = Direction.EAST; // Default
-            }
-        }
-
-        public boolean isLast() {
-            return last;
-        }
-
-        public void setLast(boolean last) {
-            this.last = last;
-        }
-
-        @Override
-        public BaseBlock getBlock(Vector position) {
-            return placement.getBlock(position);
-        }
-
-        @Override
-        public void place(EditSession editSession, Vector pos, PlaceOptions option) {
-
-            int placeLaterPlaced = 0;
-            int placeLaterPause = 0;
-            int count = 0;
-
-            // Cube traverse this clipboard
-            while (traversal.hasNext() && count < maxBlocks) {
-                Vector v = traversal.next();
-                BaseBlock clipboardBlock = getBlock(v);
-
-                if (clipboardBlock == null) {
-                    continue;
-                }
-
-                int priority = getPriority(clipboardBlock);
-
-                if (priority == PRIORITY_FIRST) {
-                    doBlock(editSession, pos, v, clipboardBlock, option);
-                } else {
-                    placeLater.add(new StructureBlock(v, clipboardBlock));
-                }
-
-                // For every X place intensive blocks
-                if (placeLaterPause > 0 && clipboardBlock.getId() != 0) {
-                    placeLaterPause--;
-                } else {
-
-                    // only place these when having a greater xz-cubevalue to avoid placing torches etc in air and break them later
-                    while (placeLater.peek() != null
-                            && (placeLater.peek().getPosition().getBlockY() < (option.getCubeY() * (Math.ceil(v.getBlockY() / option.getCubeY())))
-                            || placeLater.peek().getPosition().getBlockX() < (option.getCubeX() * (Math.ceil(v.getBlockX() / option.getCubeX())))
-                            || placeLater.peek().getPosition().getBlockZ() < (option.getCubeZ() * (Math.ceil(v.getBlockZ() / option.getCubeZ()))))) {
-                        StructureBlock plb = placeLater.poll();
-                        doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
-
-                        placeLaterPlaced++;
-
-                        if (plb.getPriority() == PRIORITY_LIQUID || BlockType.emitsLight(plb.getBlock().getId())) {
-                            placeLaterPlaced++;
-                        }
-
-                        if (placeLaterPlaced >= MAX_PLACE_LATER_TO_PLACE) {
-                            placeLaterPause = BLOCK_BETWEEN;
-                            placeLaterPlaced = 0;
-                        }
-                    }
-                }
-                count++;
-            }
-
-//        System.out.println(" ");
-            if (isLast()) {
-                // Empty the queue
-                while (placeLater.peek() != null) {
-                    StructureBlock plb = placeLater.poll();
-                    doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
-                }
-            }
-        }
-
-        @Override
-        protected void doBlock(EditSession editSession, Vector position, Vector blockPosition, BaseBlock block, PlaceOptions option) {
-            Vector p;
-
-            switch (d) {
-                case EAST:
-                    p = position.add(blockPosition);
-                    break;
-                case WEST:
-                    p = position.add((-blockPosition.getBlockX()) + (placement.getWidth() - 1), blockPosition.getBlockY(), (-blockPosition.getBlockZ()) + (placement.getLength() - 1));
-                    block.rotate90();
-                    block.rotate90();
-                    break;
-                case NORTH:
-                    p = position.add(blockPosition.getBlockZ(), blockPosition.getBlockY(), (-blockPosition.getBlockX()) + (getWidth() - 1));
-                    block.rotate90Reverse();
-                    break;
-                case SOUTH:
-                    p = position.add((-blockPosition.getBlockZ()) + (placement.getLength() - 1), blockPosition.getBlockY(), blockPosition.getBlockX());
-                    block.rotate90();
-                    break;
-                default:
-                    throw new AssertionError("unreachable");
-            }
-
-            for (BlockPredicate bp : option.getIgnore()) {
-                if (bp.evaluate(blockPosition, p, block)) {
-                    return;
-                }
-            }
-
-            for (BlockMask bm : option.getBlockMasks()) {
-                bm.apply(blockPosition, p, block);
-            }
-
-            editSession.rawSetBlock(p, block);
-        }
-
-    }
+//    private class SafePlacement extends BlockPlacement {
+//
+//        private Iterator<Vector> traversal;
+//        private int maxBlocks;
+//        private IBlockPlacement placement;
+//        private Queue<StructureBlock> placeLater;
+//        private final Direction d;
+//        private boolean last = false;
+//
+//        public SafePlacement(IBlockPlacement blockPlacement, Iterator<Vector> traversal, int maxBlocks, PriorityQueue<StructureBlock> placeLater) {
+//            super(blockPlacement.getWidth(), blockPlacement.getHeight(), blockPlacement.getLength());
+//
+//            this.maxBlocks = maxBlocks;
+//            this.traversal = traversal;
+//            this.placement = blockPlacement;
+//            this.placeLater = placeLater;
+//
+//            if (placement instanceof RotationalPlacement) {
+//                d = WorldUtil.getDirection(((RotationalPlacement) blockPlacement).getRotation());
+//            } else {
+//                d = Direction.EAST; // Default
+//            }
+//        }
+//
+//        public boolean isLast() {
+//            return last;
+//        }
+//
+//        public void setLast(boolean last) {
+//            this.last = last;
+//        }
+//
+//        @Override
+//        public BaseBlock getBlock(Vector position) {
+//            return placement.getBlock(position);
+//        }
+//
+//        @Override
+//        public void place(EditSession editSession, Vector pos, PlaceOptions option) {
+//
+//            int placeLaterPlaced = 0;
+//            int placeLaterPause = 0;
+//            int count = 0;
+//
+//            // Cube traverse this clipboard
+//            while (traversal.hasNext() && count < maxBlocks) {
+//                Vector v = traversal.next();
+//                BaseBlock clipboardBlock = getBlock(v);
+//
+//                if (clipboardBlock == null) {
+//                    continue;
+//                }
+//
+//                int priority = getPriority(clipboardBlock);
+//
+//                if (priority == PRIORITY_FIRST) {
+//                    doBlock(editSession, pos, v, clipboardBlock, option);
+//                } else {
+//                    placeLater.add(new StructureBlock(v, clipboardBlock));
+//                }
+//
+//                // For every X place intensive blocks
+//                if (placeLaterPause > 0 && clipboardBlock.getId() != 0) {
+//                    placeLaterPause--;
+//                } else {
+//
+//                    // only place these when having a greater xz-cubevalue to avoid placing torches etc in air and break them later
+//                    while (placeLater.peek() != null
+//                            && (placeLater.peek().getPosition().getBlockY() < (option.getCubeY() * (Math.ceil(v.getBlockY() / option.getCubeY())))
+//                            || placeLater.peek().getPosition().getBlockX() < (option.getCubeX() * (Math.ceil(v.getBlockX() / option.getCubeX())))
+//                            || placeLater.peek().getPosition().getBlockZ() < (option.getCubeZ() * (Math.ceil(v.getBlockZ() / option.getCubeZ()))))) {
+//                        StructureBlock plb = placeLater.poll();
+//                        doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
+//
+//                        placeLaterPlaced++;
+//
+//                        if (plb.getPriority() == PRIORITY_LIQUID || BlockType.emitsLight(plb.getBlock().getId())) {
+//                            placeLaterPlaced++;
+//                        }
+//
+//                        if (placeLaterPlaced >= MAX_PLACE_LATER_TO_PLACE) {
+//                            placeLaterPause = BLOCK_BETWEEN;
+//                            placeLaterPlaced = 0;
+//                        }
+//                    }
+//                }
+//                count++;
+//            }
+//
+////        System.out.println(" ");
+//            if (isLast()) {
+//                // Empty the queue
+//                while (placeLater.peek() != null) {
+//                    StructureBlock plb = placeLater.poll();
+//                    doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
+//                }
+//            }
+//        }
+//
+//        @Override
+//        protected void doBlock(EditSession editSession, Vector position, Vector blockPosition, BaseBlock block, PlaceOptions option) {
+//            Vector p;
+//
+//            switch (d) {
+//                case EAST:
+//                    p = position.add(blockPosition);
+//                    break;
+//                case WEST:
+//                    p = position.add((-blockPosition.getBlockX()) + (placement.getWidth() - 1), blockPosition.getBlockY(), (-blockPosition.getBlockZ()) + (placement.getLength() - 1));
+//                    block.rotate90();
+//                    block.rotate90();
+//                    break;
+//                case NORTH:
+//                    p = position.add(blockPosition.getBlockZ(), blockPosition.getBlockY(), (-blockPosition.getBlockX()) + (getWidth() - 1));
+//                    block.rotate90Reverse();
+//                    break;
+//                case SOUTH:
+//                    p = position.add((-blockPosition.getBlockZ()) + (placement.getLength() - 1), blockPosition.getBlockY(), blockPosition.getBlockX());
+//                    block.rotate90();
+//                    break;
+//                default:
+//                    throw new AssertionError("unreachable");
+//            }
+//
+//            for (BlockPredicate bp : option.getIgnore()) {
+//                if (bp.evaluate(blockPosition, p, block)) {
+//                    return;
+//                }
+//            }
+//
+//            for (BlockMask bm : option.getBlockMasks()) {
+//                bm.apply(blockPosition, p, block);
+//            }
+//
+//            editSession.rawSetBlock(p, block);
+//        }
+//
+//    }
 
 }

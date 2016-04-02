@@ -14,18 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.construction;
+package com.chingo247.structureapi.construction.engine;
 
-import com.chingo247.structureapi.model.structure.Structure;
-import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.world.World;
 import java.util.UUID;
 
 /**
  *
  * @author Chingo
  */
-public interface StructureEditSessionFactory {
+public abstract class BlockPlaceEngine {
     
-    EditSession createEditSession(Structure structure, UUID submitter);
+    
+    public abstract BlockPlaceSession getSession(World world, UUID player);
     
 }

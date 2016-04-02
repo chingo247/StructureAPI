@@ -229,7 +229,7 @@ public interface IStructureAPI {
      * Gets an AsyncEditSessionFactory
      * @return The AsyncEditSessionFactor
      */
-    AsyncEditSessionFactory getSessionFactory();
+    AsyncEditSessionFactory getEditSessionFactory();
     
     /**
      * Gets the ExecutorSerice (ThreadPool) which StructureAPI uses

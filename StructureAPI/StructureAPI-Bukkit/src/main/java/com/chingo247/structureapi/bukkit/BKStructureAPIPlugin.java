@@ -52,7 +52,6 @@ import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
@@ -110,11 +109,11 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             this.setEnabled(false);
             return;
         }
-        if (Bukkit.getPluginManager().getPlugin("AsyncWorldEdit") == null) {
-            System.out.println(MSG_PREFIX + " AsyncWorldEdit NOT FOUND!!! Disabling...");
-            this.setEnabled(false);
-            return;
-        }
+//        if (Bukkit.getPluginManager().getPlugin("AsyncWorldEdit") == null) {
+//            System.out.println(MSG_PREFIX + " AsyncWorldEdit NOT FOUND!!! Disabling...");
+//            this.setEnabled(false);
+//            return;
+//        }
 
         try {
             createDefaults();
@@ -155,7 +154,12 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             return;
         }
         structureAPI.registerConfigProvider(configProvider);
-        structureAPI.registerAWE(new BKAsyncWorldEditIntegration());
+        
+        if (Bukkit.getPluginManager().getPlugin("AsyncWorldEdit") != null) {
+            structureAPI.registerAWE(new BKAsyncWorldEditIntegration());
+            structureAPI.registerAsyncEditSesionFactoryProvider(new BKAsyncEditSessionFactoryProvider());
+        }
+   
 
         economyProvider = SettlerCraft.getInstance().getEconomyProvider();
 
@@ -172,7 +176,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
             return;
         }
 
-        structureAPI.registerAsyncEditSesionFactoryProvider(new BKAsyncEditSessionFactoryProvider());
+       
 
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(new PlanListener(structureAPI, economyProvider), this);

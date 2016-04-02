@@ -16,6 +16,7 @@
  */
 package com.chingo247.structureapi.placement.block;
 
+import com.chingo247.structureapi.construction.engine.BlockPlaceSession;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.util.iterator.CuboidIterator;
 import com.sk89q.worldedit.EditSession;
@@ -37,7 +38,7 @@ public class DemolishingPlacement extends BlockPlacement implements IBlockPlacem
     }
 
     @Override
-    public void place(EditSession session, Vector pos, PlaceOptions option) {
+    public void place(BlockPlaceSession session, Vector pos, PlaceOptions option) {
        Iterator<Vector> traversal = new CuboidIterator(
                 option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
                 option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
@@ -58,10 +59,10 @@ public class DemolishingPlacement extends BlockPlacement implements IBlockPlacem
                 BaseBlock worldBlockUnder = session.getWorld().getBlock(wUnderPos);
             // replace the block with the block underneath you if it is a natural block
                 if (BlockType.isNaturalTerrainBlock(worldBlockUnder)) {
-                    session.rawSetBlock(worldPosition, worldBlockUnder);
+                    session.setBlock(worldPosition, worldBlockUnder);
                 }
             } else {
-                session.rawSetBlock(worldPosition, new BaseBlock(BlockID.AIR));
+                session.setBlock(worldPosition, new BaseBlock(BlockID.AIR));
             }
         }
     }

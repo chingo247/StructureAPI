@@ -17,6 +17,7 @@
 package com.chingo247.structureapi.placement;
 
 import com.chingo247.blockstore.IBlockStoreChunk;
+import com.chingo247.structureapi.construction.engine.BlockPlaceSession;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.sk89q.worldedit.BlockVector;
@@ -51,7 +52,7 @@ public class BlockStoreChunkPlacement extends BlockPlacement {
     }
 
     @Override
-    public void place(EditSession editSession, Vector pos, PlaceOptions option) {
+    public void place(BlockPlaceSession editSession, Vector pos, PlaceOptions option) {
         if (!reversed) {
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
@@ -60,7 +61,7 @@ public class BlockStoreChunkPlacement extends BlockPlacement {
                         BaseBlock block = blockStoreChunk.getBlockAt(x, y, z);
                         if (block != null) {
                             Vector p = pos.add(blockPosition);
-                            editSession.rawSetBlock(p, block);
+                            editSession.setBlock(p, block);
                         }
                     }
                 }
@@ -73,7 +74,7 @@ public class BlockStoreChunkPlacement extends BlockPlacement {
                         BaseBlock block = blockStoreChunk.getBlockAt(x, y, z);
                         if (block != null) {
                             Vector p = pos.add(blockPosition);
-                            editSession.rawSetBlock(p, block);
+                            editSession.setBlock(p, block);
                         }
                     }
                 }

@@ -22,6 +22,7 @@ import static com.chingo247.settlercraft.core.Direction.EAST;
 import static com.chingo247.settlercraft.core.Direction.NORTH;
 import static com.chingo247.settlercraft.core.Direction.SOUTH;
 import static com.chingo247.settlercraft.core.Direction.WEST;
+import com.chingo247.structureapi.construction.engine.BlockPlaceSession;
 import com.chingo247.structureapi.placement.options.BlockMask;
 import com.chingo247.structureapi.placement.options.BlockPredicate;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
@@ -66,7 +67,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
     }
 
     @Override
-    public void place(EditSession editSession, Vector pos, PlaceOptions option) {
+    public void place(BlockPlaceSession session, Vector pos, PlaceOptions option) {
         Iterator<Vector> traversal = new CuboidIterator(
                 option.getCubeX() <= 0 ? getSize().getBlockX() : option.getCubeX(),
                 option.getCubeY() <= 0 ? getSize().getBlockY() : option.getCubeY(),
@@ -89,7 +90,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
             int priority = getPriority(clipboardBlock);
 
             if (priority == PRIORITY_FIRST) {
-                doBlock(editSession, pos, v, clipboardBlock, option);
+                doBlock(session, pos, v, clipboardBlock, option);
             } else {
                 placeLater.add(new StructureBlock(v, clipboardBlock));
             }
@@ -105,7 +106,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
                         && (placeLater.peek().getPosition().getBlockX() % option.getCubeX()) > (v.getBlockX() % option.getCubeX())
                         && (placeLater.peek().getPosition().getBlockZ() % option.getCubeZ()) > (v.getBlockZ() % option.getCubeZ())) {
                     StructureBlock plb = placeLater.poll();
-                    doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
+                    doBlock(session, pos, plb.getPosition(), plb.getBlock(), option);
 
                     placeLaterPlaced++;
 
@@ -124,7 +125,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
         // Empty the queue
         while (placeLater.peek() != null) {
             StructureBlock plb = placeLater.poll();
-            doBlock(editSession, pos, plb.getPosition(), plb.getBlock(), option);
+            doBlock(session, pos, plb.getPosition(), plb.getBlock(), option);
         }
 
     }
@@ -169,7 +170,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
         return getBlock(new BlockVector(x, y, z));
     }
 
-    protected void doBlock(EditSession editSession, Vector position, Vector blockPosition, BaseBlock block, PlaceOptions option) {
+    protected void doBlock(BlockPlaceSession editSession, Vector position, Vector blockPosition, BaseBlock block, PlaceOptions option) {
         Vector p;
 
         switch (WorldUtil.getDirection(getRotation())) {
@@ -203,7 +204,7 @@ public abstract class BlockPlacement extends AbstractPlacement implements IBlock
             bm.apply(blockPosition, p, block);
         }
 
-        editSession.rawSetBlock(p, block);
+        editSession.setBlock(p.getBlockX(), p.getBlockY(), p.getBlockZ(), block.getId(), block.getData());
     }
 
 }

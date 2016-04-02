@@ -20,7 +20,6 @@ import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
-import static com.chingo247.structureapi.construction.contract.BuildContract.BUILD_PRODUCER;
 import com.chingo247.structureapi.construction.listener.DemolitionListener;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.DemolitionPlacementProducer;
@@ -30,7 +29,6 @@ import com.chingo247.structureapi.placement.IPlacement;
 import com.chingo247.structureapi.placement.block.IBlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.sk89q.worldedit.Vector;
-import org.primesoft.asyncworldedit.api.IAsyncWorldEdit;
 
 /**
  *
@@ -54,23 +52,23 @@ public class DemolitionContract extends Contract {
     
     @Override
     public void apply(StructureEntry entry, PlaceOptions placeOptions) throws StructureException {
-        IStructureAPI structureAPI = StructureAPI.getInstance();
-        IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
-        Vector position = entry.getStructure().getMin(); // Always place from the min position... 
-        IPlacement placement = DEMOLITION_PRODUCER.produce(entry.getStructure());                
-        AWEPlacementTask task = new AWEPlacementTask(
-                        asyncWorldEdit,
-                        entry,
-                        placement,
-                        getPlayer(),
-                        getEditSessionFactory().createEditSession(entry.getStructure(), entry.getContract().getPlayer()),
-                        position
-                );
-        
-        
-        task.setOptions(placeOptions);        
-        entry.addListener(DEMOLITION_LISTENER);        
-        entry.addTask(task);
+//        IStructureAPI structureAPI = StructureAPI.getInstance();
+//        IAsyncWorldEdit asyncWorldEdit = structureAPI.getAsyncWorldEditIntegration().getAsyncWorldEdit();
+//        Vector position = entry.getStructure().getMin(); // Always place from the min position... 
+//        IPlacement placement = DEMOLITION_PRODUCER.produce(entry.getStructure());                
+//        AWEPlacementTask task = new AWEPlacementTask(
+//                        asyncWorldEdit,
+//                        entry,
+//                        placement,
+//                        getPlayer(),
+//                        getEditSessionFactory().createEditSession(entry.getStructure(), entry.getContract().getPlayer()),
+//                        position
+//                );
+//        
+//        
+//        task.setOptions(placeOptions);        
+//        entry.addListener(DEMOLITION_LISTENER);        
+//        entry.addTask(task);
     }
 
 }

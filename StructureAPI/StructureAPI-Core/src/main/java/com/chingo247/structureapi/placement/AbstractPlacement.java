@@ -16,8 +16,6 @@
  */
 package com.chingo247.structureapi.placement;
 
-import com.chingo247.settlercraft.core.Direction;
-import com.chingo247.structureapi.util.WorldUtil;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 

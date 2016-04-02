@@ -70,7 +70,6 @@ import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSessionFactory;
 import com.chingo247.structureapi.construction.IContractor;
-import com.chingo247.structureapi.updates.StructureAPIModelUpdater;
 import com.chingo247.structureapi.util.WorldEditHelper;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
 import com.chingo247.xplatform.core.IPlugin;
@@ -132,7 +131,6 @@ public class StructureAPI implements IStructureAPI {
         this.asyncEventBus.register(new StructurePlanManagerHandler());
         this.physicsWatch = new PhysicsWatch();
         setupSchema();
-        applyUpdates();
 
     }
 
@@ -212,10 +210,7 @@ public class StructureAPI implements IStructureAPI {
         }
     }
 
-    private void applyUpdates() {
-        StructureAPIModelUpdater update = new StructureAPIModelUpdater(graph);
-        update.update();
-    }
+   
 
     @Override
     public void addRestriction(StructureRestriction structureRestriction) {
@@ -375,7 +370,10 @@ public class StructureAPI implements IStructureAPI {
 
     @Override
     public boolean isQueueLocked(UUID player) {
-        return asyncWorldEditIntegration.isQueueLocked(player);
+        if(asyncWorldEditIntegration != null) {
+            return asyncWorldEditIntegration.isQueueLocked(player);
+        }
+        return false;
     }
 
     final File getDirectoryForStructure(WorldNode worldNode, Structure structureNode) {
@@ -455,7 +453,7 @@ public class StructureAPI implements IStructureAPI {
     }
 
     @Override
-    public AsyncEditSessionFactory getSessionFactory() {
+    public AsyncEditSessionFactory getEditSessionFactory() {
         return sessionFactoryProvider.getFactory();
     }
 

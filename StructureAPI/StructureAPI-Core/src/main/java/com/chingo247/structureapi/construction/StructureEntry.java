@@ -80,7 +80,7 @@ public class StructureEntry  {
         return contract;
     }
 
-    public IContractor getConstructionExecutor() {
+    public IContractor getContractor() {
         return constractor;
     }
 

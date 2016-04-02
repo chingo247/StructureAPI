@@ -113,7 +113,7 @@ public class AWEPlacementTask extends StructurePlacingTask {
         }
         );
         
-        p.place(editSession, position, getOptions() != null ? getOptions() : new PlaceOptions());
+//        p.place(editSession, position, getOptions() != null ? getOptions() : new PlaceOptions());
     }
 
     @Override

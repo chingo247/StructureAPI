@@ -19,8 +19,8 @@ package com.chingo247.structureapi.construction.contract;
 import com.chingo247.structureapi.construction.PlaceOptionsFactory;
 import com.chingo247.structureapi.construction.StructureEditSessionFactory;
 import com.chingo247.structureapi.construction.StructureEntry;
+import com.chingo247.structureapi.construction.engine.BlockPlaceEngine;
 import com.chingo247.structureapi.construction.listener.ConstructionListener;
-import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
 import com.chingo247.structureapi.construction.producer.IPlacementProducer;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.model.structure.Structure;
@@ -29,7 +29,6 @@ import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.placement.options.Traversal;
 import java.util.UUID;
 import java.util.logging.Logger;
-import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
 /**
  *
