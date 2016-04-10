@@ -24,7 +24,7 @@ import java.util.UUID;
  * Represents a thing that takes in space in a world
  * @author Chingo
  */
-public interface Area {
+public interface Spatial {
     
     CuboidRegion getCuboidRegion();
     
