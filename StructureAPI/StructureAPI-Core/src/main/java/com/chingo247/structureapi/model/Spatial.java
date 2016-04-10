@@ -16,7 +16,6 @@
  */
 package com.chingo247.structureapi.model;
 
-import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import java.util.UUID;
 
