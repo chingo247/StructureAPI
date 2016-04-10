@@ -20,7 +20,6 @@ import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.util.XXHasher;
 import com.chingo247.structureapi.model.schematic.SchematicDataNode;
 import com.chingo247.structureapi.model.schematic.SchematicRepository;
-import com.chingo247.structureapi.plan.exception.SchematicException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import java.io.File;
@@ -86,7 +85,7 @@ public class SchematicManager {
             }
             return schematic;
         } catch (IOException ex) {
-            throw new SchematicException(ex);
+            throw new RuntimeException(ex);
         }
 
     }

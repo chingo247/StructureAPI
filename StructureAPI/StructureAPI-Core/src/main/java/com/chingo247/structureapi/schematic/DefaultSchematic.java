@@ -20,7 +20,6 @@ import com.chingo247.settlercraft.core.util.XXHasher;
 import com.sk89q.worldedit.Vector;
 import java.io.File;
 import java.io.IOException;
-import com.chingo247.structureapi.plan.exception.SchematicException;
 import com.chingo247.structureapi.placement.block.SchematicPlacement;
 import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.Tag;
@@ -51,7 +50,7 @@ public class DefaultSchematic implements Schematic {
         try {
             this.xxhash = hasher.hash64(schematicFile);
         } catch (IOException ex) {
-            throw new SchematicException(ex);
+            throw new RuntimeException(ex);
         }
 
         this.width = width;
@@ -77,7 +76,7 @@ public class DefaultSchematic implements Schematic {
         try {
             return FastClipboard.read(schematicFile);
         } catch (IOException ex) {
-            throw new SchematicException(ex);
+            throw new RuntimeException(ex);
         }
     }
 
