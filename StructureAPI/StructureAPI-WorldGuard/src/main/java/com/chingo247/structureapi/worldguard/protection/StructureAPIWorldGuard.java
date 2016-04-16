@@ -13,6 +13,7 @@ import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.plot.Plot;
 import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.xplatform.core.IWorld;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.sk89q.worldedit.BlockVector;
@@ -54,7 +55,7 @@ import org.neo4j.graphdb.Transaction;
  */
 public class StructureAPIWorldGuard {
 
-    private static final long BULK_SIZE = 5000L;
+    private static final long BULK_SIZE = 5000;
     private static final Label LABEL = DynamicLabel.label("WORLDGUARD_REGION");
     private static final String PREFIX = "SC_";
     private static final String STRUCTURE_PREFIX = PREFIX + "REG_";
@@ -62,10 +63,9 @@ public class StructureAPIWorldGuard {
     private static final String REGION_PROPERTY = "region";
     private static final String MSG_PREFIX = "[StructureAPI-WorldGuard]: ";
 
-    
     private boolean installing = false, uninstalling = false;
     private Lock guard;
-    
+
     private Map<String, WorldGuardProtectedWorld> worlds;
     private static StructureAPIWorldGuard instance;
     private ExecutorService activePool;
@@ -74,27 +74,61 @@ public class StructureAPIWorldGuard {
         this.worlds = Maps.newHashMap();
         this.guard = new ReentrantLock();
     }
-    
+
     public static StructureAPIWorldGuard getInstance() {
         if (instance == null) {
             instance = new StructureAPIWorldGuard();
         }
         return instance;
     }
-    
+
     private synchronized WorldGuardProtectedWorld getWorldGuardProtectedWorld(World world) {
         WorldGuardProtectedWorld w = worlds.get(world.getName());
-        if(w == null) {
+        if (w == null) {
             w = new WorldGuardProtectedWorld(world.getName());
             worlds.put(world.getName(), w);
         }
         return w;
     }
-    
+
+    public void runExpirationUpdate(final long expirationDate) {
+        guard.lock();
+        try {
+            activePool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors() - 1, 1));
+            List<Future> tasks = Lists.newArrayList();
+            for (final World w : Bukkit.getWorlds()) {
+                tasks.add(activePool.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            getWorldGuardProtectedWorld(w).runExpiration(expirationDate);
+                        } catch (Exception ex) {
+                            Logger.getLogger(StructureAPIWorldGuard.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+                        }
+                    }
+                }));
+            }
+            for (Future t : tasks) {
+                try {
+                    t.get();
+                } catch (InterruptedException | ExecutionException ex) {
+                    // Ignore
+                }
+            }
+        } finally {
+            try {
+                activePool.shutdown();
+            } catch (Exception ex) {
+            } // Silent
+            guard.unlock();
+        }
+    }
+
     public void install() throws StructureAPIWorldGuardException {
         guard.lock();
         try {
-            if(activePool != null || !activePool.isShutdown()) {
+            if (activePool != null || !activePool.isShutdown()) {
                 activePool.shutdown();
             }
             installing = true;
@@ -110,7 +144,7 @@ public class StructureAPIWorldGuard {
                     @Override
                     public void run() {
                         try {
-                        protectStructuresWorld(w);
+                            protectStructuresWorld(w);
                         } catch (StorageException ex) {
                             Logger.getLogger(StructureAPIWorldGuard.class.getName()).log(Level.SEVERE, "Failed to protect structures in '" + w.getName() + "'", ex);
                         } catch (StructureAPIWorldGuardException ex) {
@@ -119,25 +153,25 @@ public class StructureAPIWorldGuard {
                     }
                 }));
             }
-            
-            for(Future t : tasks) {
+
+            for (Future t : tasks) {
                 try {
                     t.get();
                 } catch (InterruptedException | ExecutionException ex) {
                     // Ignore
                 }
             }
-            
+
         } finally {
             installing = false;
             activePool.shutdown();
         }
     }
-    
+
     public void uninstall() throws StructureAPIWorldGuardException {
         guard.lock();
         try {
-            if(activePool != null || !activePool.isShutdown()) {
+            if (activePool != null || !activePool.isShutdown()) {
                 activePool.shutdown();
             }
             uninstalling = true;
@@ -153,7 +187,7 @@ public class StructureAPIWorldGuard {
                     @Override
                     public void run() {
                         try {
-                        expireStructureProtection(w);
+                            expireStructureProtection(w);
                         } catch (StorageException ex) {
                             Logger.getLogger(StructureAPIWorldGuard.class.getName()).log(Level.SEVERE, "Failed to protect structures in '" + w.getName() + "'", ex);
                         } catch (StructureAPIWorldGuardException ex) {
@@ -162,47 +196,31 @@ public class StructureAPIWorldGuard {
                     }
                 }));
             }
-            
-            for(Future t : tasks) {
+
+            for (Future t : tasks) {
                 try {
                     t.get();
                 } catch (InterruptedException | ExecutionException ex) {
                     // Ignore
                 }
             }
-            
-            
+
         } finally {
             uninstalling = false;
             activePool.shutdown();
         }
     }
-    
-    public void checkBusy() throws StructureAPIWorldGuardException {
-        guard.lock();
-        try {
-            if (installing) {
-                throw new StructureAPIWorldGuardException("Can't proceed, currently installing StructureAPIWorldGuard...");
-            }
-            
-            if(uninstalling) {
-                throw new StructureAPIWorldGuardException("Can't proceed, currently uninstalling StructureAPIWorldGuard...");
-            }
-        } finally {
-            guard.unlock();
-        }
-    }
-    
+
     public boolean protectStructuresWorld(World world) throws StorageException, StructureAPIWorldGuardException {
         WorldGuardProtectedWorld w = getWorldGuardProtectedWorld(world);
         return w.protectAll();
     }
-    
+
     public boolean expireStructureProtection(World world) throws StorageException, StructureAPIWorldGuardException {
         WorldGuardProtectedWorld w = getWorldGuardProtectedWorld(world);
         return w.expireAll();
     }
-    
+
     private String getRegionId(Plot plot) {
         String regionId;
         if (plot instanceof Structure) {
@@ -227,9 +245,10 @@ public class StructureAPIWorldGuard {
         regionManager.removeRegion(id);
         Node n = plot.getUnderlyingNode();
         for (Relationship r : n.getRelationships(Direction.OUTGOING, RelTypes.PROTECTED_BY)) {
-            Node pluginNode = r.getOtherNode(n);
-            if (pluginNode.hasLabel(LABEL)) {
-                pluginNode.setProperty("expired", true);
+            Node regionNode = r.getOtherNode(n);
+            if (regionNode.hasLabel(LABEL)) {
+                WorldGuardRegionNode wgRegionNode = new WorldGuardRegionNode(r.getOtherNode(n));
+                wgRegionNode.setExpired(true);
                 break;
             }
         }
@@ -395,35 +414,38 @@ public class StructureAPIWorldGuard {
             this.world = world;
         }
 
+        public void runExpiration(long expirationTime) {
+            guard.lock();
+            try {
+                runExpirationRecursive(expirationTime); // Because no recursive locking
+            } finally {
+                guard.unlock();
+            }
+        }
+
+        private void runExpirationRecursive(long expirationTime) {
+            IWorld w = SettlerCraft.getInstance().getPlatform().getServer().getWorld(world);
+            if (w != null) {
+                UUID worldUUID = w.getUUID();
+                GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+                StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
+
+                boolean another;
+                try (Transaction tx = graph.beginTx()) {
+                    List<Node> toBeExpired = regionRepository.findToBeExpired(worldUUID, expirationTime, BULK_SIZE);
+                    another = toBeExpired.size() == BULK_SIZE;
+                    tx.success();
+                }
+                if (another) {
+                    runExpirationRecursive(expirationTime);
+                }
+            }
+        }
+
         public boolean protectAll() throws StorageException {
             if (guard.tryLock()) {
                 try {
-                    GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-                    StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
-                    long total;
-                    try (Transaction tx = graph.beginTx()) {
-                        total = regionRepository.countActive();
-                        tx.success();
-                    }
-
-                    RegionManager regionManager = WGBukkit.getRegionManager(Bukkit.getWorld(world));
-                    World bkWorld = Bukkit.getWorld(world);
-
-                    long done = 0;
-                    while (done < total) {
-                        List<Node> structures;
-                        try (Transaction tx = graph.beginTx()) {
-                            structures = regionRepository.findStructuresWithoutRegion(done, done + BULK_SIZE);
-
-                            for (Node n : structures) {
-                                Plot plot = new Plot(n);
-                                protect(bkWorld, regionManager, plot, getRegionId(plot));
-                            }
-                            tx.success();
-                        }
-                        regionManager.save();
-                        done += BULK_SIZE;
-                    }
+                    protectAllRecursive();
                     return true;
                 } finally {
                     guard.unlock();
@@ -433,39 +455,74 @@ public class StructureAPIWorldGuard {
             }
         }
 
+        private void protectAllRecursive() {
+            GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+            StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
+            RegionManager regionManager = WGBukkit.getRegionManager(Bukkit.getWorld(world));
+            World bkWorld = Bukkit.getWorld(world);
+
+            boolean anotherRun;
+            try (Transaction tx = graph.beginTx()) {
+                List<Node> structures = regionRepository.findStructuresWithoutRegion(BULK_SIZE);
+
+                anotherRun = structures.size() == BULK_SIZE;
+
+                for (Node n : structures) {
+                    Plot plot = new Plot(n);
+                    protect(bkWorld, regionManager, plot, getRegionId(plot));
+                }
+                tx.success();
+            }
+            try {
+                regionManager.save();
+            } catch (StorageException ex) {
+                throw new RuntimeException(ex);
+            }
+            
+            if(anotherRun) {
+                protectAllRecursive();
+            }
+            
+        }
+        
         public boolean expireAll() throws StorageException {
             if (guard.tryLock()) {
                 try {
-                    GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
-                    StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
-                    long total;
-                    try (Transaction tx = graph.beginTx()) {
-                        total = regionRepository.countActive();
-                        tx.success();
-                    }
-
-                    RegionManager regionManager = WGBukkit.getRegionManager(Bukkit.getWorld(world));
-                    long done = 0;
-                    while (done < total) {
-                        List<Node> structures;
-                        try (Transaction tx = graph.beginTx()) {
-                            structures = regionRepository.findStructuresWithoutRegion(done, done + BULK_SIZE);
-
-                            for (Node n : structures) {
-                                Plot plot = new Plot(n);
-                                expire(regionManager, plot, getRegionId(plot));
-                            }
-                            tx.success();
-                        }
-                        regionManager.save();
-                        done += BULK_SIZE;
-                    }
+                    expireAllRecursive();
                     return true;
                 } finally {
                     guard.unlock();
                 }
             } else {
                 return false;
+            }
+        }
+        
+        private void expireAllRecursive() {
+            GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+            StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
+            RegionManager regionManager = WGBukkit.getRegionManager(Bukkit.getWorld(world));
+
+            boolean another;
+            try (Transaction tx = graph.beginTx()) {
+                List<Node> structures = regionRepository.findStructuresWithoutRegion(BULK_SIZE);
+                
+                another = structures.size() == BULK_SIZE;
+                
+                for (Node n : structures) {
+                    Plot plot = new Plot(n);
+                    expire(regionManager, plot, getRegionId(plot));
+                }
+                tx.success();
+            }
+            try {
+                regionManager.save();
+            } catch (StorageException ex) {
+                throw new RuntimeException(ex);
+            }
+            
+            if (another) {
+                expireAllRecursive();
             }
         }
     }

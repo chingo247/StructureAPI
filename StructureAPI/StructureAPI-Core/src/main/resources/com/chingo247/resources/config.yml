@@ -1,14 +1,25 @@
 ## YAML Template.
 
 ## Config version DO NOT EDIT
-version: 2.2.0
+version: 2.3.0
 ## Structure Section
 structures:
+    
+    # expiremental, will allow structures to be placed in eachother.
+    # note: 
+    #   1. structures must/will not overlap other structures within the same structure
+    #   2. structures must/will not overlap the boundaries of the 'parent' structure it is placed in 
     allow-substructures: false
     # required Holographic Displays 
+    
     use-holograms: true
+    
     # required WorldGuard
     protected: true
+    
+    # the approximate time (in minutes) the protection of a structure expires
+    # if value is smaller or equal to 0, there is no expiration
+    protection-expire: -1
     # If true, demolish command will rollback a structure instead of replacing the area with air
     # NOTE rollback will only occur if a rollback file was made during construction of the structure
     demolish-is-rollback: true

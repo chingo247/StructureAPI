@@ -47,10 +47,6 @@ public class WGCommands {
         switch (subcommand) {
             case "uninstall":
                 StructureAPIWorldGuard.getInstance().uninstall();
-                
-                break;
-            case "install":
-                StructureAPIWorldGuard.getInstance().install();
                 break;
             case "expire":
                 between(args, 2, 2);
@@ -66,7 +62,6 @@ public class WGCommands {
             default:
                 throw new CommandUsageException("Invalid argument", "see stt:wg help");
         }
-
     }
 
     private static void between(final CommandContext args, int min, int max) throws CommandException {
@@ -88,7 +83,11 @@ public class WGCommands {
             if(w == null) {
                 throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
             }
-            
+            try {
+                StructureAPIWorldGuard.getInstance().expireStructureProtection(w);
+            } catch (StorageException | StructureAPIWorldGuardException ex) {
+                throw new RuntimeException(ex);
+            }
         } else {
             String arg = args.getString(1);
             Long id = getLong(arg);
@@ -118,20 +117,20 @@ public class WGCommands {
             sender.sendMessage("An error occured");
             Logger.getLogger(WGCommands.class.getName()).log(Level.SEVERE, null, ex);
         } 
-        
     }
-    
-    
-    
 
     private static void protect(final CommandContext args, final ICommandSender sender) throws CommandException {
-        // TODO Check permission
-        
-        if(args.getString(1).equalsIgnoreCase("ALL")) {
-            GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+        if(!NumberUtils.isNumber(args.getString(1))) {
+            World w = Bukkit.getWorld(args.getString(1));
+            if(w == null) {
+                throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
+            }
             
-            StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
-            regionRepository.countActive();
+            try {
+                StructureAPIWorldGuard.getInstance().protectStructuresWorld(w);
+            } catch (StorageException | StructureAPIWorldGuardException ex) {
+                throw new RuntimeException(ex);
+            }
             
         } else {
            
@@ -158,9 +157,7 @@ public class WGCommands {
                 
                 tx.success();
             }
-            
         }
-        
     }
 
     private static void checkAllowed(ICommandSender sender, PermissionManager.Perms perm) throws CommandException {
@@ -196,8 +193,6 @@ public class WGCommands {
         sender.sendMessage(message);
     }
 
-    private static void flag(CommandContext args, ICommandSender sender) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+ 
 
 }

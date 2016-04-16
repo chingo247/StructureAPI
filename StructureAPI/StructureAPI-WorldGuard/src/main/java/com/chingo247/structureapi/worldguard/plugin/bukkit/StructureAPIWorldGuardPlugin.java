@@ -26,6 +26,7 @@ import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.worldguard.commands.WGCommands;
+import com.chingo247.structureapi.worldguard.protection.ExpirationTimer;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardScheduler;
 import com.chingo247.structureapi.worldguard.restriction.WorldGuardRestriction;
@@ -37,7 +38,6 @@ import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +66,10 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
     private static final Label LABEL = DynamicLabel.label("WORLDGUARD_REGION");
     private static final String REGION_PROPERTY = "region";
     private static final String MSG_PREFIX = "[StructureAPI-WorldGuard]: ";
+    private static final long ONE_MINUTE = 1000 * 60;
 
     private PluginCommandManager commands;
+    private ExpirationTimer timer;
 
     @Override
     public void onEnable() {
@@ -106,6 +108,13 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
         if (StructureAPI.getInstance().getConfig().isProtectStructures()) {
             processStructuresWithoutRegion();
         }
+        
+        int worldguardExpire = -1;
+        if (worldguardExpire > 0) {
+            timer = new ExpirationTimer(graph, ONE_MINUTE, worldguardExpire);
+            timer.start();
+        }
+        
         registerCommands();
     }
 
@@ -183,6 +192,15 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
     }
 
     @Override
+    public void onDisable() {
+        if(timer != null) {
+            timer.stop();
+        }
+    }
+    
+    
+
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
             if (sender instanceof Player) {
@@ -209,14 +227,6 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
         }
 
         return true;
-    }
-
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (command.getName().startsWith("stt:wg") && args.length == 0) {
-            return Arrays.asList(new String[]{"expire", "protect", "help"});
-        }
-        return null;
     }
 
 }

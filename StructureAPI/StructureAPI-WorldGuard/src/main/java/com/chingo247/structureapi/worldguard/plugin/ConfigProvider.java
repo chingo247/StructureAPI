@@ -43,7 +43,7 @@ public class ConfigProvider {
         this.configFile = f;
         reload();
     }
-
+    
     public final void reload() throws SettlerCraftException {
         final FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         this.defaultFlags = getDefaultFlags(config);

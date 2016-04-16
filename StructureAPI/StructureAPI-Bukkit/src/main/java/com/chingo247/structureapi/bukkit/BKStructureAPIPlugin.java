@@ -23,8 +23,6 @@ import com.chingo247.settlercraft.core.platforms.bukkit.BKPermissionRegistry;
 import com.chingo247.settlercraft.core.platforms.services.IEconomyProvider;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
 import com.chingo247.settlercraft.core.util.JarUtil;
-import com.chingo247.settlercraft.core.util.VersionUtil;
-import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.StructureInvalidator;
 import com.chingo247.structureapi.commands.ConstructionZoneCommands;
@@ -52,11 +50,9 @@ import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -118,7 +114,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
 
         try {
             createDefaults();
-        } catch (StructureAPIException ex) {
+        } catch (Exception ex) {
             Bukkit.getConsoleSender().sendMessage(new String[]{
                 ChatColor.RED + ex.getMessage(), ChatColor.RED + "Disabling SettlerCraft-StructureAPI"
             });
@@ -135,9 +131,9 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
                 // Initialize Config
                 configProvider = ConfigProvider.load(new File(getDataFolder(), "config.yml"));
             } catch (StructureAPIException ex) {
-                System.out.println("[StructureAPI] " + ex.getMessage());
+                System.out.println(ChatColor.RED + "[StructureAPI] " + ex.getMessage());
                 this.setEnabled(false);
-                System.out.println("[StructureAPI]: Disabling SettlerCraft-StructureAPI");
+                System.out.println(ChatColor.RED + "[StructureAPI]: Disabling SettlerCraft-StructureAPI");
                 return;
             }
         } catch (IOException ex) {
@@ -193,11 +189,7 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
 
         // Setup Commands
         registerCommands();
-        try {
-            FileUtils.deleteDirectory(getTempDir());
-        } catch (IOException ex) {
-            Logger.getLogger(BKStructureAPIPlugin.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
     }
 
     private void registerCommands() {
@@ -248,13 +240,8 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
         }
     }
 
-    private File getTempDir() {
-        File temp = new File(getDataFolder(), "temp");
-        temp.mkdirs();
-        return temp;
-    }
 
-    private void createDefaults() throws StructureAPIException {
+    private void createDefaults() throws Exception {
         try {
             checkConfigUpdate();
             JarUtil.createDefault(new File(getDataFolder(), "menu.xml"), getFile(), RESOURCES_PATH + "menu.xml");
@@ -263,65 +250,28 @@ public class BKStructureAPIPlugin extends JavaPlugin implements IPlugin {
         }
     }
 
-    private void checkConfigUpdate() throws IOException, StructureAPIException {
+    private void checkConfigUpdate() throws Exception {
+        // Get current Config
         File configFile = new File(getDataFolder(), "config.yml");
-        if (configFile.exists()) {
-            File temp = getTempDir();
-            File newConfigFile = new File(temp, "config.yml");
-            newConfigFile.delete();
-            newConfigFile = new File(temp, "config.yml");
-            JarUtil.createDefault(newConfigFile, getFile(), RESOURCES_PATH + "config.yml");
-            
-            String newConfigVersion = ConfigProvider.getVersion(newConfigFile);
-            
-            ConfigProvider currentConfig = null;
-            boolean needsUpdating = false;
-            try {
-                currentConfig = ConfigProvider.load(configFile);
-            } catch (Exception ex) {
-                
-                YAMLProcessor processor = new YAMLProcessor(configFile, false);
-                if(processor.getProperty("version") != null) {
-                    throw new StructureAPIException("[SettlerCraft-StructureAPI]: An error occurred while loading the config file, if the config file is missing expected values, try removing the file. When the file is removed, a new (default) config will be generated");
-                } else {
-                    needsUpdating = true;
-                }
-                        
-                
-                
-                
-                
-            }
-            
-            if(needsUpdating || (currentConfig != null && (currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfigVersion) == -1))) {
-                int count = 1;
-                String baseName = FilenameUtils.getBaseName(configFile.getName());
-                File oldFile = new File(getDataFolder(), baseName + "(" + count + ").old.yml");
-                while(oldFile.exists()) {
-                    count++;
-                    oldFile = new File(getDataFolder(), baseName + "(" + count + ").old.yml");
-                }
-                
-                String reason;
-                if(needsUpdating || (currentConfig != null && currentConfig.getVersion() == null)) {
-                    reason = "No 'version' value found in config";
-                } else {
-                    reason = "Older 'version' value found in config.yml";
-                }
-                
-                Bukkit.getConsoleSender().sendMessage(new String[]{
-                    ChatColor.YELLOW + "[SettlerCraft-StructureAPI]: WARNING: UPDATING CONFIG!",
-                    ChatColor.YELLOW + "[SettlerCraft-StructureAPI]: REASON: " + reason,
-                    ChatColor.YELLOW + "[SettlerCraft-StructureAPI]: Old config will be saved as '" + oldFile.getName() + "' and can be found in the plugin directory"
-                });
-                
-                FileUtils.copyFile(configFile, oldFile);
-                FileUtils.copyFile(newConfigFile, configFile);
-            }
-        } else {
-            JarUtil.createDefault(new File(getDataFolder(), "config.yml"), getFile(), RESOURCES_PATH + "config.yml");
-        }
+        
+        // Get temp config
+        File temp = new File(getDataFolder(), "temp");
+        temp.mkdirs();
+        File newConfigFile = new File(temp, "config.yml");
+        newConfigFile.delete();
+        newConfigFile = new File(temp, "config.yml");
+        JarUtil.createDefault(newConfigFile, getFile(), RESOURCES_PATH + "config.yml");
 
+        // Perform update if necessary
+        BKStructureAPIConfigUpdater updater = new BKStructureAPIConfigUpdater(configFile, newConfigFile);
+        try {
+            updater.checkAndUpdate();
+        } catch (Exception ex) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + ex.getMessage());
+            throw ex;
+        }
+        // Delete the temp directory
+        FileUtils.deleteDirectory(temp);
     }
 
     public static BKStructureAPIPlugin getInstance() {

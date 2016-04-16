@@ -5,6 +5,7 @@
  */
 package com.chingo247.structureapi.worldguard.protection;
 
+import com.chingo247.settlercraft.core.model.world.WorldNode;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Result;
@@ -34,61 +36,63 @@ public class StructureRegionRepository {
         this.graph = graph;
     }
     
-    public long countActive() {
-        String query = "MATCH (n:WORLDGUARD_REGION) WHERE NOT exists(n.expired) OR n.expired = false RETURN COUNT(n) as count";
-        
-        Result r = graph.execute(query);
-        long count = 0;
-        
-        while(r.hasNext()) {
-            Map<String, Object> map = r.next();
-            count = (long) map.get("count");
-        }
-        return count;
-    }
-    
-    public long countExpired() {
-        String query = "MATCH (n:WORLDGUARD_REGION) WHERE exists(n.expired) AND n.expired = true RETURN COUNT(n) as count";
-        
-        Result r = graph.execute(query);
-        long count = 0;
-        
-        while(r.hasNext()) {
-            Map<String, Object> map = r.next();
-            count = (long) map.get("count");
-        }
-        return count;
-    }
-    
-    public long countRegionsWithoutStructure() {
-        String query = "MATCH(:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(wg:WORLDGUARD_REGION) "
-                + "WHERE r IS NULL "
-                + "RETURN COUNT(wg) as count";
-        
-        Result r = graph.execute(query);
-        long count = 0;
-        
-        while(r.hasNext()) {
-            Map<String, Object> map = r.next();
-            count = (long) map.get("count");
-        }
-        return count;
-    }
-    
-    public long countStructuresWithoutRegion() {
-        String query = "MATCH(structure:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(:WORLDGUARD_REGION) "
-                + "WHERE r IS NULL AND NOT structure."+ StructureNode.CONSTRUCTION_STATUS_PROPERTY + "=" + ConstructionStatus.REMOVED.getStatusId() + " "
-                + "RETURN COUNT(wg) as count";
-        
-        Result r = graph.execute(query);
-        long count = 0;
-        
-        while(r.hasNext()) {
-            Map<String, Object> map = r.next();
-            count = (long) map.get("count");
-        }
-        return count;
-    }
+//    public long countActive() {
+//        String query = "MATCH (n:WORLDGUARD_REGION) WHERE NOT exists(n.expired) OR n.expired = false RETURN COUNT(n) as count";
+//        
+//        Result r = graph.execute(query);
+//        long count = 0;
+//        
+//        while(r.hasNext()) {
+//            Map<String, Object> map = r.next();
+//            count = (long) map.get("count");
+//        }
+//        return count;
+//    }
+//    
+//    public long countExpired() {
+//        String query = "MATCH (n:WORLDGUARD_REGION) WHERE exists(n.expired) AND n.expired = true RETURN COUNT(n) as count";
+//        
+//        Result r = graph.execute(query);
+//        long count = 0;
+//        
+//        while(r.hasNext()) {
+//            Map<String, Object> map = r.next();
+//            count = (long) map.get("count");
+//        }
+//        return count;
+//    }
+//    
+//    public long countRegionsWithoutStructure() {
+//        String query = "MATCH(:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(wg:WORLDGUARD_REGION) "
+//                + "WHERE r IS NULL "
+//                + "RETURN COUNT(wg) as count";
+//        
+//        Result r = graph.execute(query);
+//        long count = 0;
+//        
+//        while(r.hasNext()) {
+//            Map<String, Object> map = r.next();
+//            count = (long) map.get("count");
+//        }
+//        return count;
+//    }
+//    
+//    
+//    
+//    public long countStructuresWithoutRegion() {
+//        String query = "MATCH(structure:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(:WORLDGUARD_REGION) "
+//                + "WHERE r IS NULL AND NOT structure."+ StructureNode.CONSTRUCTION_STATUS_PROPERTY + "=" + ConstructionStatus.REMOVED.getStatusId() + " "
+//                + "RETURN COUNT(wg) as count";
+//        
+//        Result r = graph.execute(query);
+//        long count = 0;
+//        
+//        while(r.hasNext()) {
+//            Map<String, Object> map = r.next();
+//            count = (long) map.get("count");
+//        }
+//        return count;
+//    }
     
     public List<Node> findRegionsWithoutStructure(long skip, long limit) {
         Map<String,Object> params = new HashMap<>();
@@ -120,11 +124,9 @@ public class StructureRegionRepository {
         return found;
     }
     
-    public List<Node> findStructuresWithoutRegion(long skip, long limit) {
+    public List<Node> findStructuresWithoutRegion(long limit) {
         Map<String,Object> params = new HashMap<>();
-        if(skip > 0) {
-            params.put("skip", skip);
-        }
+       
         if(limit > 0) {
             params.put("limit", limit);
         }
@@ -132,9 +134,7 @@ public class StructureRegionRepository {
                 + "WHERE r IS NULL "
                 + "AND NOT structure."+ StructureNode.CONSTRUCTION_STATUS_PROPERTY + "=" + ConstructionStatus.REMOVED.getStatusId() + " "
                 + "RETURN wg as regions";
-        if(skip > 0) {
-            query += " SKIP {skip}";
-        }
+      
         
         if(limit > 0) {
             query += " LIMIT {limit}";
@@ -208,21 +208,41 @@ public class StructureRegionRepository {
         return found;
     }
     
-    public List<Node> findToBeExpired(long expirationTime, int limit, int skip) {
+    public long countToBeExpired(UUID world, long expirationTime) {
         Map<String,Object> params = new HashMap<>();
-        if(skip > 0) {
-            params.put("skip", skip);
-        }
-        if(limit > 0) {
-            params.put("limit", limit);
-        }
+        
+        params.put("world", world.toString());
         
         params.put("date", System.currentTimeMillis());
         params.put("expirationTime", expirationTime);
-        String query = "MATCH (wg:WORLDGUARD_REGION) WHERE EXISTS(wg.createdAt) AND ({date} - wg.createdAt) > {expirationTime} RETURN wg as regions";
-        if(skip > 0) {
-            query += " SKIP {skip}";
+        String query = "MATCH (s:STRUCTURE)-[:"+RelTypes.WITHIN+"]->(w:"+WorldNode.LABEL+" {"+WorldNode.UUID_PROPERTY+": {world}}) "
+                + " WITH (s) "
+                + " MATCH (w)(wg:WORLDGUARD_REGION) WHERE EXISTS(wg.createdAt) AND ({date} - wg.createdAt) > {expirationTime} RETURN wg as regions";
+        
+        Result r = graph.execute(query, params);
+        long count = 0;
+        while(r.hasNext()) {
+            Map<String, Object> map = r.next();
+            count = (long) map.get("count");
         }
+        return count;
+    }
+    
+    public List<Node> findToBeExpired(UUID world, long expirationTime, long limit) {
+        Map<String,Object> params = new HashMap<>();
+        
+        if(limit > 0) {
+            params.put("limit", limit);
+        }
+        params.put("world", world.toString());
+        
+        params.put("date", System.currentTimeMillis());
+        params.put("expirationTime", expirationTime);
+        String query = "MATCH (s:STRUCTURE)-[:"+RelTypes.WITHIN+"]->(w:"+WorldNode.LABEL+" {"+WorldNode.UUID_PROPERTY+": {world}}) "
+                + " WITH (s) "
+                + " MATCH (w)(wg:WORLDGUARD_REGION) WHERE EXISTS(wg.createdAt) AND ({date} - wg.createdAt) > {expirationTime} RETURN wg as regions";
+        
+       
         
         if(limit > 0) {
             query += " LIMIT {limit}";

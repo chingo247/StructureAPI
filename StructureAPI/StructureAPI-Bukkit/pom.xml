@@ -2,14 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>structureapi-bukkit</name>
-    <parent>
-        <groupId>com.chingo247</groupId>
-        <artifactId>structureapi</artifactId>
-        <version>2.2.0</version>
-    </parent>
+    <groupId>com.chingo247</groupId>
     <artifactId>structureapi-bukkit</artifactId>
+    <version>2.3.0</version>
     <packaging>jar</packaging>
-    
     <repositories>
          <!-- ThirdParty Repo-->
         <repository>
@@ -27,7 +23,7 @@
         </repository>
     </repositories>
     <build>
-        <finalName>StructureAPI-Bukkit-${project.version}</finalName>
+        <finalName>structureapi-bukkit-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -51,6 +47,13 @@
         </plugins>
     </build>
     <dependencies>
+        <!--Bukkit-->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.8</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>settlercraft-menuapi</artifactId>
@@ -59,15 +62,39 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>structureapi-blockstore</artifactId>
+            <artifactId>structureapi-core</artifactId>
             <version>${project.version}</version>
-            <!--<scope>provided</scope>-->
+        </dependency>
+        <!--AsyncWorldEdit-->
+        <dependency>
+            <groupId>org.primesoft</groupId>
+            <artifactId>AsyncWorldEdit</artifactId>  
+            <version>2.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--AsyncWorldEdi-Injector-->
+        <dependency>
+            <groupId>org.primesoft</groupId>
+            <artifactId>AsyncWorldEditInjector</artifactId>  
+            <version>2.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--WorldEdit-->
+        <dependency>
+            <groupId>com.sk89</groupId>
+            <artifactId>worldedit</artifactId>  
+            <version>6.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>structureapi-core</artifactId>
+            <artifactId>settlercraft-core</artifactId>
             <version>${project.version}</version>
-            <!--<scope>provided</scope>-->
+            <scope>provided</scope>
         </dependency>
     </dependencies>
+    <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+    </properties>
 </project>

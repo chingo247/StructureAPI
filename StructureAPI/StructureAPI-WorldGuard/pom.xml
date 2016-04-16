@@ -3,17 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.chingo247</groupId>
     <artifactId>structureapi-worldguard</artifactId>
+    <version>2.3.0</version>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
     </properties>
-     <parent>
-        <groupId>com.chingo247</groupId>
-        <artifactId>structureapi</artifactId>
-        <version>2.2.0</version>
-    </parent>
+
     <build>
         <finalName>StructureAPI-WorldGuard-${project.version}</finalName>
     </build>
@@ -37,6 +34,13 @@
     </repositories>
     
     <dependencies>
+        <!--Bukkit-->
+        <dependency>
+            <groupId>org.bukkit</groupId>
+            <artifactId>bukkit</artifactId>
+            <version>1.8</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- WorldGuard -->
         <dependency>
             <groupId>com.sk89q</groupId>
@@ -47,7 +51,21 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>structureapi-core</artifactId>
+            <version>2.3.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>settlercraft-core</artifactId>
             <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+         <!--WorldEdit-->
+        <dependency>
+            <groupId>com.sk89</groupId>
+            <artifactId>worldedit</artifactId>  
+            <version>6.1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <name>structureapi-worldguard</name>
