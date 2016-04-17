@@ -26,7 +26,10 @@ import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.platform.ConfigProvider;
 import com.google.common.eventbus.Subscribe;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.Transaction;
 
 /**
  *
@@ -34,57 +37,146 @@ import org.neo4j.graphdb.GraphDatabaseService;
  */
 public class WorldGuardPlotListener {
 
-    private final WorldGuardProtection worldGuardHelper;
+    private StructureAPIWorldGuardScheduler scheduler;
 
-    public WorldGuardPlotListener(WorldGuardProtection worldGuardHelper, GraphDatabaseService graph) {
-        this.worldGuardHelper = worldGuardHelper;
+    public WorldGuardPlotListener() {
+        this.scheduler = StructureAPIWorldGuardScheduler.getInstance();
     }
 
     @Subscribe
     public void onStructureCreate(StructureCreateEvent structureCreateEvent) {
-        Structure structure = structureCreateEvent.getStructure();
+        final Structure structure = structureCreateEvent.getStructure();
         ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
+
         if (configProvider.isProtectStructures()) {
-            worldGuardHelper.protect(structure);
+            scheduler.submit(structure.getWorldName(), new Runnable() {
+
+                @Override
+                public void run() {
+                    GraphDatabaseService graph = StructureAPI.getInstance().getGraphDatabase();
+                    Transaction tx = null;
+                    try {
+                        tx = graph.beginTx();
+                        StructureAPIWorldGuard.getInstance().protect(structure);
+
+                        tx.success();
+                    } catch (Exception ex) {
+                        if (tx != null) {
+                            tx.failure();
+                        }
+                        Logger.getLogger(WorldGuardPlotListener.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        if (tx != null) {
+                            tx.close();
+                        }
+                    }
+                }
+            });
         }
     }
 
     @Subscribe
     public void onStructureRemove(StructureRemoveEvent structureRemoveEvent) {
-        Structure structure = structureRemoveEvent.getStructure();
-        worldGuardHelper.removeProtection(structure, false, false);
+        final Structure structure = structureRemoveEvent.getStructure();
+        scheduler.submit(structure.getWorldName(), new Runnable() {
+
+            @Override
+            public void run() {
+                GraphDatabaseService graph = StructureAPI.getInstance().getGraphDatabase();
+                Transaction tx = null;
+                try {
+                    tx = graph.beginTx();
+                    StructureAPIWorldGuard.getInstance().expire(structure);
+
+                    tx.success();
+                } catch (Exception ex) {
+                    if (tx != null) {
+                        tx.failure();
+                    }
+                    Logger.getLogger(WorldGuardPlotListener.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    if (tx != null) {
+                        tx.close();
+                    }
+                }
+            }
+        });
     }
 
     @Subscribe
-    public void onStructureAddOwner(StructureAddOwnerEvent addOwnerEvent) {
+    public void onStructureAddOwner(final StructureAddOwnerEvent addOwnerEvent) {
         ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
-
+        final Structure structure = addOwnerEvent.getStructure();
         if (configProvider.isProtectStructures()) {
-            final UUID player = addOwnerEvent.getAddedOwner();
-            final OwnerType type = addOwnerEvent.getOwnerType();
-            final Structure structure = addOwnerEvent.getStructure();
-            if (type == OwnerType.MEMBER) {
-                worldGuardHelper.addMember(player, structure);
-            } else {
-                worldGuardHelper.removeMember(player, structure);
-                worldGuardHelper.addOwner(player, structure);
-            }
+            scheduler.submit(structure.getWorldName(), new Runnable() {
+
+                @Override
+                public void run() {
+                    GraphDatabaseService graph = StructureAPI.getInstance().getGraphDatabase();
+                    Transaction tx = null;
+                    try {
+                        tx = graph.beginTx();
+                        final UUID player = addOwnerEvent.getAddedOwner();
+                        final OwnerType type = addOwnerEvent.getOwnerType();
+                        final Structure structure = addOwnerEvent.getStructure();
+                        if (type == OwnerType.MEMBER) {
+                            StructureAPIWorldGuard.getInstance().addMember(player, structure);
+                        } else {
+                            StructureAPIWorldGuard.getInstance().removeMember(player, structure);
+                            StructureAPIWorldGuard.getInstance().addOwner(player, structure);
+                        }
+
+                        tx.success();
+                    } catch (Exception ex) {
+                        if (tx != null) {
+                            tx.failure();
+                        }
+                        Logger.getLogger(WorldGuardPlotListener.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        if (tx != null) {
+                            tx.close();
+                        }
+                    }
+                }
+            });
         }
     }
 
     @Subscribe
-    public void onStructureRemoveOwner(StructureRemoveOwnerEvent removeOwnerEvent) {
+    public void onStructureRemoveOwner(final StructureRemoveOwnerEvent removeOwnerEvent) {
         ConfigProvider configProvider = StructureAPI.getInstance().getConfig();
-
+        final Structure structure = removeOwnerEvent.getStructure();
         if (configProvider.isProtectStructures()) {
-            final UUID player = removeOwnerEvent.getRemovedOwner();
-            final OwnerType type = removeOwnerEvent.getOwnerType();
-            final Structure structure = removeOwnerEvent.getStructure();
-            if (type == OwnerType.MEMBER) {
-                worldGuardHelper.removeMember(player, structure);
-            } else {
-                worldGuardHelper.removeOwner(player, structure);
-            }
+            scheduler.submit(structure.getWorldName(), new Runnable() {
+
+                @Override
+                public void run() {
+                    GraphDatabaseService graph = StructureAPI.getInstance().getGraphDatabase();
+                    Transaction tx = null;
+                    try {
+                        tx = graph.beginTx();
+                        final UUID player = removeOwnerEvent.getRemovedOwner();
+                        final OwnerType type = removeOwnerEvent.getOwnerType();
+                        final Structure structure = removeOwnerEvent.getStructure();
+                        if (type == OwnerType.MEMBER) {
+                            StructureAPIWorldGuard.getInstance().removeMember(player, structure);
+                        } else {
+                            StructureAPIWorldGuard.getInstance().removeOwner(player, structure);
+                        }
+
+                        tx.success();
+                    } catch (Exception ex) {
+                        if (tx != null) {
+                            tx.failure();
+                        }
+                        Logger.getLogger(WorldGuardPlotListener.class.getName()).log(Level.SEVERE, null, ex);
+                    } finally {
+                        if (tx != null) {
+                            tx.close();
+                        }
+                    }
+                }
+            });
         }
     }
 
@@ -140,5 +232,4 @@ public class WorldGuardPlotListener {
 //        }
 //
 //    }
-
 }

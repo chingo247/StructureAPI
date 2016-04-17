@@ -16,7 +16,7 @@
  */
 package com.chingo247.structureapi.placement;
 
-import com.chingo247.blockstore.IBlockStoreChunk;
+import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
 import com.chingo247.structureapi.placement.block.BlockPlacement;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.sk89q.worldedit.BlockVector;

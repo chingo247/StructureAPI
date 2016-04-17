@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,28 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.worldguard.plugin;
+package com.chingo247.structureapi.blockstore;
+
+import com.sk89q.worldedit.Vector;
+import com.sk89q.worldedit.blocks.BaseBlock;
 
 /**
- * Permissions as of 2.2.0 in format {on-what}.{operation}
+ *
  * @author Chingo
  */
-public class Permissions {
+public interface IBlockContainer {
     
-    private Permissions() {}
+    BaseBlock getBlockAt(Vector position);
     
-    private static final String PREFIX = "structureapi.wg.";
+    BaseBlock getBlockAt(int x, int y, int z);
     
-    public static final String EXPIRE_SINGLE = PREFIX + "expire.single";
-    public static final String EXPIRE_WORLD = PREFIX + "expire.world";
-    public static final String EXPIRE_ALL = PREFIX + "expire.all";
-    public static final String PROTECT_SINGLE = PREFIX + "protect.single";
-    public static final String PROTECT_WORLD = PREFIX + "protect.world";
-    public static final String PROTECT_ALL = PREFIX + "protect.all";
+    void setBlockAt(int x, int y, int z, BaseBlock b);
     
-   
-    
-    
-    
+    void setBlockAt(Vector position, BaseBlock b);
     
 }
