@@ -22,7 +22,6 @@ import com.chingo247.structureapi.model.RelTypes;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.UUID;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.parboiled.common.Preconditions;
@@ -72,6 +71,8 @@ public class OwnerDomainNode {
      */
     public boolean setOwnership(SettlerNode settler, OwnerType ownerType) {
         Preconditions.checkNotNull(ownerType, "Ownertype may not be null...");
+        Preconditions.checkNotNull(settler, "Settler may not be null...");
+        
         // if exists... update it
         for(Ownership o : getOwnerships()) {
             if(o.getOwner().getUniqueId().equals(settler.getUniqueId())) {
@@ -84,6 +85,7 @@ public class OwnerDomainNode {
                 }
             }
         }
+        
         // otherwise create a new one
         Relationship r = underlyingNode.createRelationshipTo(settler.getNode(), RelTypes.OWNED_BY);
         r.setProperty("Type", ownerType.getTypeId());

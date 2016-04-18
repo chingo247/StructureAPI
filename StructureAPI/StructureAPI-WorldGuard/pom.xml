@@ -12,7 +12,7 @@
     </properties>
 
     <build>
-        <finalName>StructureAPI-WorldGuard-${project.version}</finalName>
+        <finalName>structureapi-worldguard-${project.version}</finalName>
     </build>
     
     <repositories>

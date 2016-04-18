@@ -11,8 +11,8 @@ import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
-import com.chingo247.structureapi.model.plot.Plot;
 import com.chingo247.structureapi.model.structure.Structure;
+import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IWorld;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -64,7 +64,7 @@ public class StructureAPIWorldGuard {
     private static final String MSG_PREFIX = "[StructureAPI-WorldGuard]: ";
 
     private boolean installing = false, uninstalling = false;
-    private Lock guard;
+    private Lock globalLock;
 
     private Map<String, WorldGuardProtectedWorld> worlds;
     private static StructureAPIWorldGuard instance;
@@ -72,7 +72,7 @@ public class StructureAPIWorldGuard {
 
     private StructureAPIWorldGuard() {
         this.worlds = Maps.newHashMap();
-        this.guard = new ReentrantLock();
+        this.globalLock = new ReentrantLock();
     }
 
     public static StructureAPIWorldGuard getInstance() {
@@ -92,7 +92,7 @@ public class StructureAPIWorldGuard {
     }
 
     public void runExpirationUpdate(final long expirationDate) {
-        guard.lock();
+        globalLock.lock();
         try {
             activePool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors() - 1, 1));
             List<Future> tasks = Lists.newArrayList();
@@ -121,21 +121,24 @@ public class StructureAPIWorldGuard {
                 activePool.shutdown();
             } catch (Exception ex) {
             } // Silent
-            guard.unlock();
+            globalLock.unlock();
         }
     }
 
-    public void install() throws StructureAPIWorldGuardException {
-        guard.lock();
+    public void install(ICommandSender executor)  {
+        globalLock.lock();
         try {
-            if (activePool != null || !activePool.isShutdown()) {
+            if (activePool != null && !activePool.isShutdown()) {
                 activePool.shutdown();
             }
             installing = true;
         } finally {
-            guard.unlock();
+            globalLock.unlock();
         }
         try {
+            if (executor != null) {
+                executor.sendMessage("Protecting structures of all worlds...");
+            }
             activePool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors() - 1, 1));
             List<Future> tasks = Lists.newArrayList();
             for (final World w : Bukkit.getWorlds()) {
@@ -161,24 +164,30 @@ public class StructureAPIWorldGuard {
                     // Ignore
                 }
             }
-
+            if(executor != null) {
+                executor.sendMessage("Protection completed");
+            }
+            
         } finally {
             installing = false;
             activePool.shutdown();
         }
     }
 
-    public void uninstall() throws StructureAPIWorldGuardException {
-        guard.lock();
+    public void uninstall(ICommandSender executor) {
+        globalLock.lock();
         try {
-            if (activePool != null || !activePool.isShutdown()) {
+            if (activePool != null && !activePool.isShutdown()) {
                 activePool.shutdown();
             }
             uninstalling = true;
         } finally {
-            guard.unlock();
+            globalLock.unlock();
         }
         try {
+            if(executor != null) {
+                executor.sendMessage("Removing worldguard regions that belonged to structures...");
+            }
             activePool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors() - 1, 1));
             List<Future> tasks = Lists.newArrayList();
             for (final World w : Bukkit.getWorlds()) {
@@ -204,6 +213,9 @@ public class StructureAPIWorldGuard {
                     // Ignore
                 }
             }
+            if (executor != null) {
+                executor.sendMessage("Uninstall completed");
+            }
 
         } finally {
             uninstalling = false;
@@ -211,39 +223,33 @@ public class StructureAPIWorldGuard {
         }
     }
 
-    public boolean protectStructuresWorld(World world) throws StorageException, StructureAPIWorldGuardException {
+    public void protectStructuresWorld(World world) throws StorageException, StructureAPIWorldGuardException {
         WorldGuardProtectedWorld w = getWorldGuardProtectedWorld(world);
-        return w.protectAll();
+        w.protectAll();
     }
 
-    public boolean expireStructureProtection(World world) throws StorageException, StructureAPIWorldGuardException {
+    public void expireStructureProtection(World world) throws StorageException, StructureAPIWorldGuardException {
         WorldGuardProtectedWorld w = getWorldGuardProtectedWorld(world);
-        return w.expireAll();
+        w.expireAll();
     }
 
-    private String getRegionId(Plot plot) {
-        String regionId;
-        if (plot instanceof Structure) {
-            regionId = STRUCTURE_PREFIX + String.valueOf(((Structure) plot).getId());
-        } else {
-            regionId = UUID.randomUUID().toString();
-        }
-
+    private String getRegionId(Structure structure) {
+        String regionId = STRUCTURE_PREFIX + String.valueOf(structure.getId());
         return regionId;
     }
 
-    public void expire(Plot plot) throws StorageException, StructureAPIWorldGuardException {
-        World world = Bukkit.getWorld(plot.getWorldName());
+    public void expire(Structure structure) throws StorageException, StructureAPIWorldGuardException {
+        World world = Bukkit.getWorld(structure.getWorldName());
         RegionManager mgr = WGBukkit.getRegionManager(world);
-        String region = getRegionId(plot);
-        expire(mgr, plot, region);
+        String region = getRegionId(structure);
+        expire(mgr, structure, region);
         mgr.saveChanges();
 
     }
 
-    private void expire(RegionManager regionManager, Plot plot, String id) {
+    private void expire(RegionManager regionManager, Structure structure, String id) {
         regionManager.removeRegion(id);
-        Node n = plot.getUnderlyingNode();
+        Node n = structure.getUnderlyingNode();
         for (Relationship r : n.getRelationships(Direction.OUTGOING, RelTypes.PROTECTED_BY)) {
             Node regionNode = r.getOtherNode(n);
             if (regionNode.hasLabel(LABEL)) {
@@ -254,23 +260,33 @@ public class StructureAPIWorldGuard {
         }
     }
 
-    public void protect(Plot plot) throws StorageException, StructureAPIWorldGuardException {
-        World world = Bukkit.getWorld(plot.getWorldName());
+    public void protect(Structure structure) throws StorageException, StructureAPIWorldGuardException {
+        World world = Bukkit.getWorld(structure.getWorldName());
 
         RegionManager mgr = WGBukkit.getRegionManager(world);
-        String id = getRegionId(plot);
+        String id = getRegionId(structure);
 
-        protect(world, mgr, plot, id);
+        protect(world, mgr, structure, id);
 
         GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
         mgr.save();
-        Node worldGuardNode = graph.createNode(LABEL);
-        worldGuardNode.setProperty(REGION_PROPERTY, id);
-        plot.getUnderlyingNode().createRelationshipTo(worldGuardNode, RelTypes.PROTECTED_BY);
+        
+        StructureRegionRepository regionRepository = new StructureRegionRepository(graph);
+        WorldGuardRegionNode worldguardRegion = regionRepository.findRegionById(id);
+        
+        
+        
+        if(worldguardRegion == null) {
+            worldguardRegion = new WorldGuardRegionNode(graph.createNode(LABEL));
+            worldguardRegion.setExpired(false);
+            worldguardRegion.setRegion(id);
+            worldguardRegion.setCreatedAt(System.currentTimeMillis());
+        }
+        structure.getUnderlyingNode().createRelationshipTo(worldguardRegion.getNode(), RelTypes.PROTECTED_BY);
     }
 
-    private void protect(World world, RegionManager regionManager, Plot plot, String id) {
-        CuboidRegion dimension = plot.getCuboidRegion();
+    private void protect(World world, RegionManager regionManager, Structure structure, String id) {
+        CuboidRegion dimension = structure.getCuboidRegion();
         Vector p1 = dimension.getMinimumPoint();
         Vector p2 = dimension.getMaximumPoint();
 
@@ -283,7 +299,7 @@ public class StructureAPIWorldGuard {
                 new BlockVector(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ()),
                 new BlockVector(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ())
         );
-        OwnerDomainNode ownerDomain = new OwnerDomainNode(plot.getUnderlyingNode());
+        OwnerDomainNode ownerDomain = new OwnerDomainNode(structure.getUnderlyingNode());
 
         for (Ownership owner : ownerDomain.getOwnerships()) {
 
@@ -304,10 +320,10 @@ public class StructureAPIWorldGuard {
         return WGBukkit.getRegionManager(world).hasRegion(id);
     }
 
-    protected boolean addMember(UUID player, Plot plot) {
-        World world = Bukkit.getWorld(plot.getWorldName());
+    protected boolean addMember(UUID player, Structure structure) {
+        World world = Bukkit.getWorld(structure.getWorldName());
         RegionManager mgr = WGBukkit.getRegionManager(world);
-        String regionId = getRegionId(plot);
+        String regionId = getRegionId(structure);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             if (!region.getMembers().contains(player)) {
@@ -350,10 +366,10 @@ public class StructureAPIWorldGuard {
         return getWorldGuard().wrapPlayer(player);
     }
 
-    protected boolean addOwner(UUID player, Plot plot) {
-        World world = Bukkit.getWorld(plot.getWorldName());
+    protected boolean addOwner(UUID player, Structure structure) {
+        World world = Bukkit.getWorld(structure.getWorldName());
         RegionManager mgr = WGBukkit.getRegionManager(world);
-        String regionId = getRegionId(plot);
+        String regionId = getRegionId(structure);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             if (!region.getOwners().contains(player)) {
@@ -369,10 +385,10 @@ public class StructureAPIWorldGuard {
         return true;
     }
 
-    protected boolean removeOwner(UUID player, Plot plot) {
-        World world = Bukkit.getWorld(plot.getWorldName());
+    protected boolean removeOwner(UUID player, Structure structure) {
+        World world = Bukkit.getWorld(structure.getWorldName());
         RegionManager mgr = WGBukkit.getRegionManager(world);
-        String regionId = getRegionId(plot);
+        String regionId = getRegionId(structure);
         ProtectedRegion region = mgr.getRegion(regionId);
 
         if (region != null) {
@@ -387,10 +403,10 @@ public class StructureAPIWorldGuard {
         return false;
     }
 
-    protected boolean removeMember(UUID player, Plot plot) {
-        World world = Bukkit.getWorld(plot.getWorldName());
+    protected boolean removeMember(UUID player, Structure structure) {
+        World world = Bukkit.getWorld(structure.getWorldName());
         RegionManager mgr = WGBukkit.getRegionManager(world);
-        String regionId = getRegionId(plot);
+        String regionId = getRegionId(structure);
         ProtectedRegion region = mgr.getRegion(regionId);
         if (region != null) {
             region.getMembers().removePlayer(player);
@@ -406,20 +422,20 @@ public class StructureAPIWorldGuard {
 
     private class WorldGuardProtectedWorld {
 
-        private Lock guard;
+        private Lock worldLock;
         private String world;
 
         public WorldGuardProtectedWorld(String world) {
-            this.guard = new ReentrantLock();
+            this.worldLock = new ReentrantLock();
             this.world = world;
         }
 
         public void runExpiration(long expirationTime) {
-            guard.lock();
+            worldLock.lock();
             try {
                 runExpirationRecursive(expirationTime); // Because no recursive locking
             } finally {
-                guard.unlock();
+                worldLock.unlock();
             }
         }
 
@@ -442,16 +458,12 @@ public class StructureAPIWorldGuard {
             }
         }
 
-        public boolean protectAll() throws StorageException {
-            if (guard.tryLock()) {
-                try {
-                    protectAllRecursive();
-                    return true;
-                } finally {
-                    guard.unlock();
-                }
-            } else {
-                return false;
+        public void protectAll() throws StorageException {
+            worldLock.lock();
+            try {
+                protectAllRecursive();
+            } finally {
+                worldLock.unlock();
             }
         }
 
@@ -463,13 +475,13 @@ public class StructureAPIWorldGuard {
 
             boolean anotherRun;
             try (Transaction tx = graph.beginTx()) {
-                List<Node> structures = regionRepository.findStructuresWithoutRegion(BULK_SIZE);
+                List<Node> structures = regionRepository.findUnprotectedStructures(BULK_SIZE);
 
                 anotherRun = structures.size() == BULK_SIZE;
 
                 for (Node n : structures) {
-                    Plot plot = new Plot(n);
-                    protect(bkWorld, regionManager, plot, getRegionId(plot));
+                    Structure structure = new Structure(n);
+                    protect(bkWorld, regionManager, structure, getRegionId(structure));
                 }
                 tx.success();
             }
@@ -478,23 +490,17 @@ public class StructureAPIWorldGuard {
             } catch (StorageException ex) {
                 throw new RuntimeException(ex);
             }
-            
             if(anotherRun) {
                 protectAllRecursive();
             }
-            
         }
         
-        public boolean expireAll() throws StorageException {
-            if (guard.tryLock()) {
-                try {
-                    expireAllRecursive();
-                    return true;
-                } finally {
-                    guard.unlock();
-                }
-            } else {
-                return false;
+        public void expireAll() throws StorageException {
+            worldLock.lock();
+            try {
+                expireAllRecursive();
+            } finally {
+                worldLock.unlock();
             }
         }
         
@@ -505,13 +511,13 @@ public class StructureAPIWorldGuard {
 
             boolean another;
             try (Transaction tx = graph.beginTx()) {
-                List<Node> structures = regionRepository.findStructuresWithoutRegion(BULK_SIZE);
+                List<Node> structures = regionRepository.findProtectedStructures(0, BULK_SIZE);
                 
                 another = structures.size() == BULK_SIZE;
                 
                 for (Node n : structures) {
-                    Plot plot = new Plot(n);
-                    expire(regionManager, plot, getRegionId(plot));
+                    Structure structure = new Structure(n);
+                    expire(regionManager, structure, getRegionId(structure));
                 }
                 tx.success();
             }

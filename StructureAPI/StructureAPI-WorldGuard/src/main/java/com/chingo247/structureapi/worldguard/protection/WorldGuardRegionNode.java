@@ -5,6 +5,7 @@
  */
 package com.chingo247.structureapi.worldguard.protection;
 
+import com.google.common.base.Preconditions;
 import org.neo4j.graphdb.Node;
 
 /**
@@ -13,16 +14,22 @@ import org.neo4j.graphdb.Node;
  */
 public class WorldGuardRegionNode {
 
-    private static final String REGION_PROPERTY = "region";
-    private static final String CREATED_AT_PROPERTY = "createdAt";
-    private static final String EXPIRED_PROPERTY = "expired";
+    public static final String LABEL = "WORLDGUARD_REGION";
+    public static final String REGION_PROPERTY = "region";
+    public static final String CREATED_AT_PROPERTY = "createdAt";
+    public static final String EXPIRED_PROPERTY = "expired";
 
     private Node underlyingNode;
 
-    public WorldGuardRegionNode(Node underlyingNode) {
-        this.underlyingNode = underlyingNode;
+    public WorldGuardRegionNode(Node node) {
+        Preconditions.checkNotNull(node, "node may not be null");
+        this.underlyingNode = node;
     }
 
+    public Node getNode() {
+        return underlyingNode;
+    }
+    
     public void setRegion(String region) {
         this.underlyingNode.setProperty(REGION_PROPERTY, region);
     }

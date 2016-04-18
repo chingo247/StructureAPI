@@ -64,8 +64,10 @@ public class PermissionManager {
     
     public enum Perms {
         STRUCTURE_WG_EXPIRE_SINGLE(new Permission(Permissions.EXPIRE_SINGLE, PermissionDefault.OP, "Allows a player to expire a single protected structure")),
+        STRUCTURE_WG_EXPIRE_WORLD(new Permission(Permissions.EXPIRE_WORLD, PermissionDefault.OP, "Allows a player to expire all protected structures in a world")),
         STRUCTURE_WG_EXPIRE_ALL(new Permission(Permissions.EXPIRE_ALL, PermissionDefault.OP, "Allows a player to expire all protected structures")),
         STRUCTURE_WG_PROTECT_SINGLE(new Permission(Permissions.PROTECT_SINGLE, PermissionDefault.OP, "Allows a player to protect a single structure")),
+        STRUCTURE_WG_PROTECT_WORLD(new Permission(Permissions.PROTECT_WORLD, PermissionDefault.OP, "Allows a player to protect all (unprotected) structure")),
         STRUCTURE_WG_PROTECT_ALL(new Permission(Permissions.PROTECT_ALL, PermissionDefault.OP, "Allows a player to protect all (unprotected) structure"));
         private Permission permission;
 

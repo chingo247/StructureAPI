@@ -7,11 +7,13 @@ package com.chingo247.structureapi.worldguard.commands;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
+import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.model.plot.PlotNode;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.worldguard.plugin.PermissionManager;
+import com.chingo247.structureapi.worldguard.plugin.Permissions;
 import com.chingo247.structureapi.worldguard.protection.StructureRegionRepository;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardException;
@@ -22,6 +24,7 @@ import com.chingo247.xplatform.core.IPlayer;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import java.util.logging.Level;
@@ -38,53 +41,33 @@ import org.neo4j.graphdb.Transaction;
  */
 public class WGCommands {
 
-    @CommandExtras(async = true)
-    @Command(aliases = {"stt:wg", "structure:worldguard"}, desc = "WorldGuard commands for structures", min = 1, max = 2)
-    public static void worldguard(final CommandContext args, final ICommandSender sender) throws Exception {
 
-        String subcommand = args.getString(0);
-
-        switch (subcommand) {
-            case "uninstall":
-                StructureAPIWorldGuard.getInstance().uninstall();
-                break;
-            case "expire":
-                between(args, 2, 2);
-                expire(args, sender);
-                break;
-            case "protect":
-                between(args, 2, 2);
-                protect(args, sender);
-                break;
-            case "help":
-                help(args, sender);
-                break;
-            default:
-                throw new CommandUsageException("Invalid argument", "see stt:wg help");
-        }
-    }
-
-    private static void between(final CommandContext args, int min, int max) throws CommandException {
-        if (args.argsLength() < min) {
-            throw new CommandException("Too many arguments!");
-        }
-
-        if (max > 0 && args.argsLength() > max) {
-            throw new CommandException("Too many arguments!");
-        }
+    @CommandExtras(async = true, senderType = CommandSenderType.CONSOLE)
+    @CommandPermissions(Permissions.EXPIRE_ALL)
+    @Command(aliases = "sttwg:uninstall", desc = "Removes worldguard protection from all structures")
+    public static void uninstall(final CommandContext args, ICommandSender sender) throws CommandException {
+        StructureAPIWorldGuard.getInstance().uninstall(sender);
     }
     
-
-    private static void expire(final CommandContext args, final ICommandSender sender) throws CommandException {
-        // TODO Check permission
-        // Check expire single | multi
-        if (!NumberUtils.isNumber(args.getString(1)))  {   
+    @CommandExtras(async = true, senderType = CommandSenderType.CONSOLE)
+    @CommandPermissions(Permissions.PROTECT_ALL)
+    @Command(aliases = "sttwg:install", desc = "Adds worldguard protection to all structures")
+    public static void install(final CommandContext args, ICommandSender sender) throws CommandException {
+        StructureAPIWorldGuard.getInstance().install(sender);
+    }
+    
+    @CommandExtras(async = true)
+    @Command(aliases = "sttwg:expire", usage = "sttwg:expire [world|structureid]" ,desc = "Expires protection for a structure or all structures of a world", min = 1, max = 1)
+    public static void expire(final CommandContext args, ICommandSender sender) throws CommandException {
+        if (!NumberUtils.isNumber(args.getString(0)))  {
+            checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_EXPIRE_WORLD);
             World w = Bukkit.getWorld(args.getString(1));
             if(w == null) {
                 throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
             }
             try {
                 StructureAPIWorldGuard.getInstance().expireStructureProtection(w);
+                sender.sendMessage("Expired protection for structures in world '" + w.getName() + "'");
             } catch (StorageException | StructureAPIWorldGuardException ex) {
                 throw new RuntimeException(ex);
             }
@@ -105,6 +88,7 @@ public class WGCommands {
             if(node != null) {
                 try {
                     StructureAPIWorldGuard.getInstance().expire(new Structure(node));
+                    sender.sendMessage("Expired protection for structure #" + structureId);
                 } catch (StructureAPIWorldGuardException ex) {
                     throw new CommandException(ex);
                 }
@@ -118,9 +102,12 @@ public class WGCommands {
             Logger.getLogger(WGCommands.class.getName()).log(Level.SEVERE, null, ex);
         } 
     }
-
-    private static void protect(final CommandContext args, final ICommandSender sender) throws CommandException {
+    
+    @CommandExtras(async = true)
+    @Command(aliases = "sttwg:protect", usage = "sttwg:protect [world|structureid]" ,desc = "Adds protection to a structure or all structures of a world", min = 1, max = 1)
+    public static void protect(final CommandContext args, ICommandSender sender) throws CommandException {
         if(!NumberUtils.isNumber(args.getString(1))) {
+            checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_PROTECT_WORLD);
             World w = Bukkit.getWorld(args.getString(1));
             if(w == null) {
                 throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
@@ -128,12 +115,13 @@ public class WGCommands {
             
             try {
                 StructureAPIWorldGuard.getInstance().protectStructuresWorld(w);
+                sender.sendMessage("Protected structures for world '" + w.getName() + "'");
             } catch (StorageException | StructureAPIWorldGuardException ex) {
                 throw new RuntimeException(ex);
             }
-            
-        } else {
            
+        } else {
+            checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_PROTECT_SINGLE);
             long id = getLong(args.getString(1));
             GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
             
@@ -147,6 +135,7 @@ public class WGCommands {
                 
                 try {
                     StructureAPIWorldGuard.getInstance().protect(new Structure(structureNode));
+                    sender.sendMessage("Protected structure #" + id + " with worldguard");
                 } catch (StorageException ex) {
                     tx.failure();
                     Logger.getLogger(WGCommands.class.getName()).log(Level.SEVERE, null, ex);
@@ -176,22 +165,6 @@ public class WGCommands {
         }
     }
 
-    private static void help(final CommandContext args, final ICommandSender sender) {
-        IColors colors = StructureAPI.getInstance().getPlatform().getChatColors();
-
-        String[] subcommands = new String[]{
-            //            colors.blue() + "/stt:wg "+colors.yellow()+"flag <structureId> "+colors.reset()+"- Set a flag for a structure's region, will pass the arguments to worldguard",
-            colors.blue() + "/stt:wg " + colors.yellow() + "expire <structureId|ALL> " + colors.reset() + " - expire protection for a structure with given id or all structures when given ALL",
-            colors.blue() + "/stt:wg " + colors.yellow() + "protect <structureId|ALL> " + colors.reset() + "- protect structure with given id or all structures when given ALL",
-            colors.blue() + "/stt:wg " + colors.yellow() + "help " + colors.reset() + "- display all commands related to worldguard and structureapi"
-        };
-
-        String message = "StructureAPI-WorldGuard Commands \n";
-        for (String subcommand : subcommands) {
-            message += subcommand + "\n";
-        }
-        sender.sendMessage(message);
-    }
 
  
 

@@ -29,6 +29,7 @@ import com.chingo247.structureapi.worldguard.commands.WGCommands;
 import com.chingo247.structureapi.worldguard.protection.ExpirationTimer;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardScheduler;
+import com.chingo247.structureapi.worldguard.protection.WorldGuardRegionNode;
 import com.chingo247.structureapi.worldguard.restriction.WorldGuardRestriction;
 import com.chingo247.xplatform.platforms.bukkit.BukkitConsoleSender;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlayer;
@@ -130,9 +131,8 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
         try (Transaction tx = graph.beginTx()) {
             // (a)-[:PROTECTED_BY]->(w:WORLDGUARD_REGION {region: a.WGRegion})
 
-            String query = "MATCH(s:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]->(:WORLDGUARD_REGION) "
+            String query = "MATCH(s:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]->(region:WORLDGUARD_REGION) "
                     + "WHERE r IS NULL "
-                    + "AND NOT s.protectionExpired = true "
                     + "AND NOT s." + StructureNode.CONSTRUCTION_STATUS_PROPERTY + " = " + ConstructionStatus.REMOVED.getStatusId() + " "
                     + "RETURN s";
 

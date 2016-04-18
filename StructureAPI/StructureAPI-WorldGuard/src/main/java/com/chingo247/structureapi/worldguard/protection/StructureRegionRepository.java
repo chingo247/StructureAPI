@@ -94,6 +94,23 @@ public class StructureRegionRepository {
 //        return count;
 //    }
     
+    public WorldGuardRegionNode findRegionById(String regionId) {
+        WorldGuardRegionNode region = null;
+        Map<String, Object> params = Maps.newHashMap();
+        params.put("regionId", regionId);
+        String query
+                = " MATCH (wg:" + WorldGuardRegionNode.LABEL + " { " + WorldGuardRegionNode.REGION_PROPERTY + ": {regionId}})" 
+                + " RETURN wg as region";
+
+        Result result = graph.execute(query, params);
+
+        if (result.hasNext()) {
+            Node n = (Node) result.next().get("region");
+            region = new WorldGuardRegionNode(n);
+        }
+        return region;
+    }
+    
     public List<Node> findRegionsWithoutStructure(long skip, long limit) {
         Map<String,Object> params = new HashMap<>();
         if(skip > 0) {
@@ -124,16 +141,16 @@ public class StructureRegionRepository {
         return found;
     }
     
-    public List<Node> findStructuresWithoutRegion(long limit) {
+    public List<Node> findUnprotectedStructures(long limit) {
         Map<String,Object> params = new HashMap<>();
        
         if(limit > 0) {
             params.put("limit", limit);
         }
-        String query = "MATCH(structure:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(:WORLDGUARD_REGION) "
-                + "WHERE r IS NULL "
+        String query = "MATCH(structure:" + StructureNode.LABEL + ")-[r:" + RelTypes.PROTECTED_BY.name() + "]-(region:WORLDGUARD_REGION) "
+                + "WHERE r IS NULL OR region." + WorldGuardRegionNode.EXPIRED_PROPERTY + "= true "
                 + "AND NOT structure."+ StructureNode.CONSTRUCTION_STATUS_PROPERTY + "=" + ConstructionStatus.REMOVED.getStatusId() + " "
-                + "RETURN wg as regions";
+                + "RETURN structure as structures";
       
         
         if(limit > 0) {
@@ -144,7 +161,7 @@ public class StructureRegionRepository {
         List<Node> found = new ArrayList<>();
         while(r.hasNext()) {
             Map<String, Object> map = r.next();
-            Node n = (Node)map.get("regions"); 
+            Node n = (Node)map.get("structures"); 
             found.add(n);
         }
         return found;
@@ -180,7 +197,8 @@ public class StructureRegionRepository {
         return found;
     }
     
-    public List<Node> findActive(long skip, long limit) {
+    
+    public List<Node> findProtectedStructures(long skip, long limit) {
         Map<String,Object> params = new HashMap<>();
         if(skip > 0) {
             params.put("skip", skip);
@@ -189,7 +207,7 @@ public class StructureRegionRepository {
             params.put("limit", limit);
         }
         
-        String query = "MATCH (n:WORLDGUARD_REGION) WHERE NOT exists(n.expired) OR n.expired = false RETURN n as regions";
+        String query = "MATCH (structure:"+StructureNode.LABEL+")-[r:"+RelTypes.PROTECTED_BY+"]->(n:WORLDGUARD_REGION) WHERE r IS NOT NULL RETURN structure as structures";
         if(skip > 0) {
             query += " SKIP {skip}";
         }
@@ -202,7 +220,7 @@ public class StructureRegionRepository {
         List<Node> found = new ArrayList<>();
         while(r.hasNext()) {
             Map<String, Object> map = r.next();
-            Node n = (Node)map.get("regions"); 
+            Node n = (Node)map.get("structures"); 
             found.add(n);
         }
         return found;
