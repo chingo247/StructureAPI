@@ -72,7 +72,7 @@ public class WGCommands {
                 throw new RuntimeException(ex);
             }
         } else {
-            String arg = args.getString(1);
+            String arg = args.getString(0);
             Long id = getLong(arg);
             checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_EXPIRE_SINGLE);
             expireSingle(id, sender);
@@ -106,7 +106,7 @@ public class WGCommands {
     @CommandExtras(async = true)
     @Command(aliases = "sttwg:protect", usage = "sttwg:protect [world|structureid]" ,desc = "Adds protection to a structure or all structures of a world", min = 1, max = 1)
     public static void protect(final CommandContext args, ICommandSender sender) throws CommandException {
-        if(!NumberUtils.isNumber(args.getString(1))) {
+        if(!NumberUtils.isNumber(args.getString(0))) {
             checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_PROTECT_WORLD);
             World w = Bukkit.getWorld(args.getString(1));
             if(w == null) {
@@ -122,7 +122,7 @@ public class WGCommands {
            
         } else {
             checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_PROTECT_SINGLE);
-            long id = getLong(args.getString(1));
+            long id = getLong(args.getString(0));
             GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
             
             try (Transaction tx = graph.beginTx()) {
