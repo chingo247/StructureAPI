@@ -61,9 +61,9 @@ public class WGCommands {
     public static void expire(final CommandContext args, ICommandSender sender) throws CommandException {
         if (!NumberUtils.isNumber(args.getString(0)))  {
             checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_EXPIRE_WORLD);
-            World w = Bukkit.getWorld(args.getString(1));
+            World w = Bukkit.getWorld(args.getString(0));
             if(w == null) {
-                throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
+                throw new CommandException("Couldn't find world with name '" + args.getString(0) + "'");
             }
             try {
                 StructureAPIWorldGuard.getInstance().expireStructureProtection(w);
@@ -108,9 +108,9 @@ public class WGCommands {
     public static void protect(final CommandContext args, ICommandSender sender) throws CommandException {
         if(!NumberUtils.isNumber(args.getString(0))) {
             checkAllowed(sender, PermissionManager.Perms.STRUCTURE_WG_PROTECT_WORLD);
-            World w = Bukkit.getWorld(args.getString(1));
+            World w = Bukkit.getWorld(args.getString(0));
             if(w == null) {
-                throw new CommandException("Couldn't find world with name '" + args.getString(1) + "'");
+                throw new CommandException("Couldn't find world with name '" + args.getString(0) + "'");
             }
             
             try {
