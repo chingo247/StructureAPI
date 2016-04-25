@@ -39,10 +39,12 @@ public class ConfigProvider {
     private HashMap<Flag, Object> defaultFlags;
     private final File configFile;
     private int expirationTime;
+    private boolean broadcastExpiration;
 
     ConfigProvider(File f) throws SettlerCraftException {
         this.configFile = f;
         this.expirationTime = -1;
+        this.broadcastExpiration = false;
         reload();
     }
     
@@ -50,8 +52,13 @@ public class ConfigProvider {
         final FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         this.defaultFlags = getDefaultFlags(config);
         this.expirationTime = config.getInt("protection.expiration-time");
+        this.broadcastExpiration = config.getBoolean("protection.broadcast-expiration-to-owners");
     }
 
+    public boolean isBroadcastingExpiration() {
+        return broadcastExpiration;
+    }
+    
     public int getExpirationTime() {
         return expirationTime;
     }

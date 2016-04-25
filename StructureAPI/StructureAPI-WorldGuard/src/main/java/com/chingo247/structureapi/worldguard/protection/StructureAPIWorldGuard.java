@@ -7,12 +7,16 @@ package com.chingo247.structureapi.worldguard.protection;
 
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.model.settler.SettlerNode;
+import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.owner.OwnerDomainNode;
 import com.chingo247.structureapi.model.owner.OwnerType;
 import com.chingo247.structureapi.model.owner.Ownership;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
+import com.chingo247.structureapi.util.BroadCaster;
+import com.chingo247.structureapi.worldguard.plugin.bukkit.StructureAPIWorldGuardPlugin;
+import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IWorld;
 import com.google.common.collect.Lists;
@@ -96,7 +100,6 @@ public class StructureAPIWorldGuard {
         globalLock.lock();
         ExecutorService pool = null;
         try {
-            System.out.println("expiration lock acquired!");
             pool = Executors.newFixedThreadPool(Math.max(Runtime.getRuntime().availableProcessors() - 1, 1));
             List<Future> tasks = Lists.newArrayList();
             for (final World w : Bukkit.getWorlds()) {
@@ -105,9 +108,7 @@ public class StructureAPIWorldGuard {
                     @Override
                     public void run() {
                         try {
-                            System.out.println("Running expiration for world '" + w.getName() + "'");
                             getWorldGuardProtectedWorld(w).runExpiration(expirationTime);
-                            System.out.println("Running finished check for world '" + w.getName() + "'");
                         } catch (Exception ex) {
                             Logger.getLogger(StructureAPIWorldGuard.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
                         }
@@ -129,7 +130,6 @@ public class StructureAPIWorldGuard {
             } catch (Exception ex) {
             } // Silent
             globalLock.unlock();
-            System.out.println("Expiration lock released!");
         }
     }
 
@@ -258,7 +258,6 @@ public class StructureAPIWorldGuard {
     private void expire(RegionManager regionManager, Structure structure, String id) {
         regionManager.removeRegion(id);
         Node n = structure.getUnderlyingNode();
-        System.out.println("Expired region: " + id);
         for (Relationship r : n.getRelationships(Direction.OUTGOING, RelTypes.PROTECTED_BY)) {
             Node regionNode = r.getOtherNode(n);
             if (regionNode.hasLabel(LABEL)) {
@@ -455,13 +454,24 @@ public class StructureAPIWorldGuard {
 
                 RegionManager regionManager = WGBukkit.getRegionManager(Bukkit.getWorld(world));
                 
+                IColors colors = StructureAPI.getInstance().getPlatform().getChatColors();
+                
                 boolean another;
                 try (Transaction tx = graph.beginTx()) {
                     List<Node> toBeExpired = regionRepository.findToBeExpired(worldUUID, expirationTime, BULK_SIZE);
-                    
+                    BroadCaster bc = new BroadCaster(graph);
                     for(Node node : toBeExpired) {
                         Structure structure = new Structure(node);
                         expire(regionManager, structure, getRegionId(structure));
+                        
+                        
+                        if(StructureAPIWorldGuardPlugin.getInstance().getConfigProvider().isBroadcastingExpiration()) {
+                            bc.broadcastToOwners(new StructureNode(node), "Protection for structure "
+                                + "#" + colors.gold() + structure.getId() + " "
+                                + colors.blue() + structure.getName() + colors.reset() + " has "+colors.red()+" expired");
+                        }
+                        
+                        
                     }
                     
                     another = toBeExpired.size() == BULK_SIZE;

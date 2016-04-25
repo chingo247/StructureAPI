@@ -43,11 +43,7 @@ public abstract class ConfigUpdater {
     
     public void checkAndUpdate() throws Exception {
         if (currentConfigFile.exists()) {
-            
-            
             String newConfigVersion = ConfigProvider.getVersion(configFileToCheck);
-            System.out.println("New config version: " + newConfigVersion);
-            
             String currentConfigVersion = null;
             boolean needsUpdating = false;
             try {
@@ -60,8 +56,6 @@ public abstract class ConfigUpdater {
                     needsUpdating = true;
                 }
             }
-            System.out.println("Current config version: " + currentConfigVersion);
-            
             if(needsUpdating || (currentConfigVersion == null || (VersionUtil.compare(currentConfigVersion, newConfigVersion) == -1))) {
                 int count = 1;
                 String baseName = FilenameUtils.getBaseName(currentConfigFile.getName());

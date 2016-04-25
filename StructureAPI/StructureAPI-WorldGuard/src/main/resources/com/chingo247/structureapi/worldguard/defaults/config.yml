@@ -7,3 +7,5 @@ protection:
     # The time in minutes that need to pass before the protection of a structure will expire
     # Negative value (e.g. -1) means infinite amount of time
     expiration-time: -1
+    # If true, a message will be send to the owners of a structure once the protection expired.
+    broadcast-expiration-to-owners: true

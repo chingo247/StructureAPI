@@ -8,8 +8,6 @@ package com.chingo247.structureapi.worldguard.commands;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.CommandExtras;
 import com.chingo247.settlercraft.core.commands.util.CommandSenderType;
-import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.structureapi.model.plot.PlotNode;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.worldguard.plugin.PermissionManager;
@@ -17,15 +15,12 @@ import com.chingo247.structureapi.worldguard.plugin.Permissions;
 import com.chingo247.structureapi.worldguard.protection.StructureRegionRepository;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardException;
-import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardScheduler;
-import com.chingo247.xplatform.core.IColors;
 import com.chingo247.xplatform.core.ICommandSender;
 import com.chingo247.xplatform.core.IPlayer;
 import com.sk89q.minecraft.util.commands.Command;
 import com.sk89q.minecraft.util.commands.CommandContext;
 import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
-import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldguard.protection.managers.storage.StorageException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,14 +38,12 @@ public class WGCommands {
 
 
     @CommandExtras(async = true, senderType = CommandSenderType.CONSOLE)
-    @CommandPermissions(Permissions.EXPIRE_ALL)
     @Command(aliases = "sttwg:uninstall", desc = "Removes worldguard protection from all structures")
     public static void uninstall(final CommandContext args, ICommandSender sender) throws CommandException {
         StructureAPIWorldGuard.getInstance().uninstall(sender);
     }
     
     @CommandExtras(async = true, senderType = CommandSenderType.CONSOLE)
-    @CommandPermissions(Permissions.PROTECT_ALL)
     @Command(aliases = "sttwg:install", desc = "Adds worldguard protection to all structures")
     public static void install(final CommandContext args, ICommandSender sender) throws CommandException {
         StructureAPIWorldGuard.getInstance().install(sender);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Chingo
+ * Copyright (C) 2016 Chingo
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.chingo247.structureapi.worldguard.plugin;
+package com.chingo247.structureapi.exeption;
 
 /**
- * Permissions as of 2.2.0 in format {on-what}.{operation}
+ *
  * @author Chingo
  */
-public class Permissions {
-    
-    private Permissions() {}
-    
-    private static final String PREFIX = "structureapi.wg.";
-    
-    public static final String EXPIRE_SINGLE = PREFIX + "expire.single";
-    public static final String EXPIRE_WORLD = PREFIX + "expire.world";
-    public static final String PROTECT_SINGLE = PREFIX + "protect.single";
-    public static final String PROTECT_WORLD = PREFIX + "protect.world";
-    
-   
-    
-    
-    
+public class StructureNotFoundException extends StructureException {
+
+    public StructureNotFoundException(String message) {
+        super(message);
+    }
     
 }

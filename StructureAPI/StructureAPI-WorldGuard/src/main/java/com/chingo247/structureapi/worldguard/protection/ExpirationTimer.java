@@ -56,7 +56,6 @@ public class ExpirationTimer {
         public void run() {
             if(lock.tryLock()) {
                 try {
-                    System.out.println("Expiration check!");
                     StructureAPIWorldGuard.getInstance().runExpirationUpdate(expireTime);
                 } finally {
                     lock.unlock();

@@ -38,6 +38,7 @@ import com.chingo247.structureapi.worldguard.restriction.WorldGuardRestriction;
 import com.chingo247.xplatform.platforms.bukkit.BukkitConsoleSender;
 import com.chingo247.xplatform.platforms.bukkit.BukkitPlayer;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.sk89q.bukkit.util.CommandsManagerRegistration;
 import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
@@ -82,9 +83,12 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
     private PluginCommandManager commands;
     private ExpirationTimer timer;
     private ConfigProvider config;
+    
+    private static StructureAPIWorldGuardPlugin instance;
 
     @Override
     public void onEnable() {
+        instance = this;
         if (Bukkit.getPluginManager().getPlugin("SettlerCraft-Core") == null) {
             System.out.println("[StructureAPI-WorldGuard]: SettlerCraft-Core NOT FOUND!!! Disabling...");
             this.setEnabled(false);
@@ -140,9 +144,39 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
         if (worldguardExpire > 0) {
             timer = new ExpirationTimer(graph, ONE_MINUTE, worldguardExpire);
             timer.start();
+            setCreatedAtDate();
         }
         
         registerCommands();
+    }
+    
+    public static StructureAPIWorldGuardPlugin getInstance() {
+        return instance;
+    }
+    
+
+    public ConfigProvider getConfigProvider() {
+        return config;
+    }
+    
+    
+    
+    /**
+     * Sets the created at date for regions that don't have this property yet
+     */
+    private void setCreatedAtDate() {
+        GraphDatabaseService graph = SettlerCraft.getInstance().getNeo4j();
+        try (Transaction tx = graph.beginTx()) {
+            Map<String, Object> params = Maps.newHashMap();
+            params.put("date", System.currentTimeMillis());
+            
+            String query = "MATCH (wg:"+WorldGuardRegionNode.LABEL+") " 
+                        + "WHERE wg." + WorldGuardRegionNode.CREATED_AT_PROPERTY + " IS NULL " 
+                        + "SET wg." + WorldGuardRegionNode.LABEL + " = {date} ";
+            graph.execute(query, params);
+           
+            tx.success();
+        }
     }
 
     private void registerCommands() {
@@ -199,7 +233,6 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
         }
 
         if (!structures.isEmpty()) {
-            System.out.println(MSG_PREFIX + "Processing " + structures.size() + " structures without a worldguard region");
             SettlerCraft.getInstance().getExecutor().submit(new Runnable() {
 
                 @Override

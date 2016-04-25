@@ -119,19 +119,32 @@ public class OwnerDomainNode {
         return owners;
     }
     
+    public List<SettlerNode> getOwners() {
+        return getOwners(null); // Man I wish java was more like C#...
+    }
+    
     public List<SettlerNode> getOwners(OwnerType ownerType) {
-        Preconditions.checkNotNull(ownerType, "OwnerType may not be null");
 
         List<SettlerNode> owners = Lists.newArrayList();
         for (Relationship rel : underlyingNode.getRelationships(RelTypes.OWNED_BY, org.neo4j.graphdb.Direction.OUTGOING)) {
-            if (rel.hasProperty("Type")) {
+            
+            Node found = null;
+            if (ownerType != null && rel.hasProperty("Type")) {
                 Integer typeId = (Integer) rel.getProperty("Type");
                 OwnerType type = OwnerType.match(typeId);
                 if (type == ownerType) {
-                    SettlerNode ownerNode = new SettlerNode(rel.getOtherNode(underlyingNode));
-                    owners.add(ownerNode);
+                    found = rel.getOtherNode(underlyingNode);
                 }
+            } else {
+                found = rel.getOtherNode(underlyingNode);
             }
+            
+            if(found == null || !found.hasLabel(SettlerNode.label())) {
+                continue;
+            }
+            
+            owners.add(new SettlerNode(found));
+                
         }
         return owners;
     }
