@@ -90,6 +90,16 @@ Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.n
 | plans:shop | opens plan shop menu where plans are **not free** |
 | plans:reload | reloads plans located in directory: */plugins/SettlerCraft-StructureAPI/plans* |
 
+### StructureAPI-WorldGuard Commands (Since 2.3.0) <div id="schematiccommands"/>
+| Command | Arguments | Desciption | Permission
+| ------------- |:-------:| ----- | ------ |
+| sttwg:unistall |  | Removes worldguard protection from all structures  | Only from console |
+| sttwg:install |  | Adds worldguard protection to all structures | Only from console |
+| sttwg:expire | [structureid] | Expires worldguard protection from a structure with the given id | structureapi.wg.expire.single |
+| sttwg:expire | [world] | Expires worldguard protection for all structures within a world | structureapi.wg.expire.world |
+| sttwg:protect | [structureid] | Adds worldguard protection to a structure with the given id | structureapi.wg.protect.single |
+| sttwg:protect | [world] | Adds worldguard protection to all structures within a world | structureapi.wg.protect.world |
+
 ### Schematic Commands <div id="schematiccommands"/>
 | Command | Arguments | Desciption |
 | ------------- |:-------:| ----- |
