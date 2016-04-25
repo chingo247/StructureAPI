@@ -6,4 +6,4 @@ version: 2.3.0
 protection:
     # The time in minutes that need to pass before the protection of a structure will expire
     # Negative value (e.g. -1) means infinite amount of time
-    expires: -1
+    expiration-time: -1

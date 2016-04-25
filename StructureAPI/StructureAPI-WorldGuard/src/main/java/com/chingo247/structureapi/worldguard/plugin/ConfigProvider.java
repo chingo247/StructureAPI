@@ -38,17 +38,24 @@ public class ConfigProvider {
 
     private HashMap<Flag, Object> defaultFlags;
     private final File configFile;
+    private int expirationTime;
 
     ConfigProvider(File f) throws SettlerCraftException {
         this.configFile = f;
+        this.expirationTime = -1;
         reload();
     }
     
     public final void reload() throws SettlerCraftException {
         final FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
         this.defaultFlags = getDefaultFlags(config);
+        this.expirationTime = config.getInt("protection.expiration-time");
     }
 
+    public int getExpirationTime() {
+        return expirationTime;
+    }
+    
     public HashMap<Flag, Object> getDefaultRegionFlags() {
         return defaultFlags;
     }
@@ -60,7 +67,7 @@ public class ConfigProvider {
             for (Map.Entry<String, Object> entry : flags.entrySet()) {
                 Flag<?> foundFlag = DefaultFlag.fuzzyMatchFlag(entry.getKey());
                 if (foundFlag == null) {
-                    throw new SettlerCraftException("Error in SettlerCraft config.yml: Flag '" + entry.getKey() + "' doesn't exist!");
+                    throw new SettlerCraftException("Error in StructureAPI-WorldGuard config.yml: Flag '" + entry.getKey() + "' is not a valid worldguard flag");
                 } else {
                     try {
                         df.put(foundFlag, foundFlag.parseInput(WorldGuardPlugin.inst(), Bukkit.getConsoleSender(), String.valueOf(entry.getValue())));

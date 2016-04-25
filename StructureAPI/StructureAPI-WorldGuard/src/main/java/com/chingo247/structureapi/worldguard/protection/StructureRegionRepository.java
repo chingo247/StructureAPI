@@ -256,11 +256,11 @@ public class StructureRegionRepository {
         
         params.put("date", System.currentTimeMillis());
         params.put("expirationTime", expirationTime);
-        String query = "MATCH (s:STRUCTURE)-[:"+RelTypes.WITHIN+"]->(w:"+WorldNode.LABEL+" {"+WorldNode.UUID_PROPERTY+": {world}}) "
+        String query = "MATCH (w:"+WorldNode.LABEL+" { "+WorldNode.UUID_PROPERTY+": {world}}) "
+                + " WITH (w) "
+                + " MATCH (w)<-[:"+RelTypes.WITHIN+"]-(s:STRUCTURE) "
                 + " WITH (s) "
-                + " MATCH (w)(wg:WORLDGUARD_REGION) WHERE EXISTS(wg.createdAt) AND ({date} - wg.createdAt) > {expirationTime} RETURN wg as regions";
-        
-       
+                + " MATCH (s)-[:"+RelTypes.PROTECTED_BY+"]->(wg:WORLDGUARD_REGION) WHERE EXISTS(wg.createdAt) AND ABS({date} - wg.createdAt) > {expirationTime} AND wg.expired = false RETURN s as structures";
         
         if(limit > 0) {
             query += " LIMIT {limit}";
@@ -271,7 +271,7 @@ public class StructureRegionRepository {
         List<Node> found = new ArrayList<>();
         while(r.hasNext()) {
             Map<String, Object> map = r.next();
-            Node n = (Node)map.get("regions"); 
+            Node n = (Node)map.get("structures"); 
             found.add(n);
         }
         return found;

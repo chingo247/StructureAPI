@@ -43,12 +43,15 @@ public abstract class ConfigUpdater {
     
     public void checkAndUpdate() throws Exception {
         if (currentConfigFile.exists()) {
-            String newConfigVersion = ConfigProvider.getVersion(configFileToCheck);
             
-            ConfigProvider currentConfig = null;
+            
+            String newConfigVersion = ConfigProvider.getVersion(configFileToCheck);
+            System.out.println("New config version: " + newConfigVersion);
+            
+            String currentConfigVersion = null;
             boolean needsUpdating = false;
             try {
-                currentConfig = ConfigProvider.load(currentConfigFile);
+                currentConfigVersion = ConfigProvider.getVersion(currentConfigFile);
             } catch (Exception ex) {
                 YAMLProcessor processor = new YAMLProcessor(currentConfigFile, false);
                 if(processor.getProperty("version") != null) {
@@ -57,8 +60,9 @@ public abstract class ConfigUpdater {
                     needsUpdating = true;
                 }
             }
+            System.out.println("Current config version: " + currentConfigVersion);
             
-            if(needsUpdating || (currentConfig != null && (currentConfig.getVersion() == null || VersionUtil.compare(currentConfig.getVersion(), newConfigVersion) == -1))) {
+            if(needsUpdating || (currentConfigVersion == null || (VersionUtil.compare(currentConfigVersion, newConfigVersion) == -1))) {
                 int count = 1;
                 String baseName = FilenameUtils.getBaseName(currentConfigFile.getName());
                 File oldFile = new File(currentConfigFile.getParent(), baseName + "(" + count + ").old.yml");
@@ -68,7 +72,7 @@ public abstract class ConfigUpdater {
                 }
                 
                 String reason;
-                if(needsUpdating || (currentConfig != null && currentConfig.getVersion() == null)) {
+                if(needsUpdating || (currentConfigVersion == null)) {
                     reason = "No 'version' value found in config";
                 } else {
                     reason = "Older 'version' value found in config.yml";

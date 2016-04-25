@@ -19,13 +19,17 @@ package com.chingo247.structureapi.worldguard.plugin.bukkit;
 import com.chingo247.structureapi.worldguard.protection.WorldGuardPlotListener;
 import com.chingo247.settlercraft.core.SettlerCraft;
 import com.chingo247.settlercraft.core.commands.util.PluginCommandManager;
+import com.chingo247.settlercraft.core.exception.SettlerCraftException;
 import com.chingo247.settlercraft.core.persistence.neo4j.Neo4jHelper;
+import com.chingo247.settlercraft.core.util.JarUtil;
 import com.chingo247.structureapi.StructureAPI;
+import com.chingo247.structureapi.exeption.StructureAPIException;
 import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.worldguard.commands.WGCommands;
+import com.chingo247.structureapi.worldguard.plugin.ConfigProvider;
 import com.chingo247.structureapi.worldguard.protection.ExpirationTimer;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuard;
 import com.chingo247.structureapi.worldguard.protection.StructureAPIWorldGuardScheduler;
@@ -39,12 +43,15 @@ import com.sk89q.minecraft.util.commands.CommandPermissionsException;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.minecraft.util.commands.MissingNestedCommandException;
 import com.sk89q.minecraft.util.commands.WrappedCommandException;
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -64,35 +71,54 @@ import org.neo4j.graphdb.Transaction;
  */
 public class StructureAPIWorldGuardPlugin extends JavaPlugin {
 
+    private static final String RESOURCES_PATH = "com/chingo247/structureapi/worldguard/defaults/";
+    private static final String CONFIG_FILE = "config.yml";
+    
     private static final Label LABEL = DynamicLabel.label("WORLDGUARD_REGION");
     private static final String REGION_PROPERTY = "region";
     private static final String MSG_PREFIX = "[StructureAPI-WorldGuard]: ";
     private static final long ONE_MINUTE = 1000 * 60;
-
+    
     private PluginCommandManager commands;
     private ExpirationTimer timer;
+    private ConfigProvider config;
 
     @Override
     public void onEnable() {
         if (Bukkit.getPluginManager().getPlugin("SettlerCraft-Core") == null) {
-            System.out.println("[SettlerCraft-WorldGuard]: SettlerCraft-Core NOT FOUND!!! Disabling...");
+            System.out.println("[StructureAPI-WorldGuard]: SettlerCraft-Core NOT FOUND!!! Disabling...");
             this.setEnabled(false);
             return;
         }
 
         if (Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI") == null
                 || !Bukkit.getPluginManager().getPlugin("SettlerCraft-StructureAPI").isEnabled()) {
-            System.out.println("[SettlerCraft-WorldGuard]: SettlerCraft-StructureAPI NOT FOUND!!! Disabling...");
+            System.out.println("[StructureAPI-WorldGuard]: SettlerCraft-StructureAPI NOT FOUND!!! Disabling...");
             this.setEnabled(false);
             return;
         }
 
         // Enable WorldGuard
         if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
-            System.out.println("[SettlerCraft-WorldGuard]: Couldn't find WorldGuard! Disabling SettlerCraft-WorldGuard");
+            System.out.println("[StructureAPI-WorldGuard]: Couldn't find WorldGuard! Disabling SettlerCraft-WorldGuard");
             this.setEnabled(false);
             return;
         }
+        
+        try {
+            checkConfigUpdate();
+        } catch (Exception ex) {
+            Logger.getLogger(StructureAPIWorldGuardPlugin.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+        }
+        try {
+            this.config = ConfigProvider.load(new File(getDataFolder(), CONFIG_FILE));
+        } catch (SettlerCraftException ex) {
+            Logger.getLogger(StructureAPIWorldGuardPlugin.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
+            System.out.println("Disabling StructureAPI-WorldGuard");
+            this.setEnabled(false);
+            return;
+        } 
+        
 
         ExecutorService executor = StructureAPI.getInstance().getExecutor();
         StructureAPIWorldGuardScheduler.getInstance().setExecutor(executor);
@@ -110,7 +136,7 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
             processStructuresWithoutRegion();
         }
         
-        int worldguardExpire = -1;
+        int worldguardExpire = config.getExpirationTime() * 1000 * 60;
         if (worldguardExpire > 0) {
             timer = new ExpirationTimer(graph, ONE_MINUTE, worldguardExpire);
             timer.start();
@@ -123,6 +149,30 @@ public class StructureAPIWorldGuardPlugin extends JavaPlugin {
         this.commands = new PluginCommandManager(StructureAPI.getInstance().getExecutor(), SettlerCraft.getInstance().getPlatform());
         CommandsManagerRegistration cmdRegister = new CommandsManagerRegistration(this, commands);
         cmdRegister.register(WGCommands.class);
+    }
+    
+    private void checkConfigUpdate() throws Exception {
+        // Get current Config
+        File configFile = new File(getDataFolder(), "config.yml");
+        
+        // Get temp config
+        File temp = new File(getDataFolder(), "temp");
+        temp.mkdirs();
+        File newConfigFile = new File(temp, "config.yml");
+        newConfigFile.delete();
+        newConfigFile = new File(temp, "config.yml");
+            JarUtil.createDefault(newConfigFile, getFile(), RESOURCES_PATH + "config.yml");
+
+        // Perform update if necessary
+        StructureAPIWGConfigUpdater updater = new StructureAPIWGConfigUpdater(configFile, newConfigFile);
+        try {
+            updater.checkAndUpdate();
+        } catch (Exception ex) {
+            Bukkit.getConsoleSender().sendMessage(ChatColor.RED + ex.getMessage());
+            throw ex;
+        }
+        // Delete the temp directory
+        FileUtils.deleteDirectory(temp);
     }
 
     private void processStructuresWithoutRegion() {
