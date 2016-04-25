@@ -27,9 +27,9 @@ public class Permissions {
     private static final String PREFIX = "structureapi.wg.";
     
     public static final String EXPIRE_SINGLE = PREFIX + "expire.single";
-    public static final String EXPIRE_ALL = PREFIX + "expire.all";
+    public static final String EXPIRE_WORLD = PREFIX + "expire.world";
     public static final String PROTECT_SINGLE = PREFIX + "protect.single";
-    public static final String PROTECT_ALL = PREFIX + "protect.all";
+    public static final String PROTECT_WORLD = PREFIX + "protect.world";
     
    
     

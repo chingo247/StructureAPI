@@ -21,6 +21,7 @@ import com.chingo247.settlercraft.core.util.yaml.YAMLProcessor;
 import com.chingo247.structureapi.exeption.StructureAPIException;
 import java.io.File;
 import java.io.IOException;
+import org.neo4j.register.Register.Int;
 
 /**
  *
@@ -46,6 +47,8 @@ public class ConfigProvider {
         this.f = f;
     }
 
+
+    
     public void setVersion(String version) {
         this.version = version;
     }
@@ -136,7 +139,6 @@ public class ConfigProvider {
         config.setMenuEnabled(getValue(yamlp, "menus.planmenu-enabled", Boolean.class));
         config.setShopEnabled(getValue(yamlp, "menus.planshop-enabled", Boolean.class));
         config.setDemolishIsRollback(getValue(yamlp, "structures.demolish-is-rollback", Boolean.class));
-        
         
         return config;
         

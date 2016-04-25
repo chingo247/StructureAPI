@@ -22,7 +22,6 @@ import com.chingo247.structureapi.model.RelTypes;
 import com.google.common.collect.Lists;
 import java.util.List;
 import java.util.UUID;
-import org.neo4j.graphdb.DynamicRelationshipType;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
 import org.parboiled.common.Preconditions;
@@ -72,6 +71,8 @@ public class OwnerDomainNode {
      */
     public boolean setOwnership(SettlerNode settler, OwnerType ownerType) {
         Preconditions.checkNotNull(ownerType, "Ownertype may not be null...");
+        Preconditions.checkNotNull(settler, "Settler may not be null...");
+        
         // if exists... update it
         for(Ownership o : getOwnerships()) {
             if(o.getOwner().getUniqueId().equals(settler.getUniqueId())) {
@@ -84,6 +85,7 @@ public class OwnerDomainNode {
                 }
             }
         }
+        
         // otherwise create a new one
         Relationship r = underlyingNode.createRelationshipTo(settler.getNode(), RelTypes.OWNED_BY);
         r.setProperty("Type", ownerType.getTypeId());
@@ -117,19 +119,32 @@ public class OwnerDomainNode {
         return owners;
     }
     
+    public List<SettlerNode> getOwners() {
+        return getOwners(null); // Man I wish java was more like C#...
+    }
+    
     public List<SettlerNode> getOwners(OwnerType ownerType) {
-        Preconditions.checkNotNull(ownerType, "OwnerType may not be null");
 
         List<SettlerNode> owners = Lists.newArrayList();
         for (Relationship rel : underlyingNode.getRelationships(RelTypes.OWNED_BY, org.neo4j.graphdb.Direction.OUTGOING)) {
-            if (rel.hasProperty("Type")) {
+            
+            Node found = null;
+            if (ownerType != null && rel.hasProperty("Type")) {
                 Integer typeId = (Integer) rel.getProperty("Type");
                 OwnerType type = OwnerType.match(typeId);
                 if (type == ownerType) {
-                    SettlerNode ownerNode = new SettlerNode(rel.getOtherNode(underlyingNode));
-                    owners.add(ownerNode);
+                    found = rel.getOtherNode(underlyingNode);
                 }
+            } else {
+                found = rel.getOtherNode(underlyingNode);
             }
+            
+            if(found == null || !found.hasLabel(SettlerNode.label())) {
+                continue;
+            }
+            
+            owners.add(new SettlerNode(found));
+                
         }
         return owners;
     }

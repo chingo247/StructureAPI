@@ -1,6 +1,6 @@
 name: StructureAPI-HolographicDisplays
 main: com.chingo247.structureapi.holographicdisplays.bukkit.plugin.SettlerCraftHolographicDisplaysPlugin
-version: 2.2.0
+version: 2.3.0
 author: Chingo247
 description: HolographicDisplays support for SettlerCraft-StructureAPI
 depend: [SettlerCraft-Core, SettlerCraft-StructureAPI, HolographicDisplays]

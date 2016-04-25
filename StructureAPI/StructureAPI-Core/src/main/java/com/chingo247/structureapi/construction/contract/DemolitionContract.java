@@ -63,7 +63,7 @@ public class DemolitionContract extends Contract {
                         entry,
                         placement,
                         getPlayer(),
-                        getEditSession(),
+                        getEditSessionFactory().createEditSession(entry.getStructure(), entry.getContract().getPlayer()),
                         position
                 );
         

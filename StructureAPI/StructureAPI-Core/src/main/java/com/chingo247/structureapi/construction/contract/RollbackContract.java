@@ -18,10 +18,10 @@ package com.chingo247.structureapi.construction.contract;
 
 import com.chingo247.structureapi.IStructureAPI;
 import com.chingo247.structureapi.StructureAPI;
-import com.chingo247.blockstore.IBlockStoreChunk;
-import com.chingo247.blockstore.IBlockStoreRegion;
-import com.chingo247.blockstore.safe.SafeBlockStore;
-import com.chingo247.blockstore.safe.SafeBlockStoreReader;
+import com.chingo247.structureapi.blockstore.IBlockStoreChunk;
+import com.chingo247.structureapi.blockstore.IBlockStoreRegion;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStore;
+import com.chingo247.structureapi.blockstore.safe.SafeBlockStoreReader;
 import com.chingo247.structureapi.construction.awe.AWEPlacementTask;
 import com.chingo247.structureapi.exeption.StructureException;
 import com.chingo247.structureapi.construction.StructureEntry;
@@ -95,7 +95,7 @@ public class RollbackContract extends Contract {
                             entry,
                             placement,
                             getPlayer(),
-                            getEditSession(),
+                            getEditSessionFactory().createEditSession(structure, entry.getContract().getPlayer()),
                             structureMin.add(chunk.getX(), 0, chunk.getZ())
                     );
                     task.setOptions(placeOptions);

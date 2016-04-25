@@ -21,14 +21,10 @@ import com.chingo247.settlercraft.core.concurrent.KeyPool;
 import com.chingo247.structureapi.StructureAPI;
 import com.chingo247.structureapi.construction.contract.Contract;
 import com.chingo247.structureapi.exeption.StructureException;
-import com.chingo247.structureapi.model.RelTypes;
 import com.chingo247.structureapi.model.structure.ConstructionStatus;
-import com.chingo247.structureapi.model.structure.Structure;
-import com.chingo247.structureapi.model.structure.StructureRepository;
 import com.chingo247.structureapi.model.structure.Structure;
 import com.chingo247.structureapi.model.structure.StructureNode;
 import com.chingo247.structureapi.model.structure.StructureRepository;
-import com.chingo247.structureapi.placement.options.BlockPredicate;
 import com.chingo247.structureapi.placement.options.PlaceOptions;
 import com.chingo247.structureapi.watchers.PhysicsWatch;
 import com.chingo247.xplatform.core.APlatform;
@@ -49,15 +45,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.traversal.Evaluation;
-import org.neo4j.graphdb.traversal.Evaluator;
-import org.neo4j.graphdb.traversal.TraversalDescription;
 import org.primesoft.asyncworldedit.worldedit.AsyncEditSession;
 
 /**
@@ -100,6 +89,7 @@ public class Contractor implements IContractor {
      * The ExecutorService
      */
     private ExecutorService es;
+    
 
     /**
      * Private Constructor.
@@ -163,28 +153,13 @@ public class Contractor implements IContractor {
             playerOrRandomUUID = CONSOLE;
             sender = platform.getConsole();
         }
+        
+        constract.setPlayer(playerOrRandomUUID);
        
         // Set default editsession if null
-        if (constract.getEditSession() == null) {
-            
-             // Get the world where it's happening
-            World world = SettlerCraft
-                .getInstance()
-                .getWorld(
-                        structure.getWorldName()
-                );
-            
-            // Gets the player or null
-            Player playerOrNull = SettlerCraft.getInstance()
-                    .getPlayer(playerOrRandomUUID);
-
-            // Create a editsession for the player or the randomUUID if player was null
-            final EditSession editSession = playerOrNull != null ? 
-                   StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1, playerOrNull)
-                            : StructureAPI.getInstance().getSessionFactory().getEditSession(world, -1);
-
+        if (constract.getEditSessionFactory() == null) {
             // Set the editsession if the editsession was null
-            constract.setEditsession((AsyncEditSession) editSession);
+            constract.setEditSessionFactory(new DefaultStructureEditSessionFactory());
         }
 
         es.execute(new Runnable() {

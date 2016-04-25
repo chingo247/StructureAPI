@@ -17,6 +17,7 @@
 package com.chingo247.structureapi.construction.contract;
 
 import com.chingo247.structureapi.construction.PlaceOptionsFactory;
+import com.chingo247.structureapi.construction.StructureEditSessionFactory;
 import com.chingo247.structureapi.construction.StructureEntry;
 import com.chingo247.structureapi.construction.listener.ConstructionListener;
 import com.chingo247.structureapi.construction.producer.BlockPlacementProducer;
@@ -50,7 +51,7 @@ public abstract class Contract  {
 
     private boolean recursive, restrictive, reversed;
     private UUID player;
-    private AsyncEditSession editSession;
+    private StructureEditSessionFactory editSessionFactory;
     private Traversal traveral;
     private boolean useForce;
     private PlaceOptionsFactory placeOptionsFactory;
@@ -90,8 +91,8 @@ public abstract class Contract  {
         return this;
     }
 
-    public AsyncEditSession getEditSession() {
-        return editSession;
+    public StructureEditSessionFactory getEditSessionFactory() {
+        return editSessionFactory;
     }
 
     public UUID getPlayer() {
@@ -130,8 +131,8 @@ public abstract class Contract  {
         return this;
     }
 
-    public Contract setEditsession(AsyncEditSession aes) {
-        this.editSession = aes;
+    public Contract setEditSessionFactory(StructureEditSessionFactory aes) {
+        this.editSessionFactory = aes;
         return this;
     }
 

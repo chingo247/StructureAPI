@@ -136,7 +136,7 @@ public class StructureEntry  {
         this.listeners.add(listener);
     }
 
-    public void proceed() {
+    public synchronized void proceed() {
 
         // If it was cancelled or has failed... abort all
         if (currentTask != null && (currentTask.hasFailed() || currentTask.isCancelled())) {

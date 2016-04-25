@@ -52,7 +52,6 @@ import com.sk89q.minecraft.util.commands.CommandException;
 import com.sk89q.minecraft.util.commands.CommandPermissions;
 import com.sk89q.minecraft.util.commands.CommandUsageException;
 import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import java.util.Collection;
@@ -210,6 +209,7 @@ public class StructureCommands {
         final StructureRepository structureRepository = new StructureRepository(graph);
         final StructureNode structure;
 
+        
         if (args.argsLength() == 1) {
             // Find by ID
             Long id;
