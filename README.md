@@ -74,13 +74,13 @@ Although not required,  you will need [WorldEditCUI](http://www.minecraftforum.n
 | structure:info | stt:info | (id) | Displays information of the structure you are in or with the given id |
 | structure:members | stt:members | (Structure-Id) | Display a list of members of a structure |   
 | structure:members | stt:members | (Structure-Id) (add/remove) (playername) | Add or remove a player as member of a structure |
-| structure:members | stt:members | (Structure-Id) (add/remove) (Settler-Id) | Add or remove a player as member of a structure |
+| structure:members | stt:members | (Structure-Id) (add/remove) #(Settler-Id) | Add or remove a player as member of a structure |
 | structure:owners | stt:owners | (Structure-Id) | Display a list of owner of a structure |   
 | structure:owners | stt:owners | (Structure-Id) (add/remove) (playername) | Add or remove a player as owner of a structure |  
-| structure:owners | stt:owners | (Structure-Id) (add/remove) (Settler-Id) | Add or remove a player as owner of a structure |  
+| structure:owners | stt:owners | (Structure-Id) (add/remove) #(Settler-Id) | Add or remove a player as owner of a structure |  
 | structure:masters | stt:masters | (Structure-Id) |  Display a list of masters of a structure |   
 | structure:masters | stt:masters | (Structure-Id) (add/remove) (playername) | Add or remove a player as master of a structure | 
-| structure:masters | stt:masters | (Structure-Id) (add/remove) (Settler-ID) | Add or remove a player as master of a structure | 
+| structure:masters | stt:masters | (Structure-Id) (add/remove) #(Settler-ID) | Add or remove a player as master of a structure | 
 
 ### StructurePlan Commands <div id="planscommands"/>
 | Command | Desciption |
